@@ -33,10 +33,10 @@ class Copernica_MarketingSoftware_Model_QueueEvent_ViewedProductAdd extends Cope
      *  Process this item in the queue
      *  @return boolean was the processing successfull
      */
-    public function process()
+    public function process()    
     {
         // Get the copernica API
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        $api = Mage::helper('marketingsoftware/api');
 
         $product = $this->getObject();
         
@@ -47,19 +47,23 @@ class Copernica_MarketingSoftware_Model_QueueEvent_ViewedProductAdd extends Cope
 
         $tmpStore = Mage::getModel('core/store')->load($product->storeId);
         
-        $customer = Mage::getModel('customer/customer')->load($productData->customerId());
-        
         $storeView = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($tmpStore);
-        
-        $copernicaId = Mage::helper('marketingsoftware')->generateCustomerId($customer->getEmail(), (string)$storeView);
+
+        $customer = Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($productData->customerId());
+
+        // get customer Id
+        $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $storeView);
                 
-        $profiles = $api->searchProfiles($copernicaId);
+        $profiles = $api->searchProfiles($customerId);
+
+        // check if we have any profiles
+        if (!array_key_exists('data', $profiles)) return true;
         
         // Process all the profiles
-        foreach ($profiles->items as $profile)
+        foreach ($profiles['data'] as $profile)
         {
-	        // Update the profiles given the customer
-	        $api->updateViewedProductSubProfiles($profile->id, $productData);
+            // Update the profiles given the customer
+            $api->updateViewedProductSubProfiles($profile['ID'], $productData);
         }
 
         // this viewed product is processed

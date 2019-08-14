@@ -28,9 +28,9 @@ $installer = $this;
 $installer->startSetup();
 
 try {
-	$installer->run("
-		ALTER TABLE {$this->getTable('marketingsoftware/queue')}
-		MODIFY object LONGTEXT;");
+    $installer->run("
+        ALTER TABLE {$this->getTable('marketingsoftware/queue')}
+        MODIFY object LONGTEXT;");
 } catch(Exception $e) {}
 
 $installer->endSetup();

@@ -28,7 +28,7 @@
  *  Export Controller takes care of the export data menu.
  *   
  */
-class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController extends Mage_Adminhtml_Controller_Action
+class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController extends Copernica_MarketingSoftware_Controller_Base
 {
     /**
      * Takes care of displaying the form which 
@@ -37,27 +37,34 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
      */
     public function indexAction()
     {
-        // Call the helper, to validate the settings
-        Mage::helper('marketingsoftware')->validatePluginBehaviour();
-        
         // Load the layout
         $this->loadLayout();
-        
-        // The copernica Menu is active
+
+        // set menu
         $this->_setActiveMenu('copernica');
+
+        // get layout
+        $layout = $this->getLayout();
+
+        // get content block
+        $contentBlock = $layout->getBlock('content');
+
+        // create export block
+        $exportBlock = $layout->createBlock('marketingsoftware/adminhtml_marketingsoftware_export');
+
+        // append export block to content block
+        $contentBlock->append($exportBlock);
         
-        $this->getLayout()
-            ->getBlock('content')->append(
-                    $this->getLayout()->createBlock('marketingsoftware/adminhtml_marketingsoftware_export')
-                );
-        $this->getLayout()->getBlock('head')->setTitle($this->__('Synchronize Data / Copernica Marketing Software / Magento Admin'));
+        // set title
+        $layout->getBlock('head')->setTitle($this->__('Synchronize Data / Copernica Marketing Software / Magento Admin'));
         
+        // render layout
         $this->renderLayout();
     }
 
     /**
-     *  progressAction() takes care of placing a loader 
-     *  during the background export action
+     *  progressAction() takes care of placing a loader during the background 
+     *  export action.
      *  Returns a 'completed' or 'in progress' message, depending
      *  on the state of the sync tool
      *  @return string 
@@ -124,18 +131,41 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
             Mage::getSingleton('adminhtml/session')
                     ->addError('A synchronization has already been scheduled, please be patient for it to finish.');
         }
-        else
-        {
-            // The start synch token must be added to the queue
-            $queue = Mage::getModel('marketingsoftware/queue')
-                ->setObject(null)
-                ->setAction('start_sync')
-                ->save();
-            
-            // The item has been scheduled successfully
-            Mage::getSingleton('adminhtml/session')->addSuccess("The synchronization process has been scheduled!");
-        }
+        else $this->startSync();
 
+        // reload the page
         return $this->_redirect('*/*');
+    }
+
+    /**
+     *  Start synchronization process. This method should add new 'start_sync'
+     *  event on the event queue.
+     */
+    private function startSync() 
+    {
+        // get config helper
+        $config = Mage::helper('marketingsoftware/config');
+
+        // set customer progress status to date when a-bomb hit Hiroshima. 
+        // we can be quite certain that no magento webshop was set up during that 
+        // time.
+        $config->setCustomerProgressStatus('1945-08-06 08:15:00');
+        $config->setOrderProgressStatus('1945-08-06 08:15:00');
+
+        // create sync status object
+        $syncStatus = Mage::getModel('marketingsoftware/SyncStatus');
+
+        // check if current configuration is telling us to filter stores
+        if ($enabledStores = $config->getEnabledStores()) $syncStatus->setStoresFilter($enabledStores);
+
+        // The start sync token must be added to the queue
+        $queue = Mage::getModel('marketingsoftware/queue')
+            ->setObject($syncStatus->toArray())
+            ->setAction('start_sync')
+            ->setName('startSync')
+            ->save();
+        
+        // The item has been scheduled successfully
+        Mage::getSingleton('adminhtml/session')->addSuccess("The synchronization process has been scheduled!");
     }
 }    

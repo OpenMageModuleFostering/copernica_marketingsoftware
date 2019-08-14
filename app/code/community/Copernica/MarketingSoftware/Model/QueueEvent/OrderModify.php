@@ -29,79 +29,143 @@
  */
 class Copernica_MarketingSoftware_Model_QueueEvent_OrderModify extends Copernica_MarketingSoftware_Model_QueueEvent_Abstract
 {
+    /**
+     *  Profile Id on copernica platform that will be updated
+     *  @var int
+     */
+    private $profileId;
+
+    /**
+     *  Magento order 
+     */
+    private $order;
+
      /**
      *  Process this item in the queue
      *  @return boolean was the processing successfull
      */
     public function process()
     {
-        // Get the copernica API and config helper
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
-
-        // Get the subscription which has been modified
-        $order = $this->getObject();
-
-        // is there a customer?
-        if (is_object($customer = $order->customer()))
-        {
-            $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
-                            ->setCustomer($customer);
-        }
-        else
-        {
-            $customerData = Mage::getModel('marketingsoftware/copernica_profileorder')
-                            ->setOrder($order);
-        }
-
-        // The direction should be set
-        $customerData->setDirection('copernica');
-
-        // Update the profiles given the customer and return the found profiles
+        /*
+         *  We need to make some preparations. We will need Api, order instance,
+         *  customer and target profile Id. 
+         */
+        $api = Mage::helper('marketingsoftware/api');
+        $this->order = $this->getObject();
+        $customerData = $this->getCustomerData();
+        
+        // update profiles, this will create a profile if it does not exists
         $api->updateProfiles($customerData);
-        $profiles = $api->searchProfiles($customerData->id());
 
-        // Process all the profiles
-        foreach ($profiles->items as $profile)
+        // get profile Id
+        $profileId = $api->getProfileId($customerData);
+
+        /*
+         *  It's possible that we will be trying to update a customer that is not
+         *  yet present in copernica database. In such situation we should create
+         *  it's profile so we can use profileId for subprofiles. Thus there is
+         *  no point in waiting till profile is created. Instead we will send 
+         *  request to create profile and respawn this event. This way we will not
+         *  be waitning and therefore we will not block other events.
+         */
+        if ($profileId === false)
         {
-            // Remove any cart items belonging to this quote, which have not been
-            // deleted
-            $api->removeOldCartItems($profile->id, $order->quoteId());
+            // respawn this event with the same data
+            $this->respawn();
 
-            // Add an record to the order collection of the profile.
-            // Get the order data to prepare for sending it to Copernica
-            $orderData = Mage::getModel('marketingsoftware/copernica_order_subprofile')
-                            ->setOrder($order)
-                            ->setDirection('copernica');
-
-            // Update the subprofile in the order collection
-            $api->updateOrderSubProfile($profile->id, $orderData);
-
-            // add all order items to the order items collection
-            foreach ($order->items() as $orderItem)
-            {
-                // Get the information of this item
-                $itemData = Mage::getModel('marketingsoftware/copernica_orderitem_subprofile')
-                            ->setOrderItem($orderItem)
-                            ->setDirection('copernica');
-
-                // Update the subprofile of this profile
-                $api->updateOrderItemSubProfiles($profile->id, $itemData);
-            }
-
-            // add all addresses to the address collection
-            foreach ($order->addresses() as $address)
-            {
-                // Get the information of this item
-                $addressData = Mage::getModel('marketingsoftware/copernica_address_subprofile')
-                            ->setAddress($address)
-                            ->setDirection('copernica');
-
-                // Update the subprofile of this profile
-                $api->updateAddressSubProfiles($profile->id, $addressData);
-            }
+            // we are done here
+            return true;
         }
 
-        // This order was successfully synchronized
+        // cache profile Id
+        $this->profileId = $profileId;
+
+        // remove old cart items
+        $api->removeOldCartItems($this->profileId, $this->order->quoteId());
+
+        // get REST request
+        $request = Mage::helper('marketingsoftware/RESTrequest');
+
+        // start preparing calls
+        $request->prepare();
+
+        // update order subprofile with new info
+        $api->updateOrderSubProfile($this->profileId, $this->getOrderData());
+
+        // update order items
+        $this->updateOrderItems();
+
+        // update order addresses
+        $this->updateOrderAddresses();
+
+        // commit changes to API server
+        $request->commit();
+
+        // we are good
         return true;
+    }
+
+    /**
+     *  Get order data
+     *  @return Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile
+     */
+    private function getOrderData()
+    {
+        // get order subprofile
+        $orderData = Mage::getModel('marketingsoftware/copernica_order_subprofile');
+        $orderData->setOrder($this->order)->setDirection('copernica');
+
+        // return order data
+        return $orderData;
+    }
+
+    /**
+     *  Get customer data
+     *  @return Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer|Copernica_MarketingSoftware_Model_Copernica_ProfileOrder
+     */
+    private function getCustomerData()
+    {
+        // try to get customer instance from order
+        $customer = $this->order->customer();
+
+        // if we have a customer we want to return customer profile
+        if (is_object($customer)) return Mage::getModel('marketingsoftware/copernica_profilecustomer')->setCustomer($customer)->setDirection('copernica');
+
+        // we will just return order profile
+        return Mage::getModel('marketingsoftware/copernica_profileorder')->setOrder($this->order)->setDirection('copernica');
+    }
+
+    /**
+     *  Update order items
+     */
+    private function updateOrderItems()
+    {
+        // update all order items
+        foreach ($this->order->items() as $orderItem)
+        {
+            // get information about current order item
+            $itemData = Mage::getModel('marketingsoftware/copernica_orderitem_subprofile');
+            $itemData->setOrderItem($orderItem)->setDirection('copernica');
+
+            // update order item subprofile
+            Mage::helper('marketingsoftware/api')->updateOrderItemSubProfiles($this->profileId, $itemData);
+        }
+    }
+
+    /**
+     *  Update order addresses
+     */
+    private function updateOrderAddresses()
+    {
+        // update all order addresses
+        foreach ($this->order->addresses() as $address)
+        {
+            // get information about current address
+            $addressData = Mage::getModel('marketingsoftware/copernica_address_subprofile');
+            $addressData->setAddress($address)->setDirection('copernica');
+
+            // update address subprofile
+            Mage::helper('marketingsoftware/api')->updateAddressSubProfiles($this->profileId, $addressData);
+        }
     }
 }

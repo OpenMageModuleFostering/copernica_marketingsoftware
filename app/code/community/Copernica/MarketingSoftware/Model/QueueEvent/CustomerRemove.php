@@ -35,16 +35,23 @@ class Copernica_MarketingSoftware_Model_QueueEvent_CustomerRemove extends Copern
      */
     public function process()
     {
-        // Get the copernica API
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        // get object into local scope
+        $object = $this->getObject();
+
+        /*
+         *  This bit is kinda silly, but we have to ensure that we have a proper 
+         *  object to manipulate. If we don't have such object we will just return
+         *  from this event cause we can not do anything useful.
+         */
+        if (!$object->id()) return true;
 
         // Get the customer
         $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
-                            ->setCustomer($customer = $this->getObject())
+                            ->setCustomer($object)
                             ->setDirection('copernica');
-                            
+
         // Remove the profiles given the customer
-        $api->removeProfiles($customerData);
+        Mage::helper('marketingsoftware/api')->removeProfiles($customerData);
 
         // this customer is processed
         return true;

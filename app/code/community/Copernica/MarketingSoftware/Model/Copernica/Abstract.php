@@ -30,6 +30,7 @@
 abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements ArrayAccess
 {
     /**
+     *  To where data will be saved? Posible values are 'copernica' and 'magento'
      *  @var String
      */
     protected $direction = 'copernica';

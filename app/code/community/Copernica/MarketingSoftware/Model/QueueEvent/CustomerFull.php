@@ -29,6 +29,24 @@
  */
 class Copernica_MarketingSoftware_Model_QueueEvent_CustomerFull extends Copernica_MarketingSoftware_Model_QueueEvent_Abstract
 {
+    /**
+     *  The customer instance
+     *  @var Copernica_MarketingSoftware_Model_Copernica_CustomerProfile
+     */
+    private $customer;
+
+    /**
+     *  The target profile Id
+     *  @var int
+     */
+    private $profileId;
+
+    /**
+     * Quotes that were processed.
+     *  @var array
+     */
+    private $processedQuotes = array();
+
      /**
      *  Process this item in the queue
      *  @return boolean was the processing successfull
@@ -36,87 +54,189 @@ class Copernica_MarketingSoftware_Model_QueueEvent_CustomerFull extends Copernic
     public function process()
     {
         // Get the copernica API
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        $api = Mage::helper('marketingsoftware/api');
+        $this->customer = $this->getObject();
 
-        // Get the customer object
-        $customer = $this->getObject();
+        // get customer data
+        $customerData = $this->getCustomerData();
 
-        // Get the customer
-        $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
-                            ->setCustomer($customer)
-                            ->setDirection('copernica');
-
-        // Update the profiles given the customer and return the found profiles
+        // update/create profile 
         $api->updateProfiles($customerData);
-        $profiles = $api->searchProfiles($customerData->id());
 
-        // Process all the profiles
-        foreach ($profiles->items as $profile)
+        // get profile Id
+        $profileId = $api->getProfileId($customerData);
+
+        /*
+         *  It's possible that we will be trying to update a customer that is not
+         *  yet present in copernica database. In such situation we should create
+         *  it's profile so we can use profileId for subprofiles. Thus there is
+         *  no point in waiting till profile is created. Instead we will send 
+         *  request to create profile and respawn this event. This way we will not
+         *  be waitning and therefore we will not block other events.
+         */
+        if ($profileId === false)
         {
-            // add all addresses to the address collection
-            foreach ($customer->addresses() as $address)
-            {
-                // Get the information of this item
-                $addressData = Mage::getModel('marketingsoftware/copernica_address_subprofile')
-                            ->setAddress($address)
-                            ->setDirection('copernica');
+            // respawn this event with the same data
+            $this->respawn();
 
-                // Update the subprofile of this profile
-                $api->updateAddressSubProfiles($profile->id, $addressData);
-            }
-
-            $processedQuotes = array();
-
-            // Add all the orders + items
-            foreach ($customer->orders() as $order)
-            {
-                // Add an record to the order collection of the profile.
-                // Get the order data to prepare for sending it to Copernica
-                $orderData = Mage::getModel('marketingsoftware/copernica_order_subprofile')
-                                ->setOrder($order)
-                                ->setDirection('copernica');
-
-                // Update the subprofile in the order collection
-                $api->updateOrderSubProfile($profile->id, $orderData);
-
-                // add all order items to the order items collection
-                foreach ($order->items() as $orderItem)
-                {
-                    // Get the information of this item
-                    $itemData = Mage::getModel('marketingsoftware/copernica_orderitem_subprofile')
-                                ->setOrderItem($orderItem)
-                                ->setDirection('copernica');
-
-                    // Update the subprofile of this profile
-                    $api->updateOrderItemSubProfiles($profile->id, $itemData);
-                }
-
-                // Add this orders quote_id to the list of processed quotes
-                $processedQuotes[] = $order->quoteId();
-            }
-
-            // add all the cart items
-            foreach ($customer->quotes() as $quote)
-            {
-                // this has alread become an order
-                if (in_array($quote->id(), $processedQuotes)) continue;
-
-                // iterate over the items to add them to the cart items collection
-                foreach ($quote->items() as $quoteItem)
-                {
-                    // Get the cart item data
-                    $cartItemData = Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
-                                        ->setQuoteItem($quoteItem)
-                                        ->setDirection('copernica')
-                                        ->setStatus('basket');
-
-                    // add / update the quote item
-                    $api->updateCartItemSubProfiles($profile->id, $cartItemData);
-                }
-            }
+            // we are done here
+            return true;
         }
+
+        // cache profile Id
+        $this->profileId = $profileId;
+
+        // get request to local scope
+        $request = Mage::helper('marketingsoftware/RESTRequest');
+
+        // start preparing calls
+        $request->prepare();
+
+        // update all customer addresses
+        $this->updateCustomerAddresses();
+
+        // update all customer orders
+        $this->updateCustomerOrders();
+
+        // update all customers quotes
+        $this->updateCustomerQuotes();
+
+        // execute all prepared calls
+        $request->commit();
 
         // this was processed
         return true;
+    }
+
+    /**
+     *  Get customer data
+     *  @return Copernice_MarketingSoftware_Model_Copernice_ProfileCustomer
+     */
+    private function getCustomerData()
+    {
+        return Mage::getModel('marketingsoftware/copernica_profilecustomer')
+            ->setCustomer($this->customer)
+            ->setDirection('copernica');
+    }
+
+    /**
+     *  Update all customer addresses
+     */
+    private function updateCustomerAddresses()
+    {
+        // get Api instance
+        $api = Mage::helper('marketingsoftware/api');
+
+        // iterate over all addresses
+        foreach($this->customer->addresses() as $address)
+        {
+            $api->updateAddressSubProfiles($this->profileId, $this->getAddressData($address));
+        }
+    }
+
+    /**
+     *  Get address data
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  @return Copernica_MarketingSoftware_Model_Copernice_Address_Subprofile
+     */
+    private function getAddressData($address)
+    {
+        return Mage::getModel('marketingsoftware/copernica_address_subprofile')
+            ->setAddress($address)
+            ->setDirection('copernica');
+    }
+
+    /**
+     *  Update all customer orders
+     */
+    private function updateCustomerOrders()
+    {
+        // get Api instance
+        $api = Mage::helper('marketingsoftware/api');
+
+        // iterate over all orders
+        foreach ($this->customer->orders() as $order)
+        {
+            // update order subprofile
+            $api->updateOrderSubProfile($this->profileId, $this->getOrderData($order));
+
+            // update all items of current order
+            $this->updateOrderItems($order);
+
+            // mark quote as processed
+            $this->processedQuotes[] = $order->quoteId();
+        }
+    }
+
+    /**
+     *  Get orderdata
+     *  @param Copernica_MarketingSoftware_Model_Abstraction_Order
+     */
+    private function getOrderData($order)
+    {
+        return Mage::getModel('marketingsoftware/copernica_order_subprofile')
+            ->setOrder($order)
+            ->setDirection('copernica');
+    }
+
+    /**
+     *  @param Copernice_MarketingSoftware_Model_Copernica_ProfileOrder
+     */
+    private function updateOrderItems($order)
+    {
+        // get Api instance
+        $api = Mage::helper('marketingsoftware/api');
+
+        // iterate over all order items
+        foreach ($order->items() as $item)
+        {
+            // update order items
+            $api->updateOrderItemSubProfiles($this->profileId, $this->getOrderItemData($item));
+        }
+    }
+
+    /**
+     *  Get order item data
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  @return Copernica_MarketingSoftware_Model_Copernica_OrderItem_SubProfile
+     */
+    private function getOrderItemData($item)
+    {
+        return Mage::getModel('marketingsoftware/copernica_orderitem_subprofile')
+            ->setOrderItem($item)
+            ->setDirection('copernica');
+    }
+
+    /**
+     *  Update customers quotes
+     */
+    private function updateCustomerQuotes()
+    {
+        // get api instance
+        $api = Mage::helper('marketingsoftware/api');
+
+        // iterate over all customer quotes
+        foreach ($this->customer->quotes() as $quote)
+        {
+            // if quote was processed we don't want to process it again
+            if (in_array($quote->id(), $this->processedQuotes)) continue;
+
+            // iterate over all items in quote
+            foreach ($quote->items() as $item)
+            {
+                $api->updateCartItemSubProfiles($this->profileId, $this->getQuoteItemData($item));
+            }
+        }
+    }
+
+    /**
+     *  Get quote item data
+     */
+    private function getQuoteItemData($quote)
+    {
+        return Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
+            ->setDirection('copernica')
+            ->setStatus('basket')
+            ->setQuoteItem($quote);
     }
 }

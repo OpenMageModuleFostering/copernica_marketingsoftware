@@ -48,23 +48,23 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function setOriginal(Mage_Sales_Model_Quote_Item $original)
     {
-    	$this->id = $original->getId();
-    	$this->quantity = $original->getQty();
-    	$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-    	$this->weight = $original->getWeight();
-    	$this->timestamp = $original->getUpdatedAt();
-    	$this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
-    	
-		$options = Mage::getModel('marketingsoftware/abstraction_quote_item_options')->setOriginal($original);
-    	if ($options->attributes()) {
-    		//only return option object if it this quote actually has options
-    		$this->options = $options;
-    	}
-    	
-   		if ($quote = $original->getQuote()) {
- 			$this->quoteId = $quote->getId();
-    	}
-    	
+        $this->id = $original->getId();
+        $this->quantity = $original->getQty();
+        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->weight = $original->getWeight();
+        $this->timestamp = $original->getUpdatedAt();
+        $this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
+        
+        $options = Mage::getModel('marketingsoftware/abstraction_quote_item_options')->setOriginal($original);
+        if ($options->attributes()) {
+            //only return option object if it this quote actually has options
+            $this->options = $options;
+        }
+        
+        if ($quote = $original->getQuote()) {
+            $this->quoteId = $quote->getId();
+        }
+        
         return $this;
     }
 
@@ -74,7 +74,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function id()
     {
-		return $this->id;
+        return $this->id;
     }
 
     /**
@@ -92,7 +92,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function quantity()
     {
-		return $this->quantity;
+        return $this->quantity;
     }
 
     /**
@@ -102,7 +102,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function price()
     {
-		return $this->price;
+        return $this->price;
     }
 
     /**
@@ -111,7 +111,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function weight()
     {
-		return $this->weight;
+        return $this->weight;
     }
 
     /**
@@ -120,7 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function timestamp()
     {
-		return $this->timestamp;
+        return $this->timestamp;
     }
 
     /**
@@ -129,7 +129,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function options()
     {
-		return $this->options;
+        return $this->options;
     }
 
     /**
@@ -138,7 +138,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      */
     public function product()
     {
-		return $this->product;
+        return $this->product;
     }
 
     /**

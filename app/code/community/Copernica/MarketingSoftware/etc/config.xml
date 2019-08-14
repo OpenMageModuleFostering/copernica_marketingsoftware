@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Copernica_MarketingSoftware>
-            <version>2.2.0</version>
+            <version>3.0.0</version>
         </Copernica_MarketingSoftware>
     </modules>
     <global>
@@ -17,12 +17,21 @@
                     <queue>
                         <table>copernica_queue</table>
                     </queue>
-                    <marketingsoftware>
-                        <table>copernica_marketingsoftware</table>
-                    </marketingsoftware>
                     <config_data>
                         <table>copernica_config_data</table>
                     </config_data>
+                    <profileCache>
+                        <table>copernica_profile_cache</table>
+                    </profileCache>
+                    <errorqueue>
+                        <table>copernica_error_queue</table>
+                    </errorqueue>
+                    <syncProfile>
+                        <table>copernica_sync_profile</table>
+                    </syncProfile>
+                    <abandonedCart>
+                        <table>copernica_abandoned_cart</table>
+                    </abandonedCart>
                 </entities>
             </marketingsoftware_mysql4>
         </models>
@@ -67,6 +76,14 @@
                     </marketingsoftware_observer>
                 </observers>
             </sales_order_save_after>
+            <sales_quote_delete_before>
+                <observers>
+                    <marketingsoftware_observer>
+                        <class>marketingsoftware/observer</class>
+                        <method>quoteDelete</method>
+                    </marketingsoftware_observer>
+                </observers>
+            </sales_quote_delete_before>
             <newsletter_subscriber_delete_before>
                 <observers>
                     <marketingsoftware_observer>
@@ -75,14 +92,14 @@
                     </marketingsoftware_observer>
                 </observers>
             </newsletter_subscriber_delete_before>
-            <newsletter_subscriber_save_after>
+            <newsletter_subscriber_save_commit_after>
                 <observers>
                     <marketingsoftware_observer>
                         <class>marketingsoftware/observer</class>
                         <method>newsletterSubscriptionModified</method>
                     </marketingsoftware_observer>
                 </observers>
-            </newsletter_subscriber_save_after>
+            </newsletter_subscriber_save_commit_after>
             <customer_delete_before>
                 <observers>
                     <marketingsoftware_observer>
@@ -99,45 +116,45 @@
                     </marketingsoftware_observer>
                 </observers>
             </customer_save_after>
-			<catalog_controller_product_view>
-				<observers>
-					<marketingsoftware_observer>
-						<class>marketingsoftware/observer</class>
-						<method>productViewed</method>
-					</marketingsoftware_observer>
-				</observers>
-			</catalog_controller_product_view>
+            <catalog_controller_product_view>
+                <observers>
+                    <marketingsoftware_observer>
+                        <class>marketingsoftware/observer</class>
+                        <method>productViewed</method>
+                    </marketingsoftware_observer>
+                </observers>
+            </catalog_controller_product_view>
         </events>
-            <resources>
-                <marketingsoftware_setup>
-                    <setup>
-                        <module>Copernica_MarketingSoftware</module>
-                    </setup>
-                    <connection>
-                        <use>core_setup</use>
-                    </connection>
-                </marketingsoftware_setup>
-                <marketingsoftware_write>
-                    <connection>
-                        <use>core_write</use>
-                    </connection>
-                </marketingsoftware_write>
-                <marketingsoftware_read>
-                    <connection>
-                        <use>core_read</use>
-                    </connection>
-                </marketingsoftware_read>
-            </resources>
-            <blocks>
-                <marketingsoftware>
-                    <class>Copernica_MarketingSoftware_Block</class>
-                </marketingsoftware>
-            </blocks>
-            <helpers>
-                <marketingsoftware>
-                    <class>Copernica_MarketingSoftware_Helper</class>
-                </marketingsoftware>
-            </helpers>
+        <resources>
+            <marketingsoftware_setup>
+                <setup>
+                    <module>Copernica_MarketingSoftware</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </marketingsoftware_setup>
+            <marketingsoftware_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </marketingsoftware_write>
+            <marketingsoftware_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </marketingsoftware_read>
+        </resources>
+        <blocks>
+            <marketingsoftware>
+                <class>Copernica_MarketingSoftware_Block</class>
+            </marketingsoftware>
+        </blocks>
+        <helpers>
+            <marketingsoftware>
+                <class>Copernica_MarketingSoftware_Helper</class>
+            </marketingsoftware>
+        </helpers>
     </global>
     <frontend>
         <routers>
@@ -167,6 +184,10 @@
                 <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
                 <run><model>marketingsoftware/observer::processQueue</model></run>
             </marketingsoftware_process_queue>
+            <marketingsoftware_detect_abandoned_carts>
+                <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+                <run><model>marketingsoftware/observer::detectAbandonedCarts</model></run>
+            </marketingsoftware_detect_abandoned_carts>
         </jobs>
     </crontab>
 </config>

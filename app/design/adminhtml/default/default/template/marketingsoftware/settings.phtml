@@ -1,223 +1,341 @@
 <?php
-/**
+/** 
  *  View for Settings controller
- *  Copernica Marketing Software v 1.2.0
- *  March 2011
- *  http://www.copernica.com/
+ *  Copernica Marketing Software
+ *  http://www.copernica.com 
  */
 
-$_helper = Mage::helper('marketingsoftware'); 
+// get config into local scope
 $_config = Mage::helper('marketingsoftware/config');
+
+// authorization url
+$authorizeUrl = 'https://www.copernica.com/en/authorize';
+
+// what we will include in our query string
+$query = array(
+    // get access to all resources
+    'scope'         =>  'all',
+
+    // we want response in form of code
+    'response_type' =>  'code',
+
+    // we do store state inside session
+    'state'         =>  Mage::getSingleton('adminhtml/session')->getState(),
+
+    // client_id
+    'client_id'     =>  $_config->getClientKey(),
+
+    // where we should return after we authorize?
+    'redirect_uri'  =>  $this->getStateUrl(),
+);
+
+// parts of the query string
+$parts = array();
+
+// format our url properly
+foreach ($query as $key => $part) $parts[] = implode('=', array($key, urlencode($part)));
+
+// append query string to our authorization url
+$authorizeUrl.= '?'.implode('&', $parts);
+
+// get current controller
+$currentController = $this->getAction();
 ?>
+
 <script type="text/javascript">
 
-// define timeout variable
-var timerID = 0;
-
-// on page loader
+// on page load
 Event.observe(window, 'load', init, false);
 
-/**
- *  Function that is loaded on window load.
- *  It contains a default settings checker and multiple event listeners
- */
-function init() {
-     checksettings('onload');
-     $('cp_host').observe('keyup', checksettings);
-     $('cp_user').observe('keyup', checksettings);
-     $('cp_pass').observe('keyup', checksettings);
-     $('cp_account').observe('keyup', checksettings);
-}
+// initialize function
+function init() {  
 
-/**
- *  Function that checks account settings.
- *  This method will send an ajax call to the server.
- *  @param string|object    We can have either a string ('onload') for calling the function on page load, or we can have a 'on key press' event object.
- */
-function checksettings(event) {
+    // when button is clicked we want to save information on server
+    $('cp_save').on('click', function(event) {
+        $('cp_form').submit();
+    });
 
-    // the data that we want to send to the server
-    var data = {
-        cp_host : document.getElementById('cp_host').value,
-        cp_user : document.getElementById('cp_user').value,
-        cp_pass : document.getElementById('cp_pass').value,
-        cp_account : document.getElementById('cp_account').value
-    };
+    $('qs_save').on('click', function(event) {
+        $('qs_form').submit();
+    });
 
-    // Ajax URL
-    var url = <?php echo(json_encode($this->getCheckSettingsUrl())); ?>;
-
-    // status DIV
-    var div = $('settings_status');
-
-    // reset timer
-    if (timerID) clearTimeout(timerID);
-
-    // proceed with the function
-    timerID = setTimeout(function() {
-        
-        // display a 'checking' status
-        div.innerHTML = 'Checking account information...';
-        
-        // proceed with the AJAX call
-        new Ajax.Request(url, {
-            method: 'post', 
-            parameters: data,
-            onLoading: function() {
-                $('loading-mask', 'loading_mask_loader').invoke('hide');
-            },
-            onComplete: function(answer) {
-                if (answer.responseText == '') 
-                {
-                    // set the return message
-                    answer.responseText = 'Acount information is valid.';
-                    
-                    // enable the save button
-                    document.getElementById('cp_save').disabled = false;
-                    document.getElementById('cp_save').setAttribute("class","");
-                    
-                    // display the 'save your settings 'notice
-                    if (event != 'onload') document.getElementById('cp_save_notice').style.display = 'inline';
-                    
-                    // hide the 'invalid settings' notice
-                    if (event != 'onload') document.getElementById('cp_invalid_notice').style.display = 'none';
-                }
-                else
-                {
-                    // disable the settings button
-                    document.getElementById('cp_save').disabled = true;
-                    document.getElementById('cp_save').setAttribute("class","disabled");
-                    
-                    // display the 'invalid settings' notice
-                    document.getElementById('cp_invalid_notice').style.display = 'inline';
-                    
-                    // hide the 'save your settings' notice
-                    if (event != 'onload') document.getElementById('cp_save_notice').style.display = 'none';
-                }
-                
-                // set a return message for invalid login data situation
-                if (answer.responseText == 'impossible') answer.responseText = 'Invalid login data.';
-                
-                // feed the div with the right content
-                div.innerHTML = answer.responseText;
-                
-            }
-        });
-    }, 1000);
+    $('ss_save').on('click', function(event) {
+        $('ss_form').submit();
+    });
 }
 
 </script>
 
 <div class="content-header">
-    <h3 class="icon-head head-system-account">Copernica Marketing Software : Settings</h3>
+    <h3 class="icon-head head-system-account">
+        Copernica Marketing Software : Settings
+    </h3>
     <p class="form-buttons">
-        <span id="cp_save_notice" style="color: white; font-weight: bold; padding: 2px 4px; background-color: #188F11; border: thin solid #660000; display:none;">Warning: the settings are not yet saved !</span>
-        <span id="cp_invalid_notice" style="color: white; font-weight: bold; padding: 2px 4px; background-color: #CC3300; border: thin solid #660000; display:none;">Warning: the settings are invalid !</span>        
-        <button type="button" onclick="cpForm.submit();" name="cp_save" id="cp_save">Save connection settings</button>
+        <button type="button" name="cp_save" id="cp_save">Save connection settings</button>
     </p>
 </div>
+
+<!-- Start of status box -->
+<?php if (count($currentController->getErrors()) or count($currentController->getWarnings())) { ?>
+    <div class="entry-edit">    
+        <div class="entry-edit-head collapsable">
+            <h4>Current status</h4>
+        </div>
+        <div class="fieldset collapsable">
+            <ul>
+                <?php foreach ($currentController->getErrors() as $error) { ?>
+                    <li><?php echo $error ?></li>
+                <?php } ?>
+                <?php foreach ($currentController->getWarnings() as $warning) { ?>
+                    <li><?php echo $warning ?></li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+<?php } ?>
+<!-- End of status box -->
+
 <div class="entry-edit">
     <form action="<?php echo $this->getPostUrl(); ?>" method="post" name="cp_form" id="cp_form">
         <?php echo $this->getBlockHtml('formkey'); ?>
         <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend">Login Information</h4>
-            <a href="#" onclick ="document.getElementById('settings_help').style.display='block';" id="page-help-link" style="float: right; line-height:18px; return false;">More information</a>             
+            <h4 class="icon-head head-edit-form fieldset-legend">
+                REST API
+            </h4>
         </div>
         <div class="fieldset">
             <div class="hor-scroll">
                 <table cellspacing="0" class="form-list">
                     <tbody>
                         <tr>
-                        <td class="label"><label for="cp_host">Hostname <span class="required">*</span></label></td>
-                        <td class="value"><input type="text" class=" required-entry input-text validate-url" title="Hostname" value="<?php echo $_config->getHostname(); ?>" name="cp_host" id="cp_host"></td>
+                            <td class="label">
+                                <label for="cp_client_key">Client key</label>
+                            </td>
+                            <td class="value">
+                                <input type="text" class="required-entry input-text" title="Client key" name="cp_client_key" value="<?php echo $_config->getClientKey(); ?>" id="cp_client_key">
+                            </td>
                         </tr>
-                        
                         <tr>
-                        <td class="label"><label for="cp_user">Username <span class="required">*</span></label></td>
-                        <td class="value"><input type="text" class=" required-entry input-text" title="Username" value="<?php echo $_config->getUsername(); ?>" name="cp_user" id="cp_user"></td>
+                            <td class="label">
+                                <label for="cp_client_secret">Client secret</label>
+                            </td>
+                            <td class="value">
+                                <input type="text" class="required-entry input-text" title="Client secret" name="cp_client_secret" value="<?php echo $_config->getClientSecret(); ?>">
+                            </td>
                         </tr>
-                        
                         <tr>
-                        <td class="label"><label for="cp_account">Account Name <span class="required">*</span></label></td>
-                        <td class="value"><input type="text" class=" required-entry input-text" title="Account Name" value="<?php echo $_config->getAccount(); ?>" name="cp_account" id="cp_account"></td>
+                            <td class="label">
+                                Current Access Token
+                            </td>
+                            <td class="value">
+                                <?php 
+                                    $accessToken = Mage::helper('marketingsoftware/config')->getAccessToken(); 
+
+                                    if ($accessToken) { 
+                                ?>
+
+                                    <b>Valid</b>
+
+                                <?php } elseif ($_config->getClientKey()) { ?>
+                                    <p>
+                                        To use this Copernica platform you have to obtain an Access Token
+                                        to Copernica REST API. To obtain one go to <a href="<?php echo $authorizeUrl; ?>">authorization page</a>.
+                                    </p>
+
+
+                                <?php } else { ?>
+                                    <p>
+                                        Fill Client key.
+                                    </p>
+                                <?php } ?> 
+                            </td>
                         </tr>
-                        
+                        <?php if ($response = $this->getRequest()->getParam('response')) { ?>
+                            <tr>
+                                <td class="label">
+                                    Authorization response
+                                </td>
+                                <td class="value">
+                                    <?php if ($response == 'new-access-token') { ?>
+                                        New Access Token was stored.
+                                    <?php } elseif ($response == 'invalid-state') { ?>
+                                        Invalid state code was returned
+                                    <?php } elseif ($response =='authorize-error') { 
+
+                                        // get seesion into local scope
+                                        $session = Mage::getSingleton('core/session');
+
+                                        // get serialized error
+                                        $serializedError = $session->getErrorMessage();
+
+                                        // unset session variable
+                                        $session->unsErrorMessage();
+                                    ?>
+                                        Authorization call failed. Error: <?php echo $serializedError; ?>
+                                    <?php } ?>
+                                </td>
+                            </tr>
+                        <?php } ?>
                         <tr>
-                        <td class="label"><label for="cp_pass">Password <span class="required">*</span></label></td>
-                        <td class="value"><input type="password" class=" required-entry input-text" title="Password" value="<?php echo $_config->getPassword(); ?>" name="cp_pass" id="cp_pass"></td>
-                        </tr>
-                        
-                        <tr>
-                        <td class="label"><label for="settings_status">Status </label></td>
-                        <td class="value"><div id="settings_status">Checking account information...</div></td>
+                            <td>
+                                <a href="https://www.copernica.com/en/support/rest/register-your-app-on-copernica-com" target="_blank">How to obtain key and secret?</a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </form>
-   
-    <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend">Important Notice</h4>
-    </div>
-    <div class="fieldset">
-        <div class="hor-scroll">
-            <table cellspacing="0" class="form-list">
-                <tbody>
-                    <tr>
-                    <td>To enable the Magento extension, you need to have a valid license for <a href="https://www.copernica.com/en/magento" target="_blank" title="Copernica Marketing Software">Copernica Marketing Software</a>.</td>
-                    </tr>
-                </tbody>
-            </table>
+</div>
+
+<div class="entry-edit">
+    <form action="<?php echo $this->getQueuePostUrl(); ?>" method="post" name="qs_form" id="qs_form">
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend">
+                Synchronization settings
+            </h4>
         </div>
-    </div>
     
-    <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend">Environment Information</h4>
-    </div>
-    <div class="fieldset">
-        <div class="hor-scroll">
-            <table cellspacing="0" class="form-list">
-                <tbody>
-                    <tr>
-                    <td class="label">Copernica extension version: </td>
-                    <td class="value"><strong><?php echo $_helper->getExtensionVersion();?></strong></td>
-                    </tr>
-                    <tr>
-                    <td class="label">Magento webshop version: </td>
-                    <td class="value"><strong><?php echo Mage::getVersion();?></strong></td>
-                    </tr>                    
-                </tbody>
-            </table>
+        <div class="fieldset">
+                <div class="hor-scroll">
+                    <table cellspacing="0" class="form-list">
+                        <tbody>
+                            <tr>
+                                <td class="label">
+                                    Api server
+                                </td>
+                                <td class="value">
+                                    <input type="text" name="qs_api_server" id="qs_api_server" class="input-text" value="<?php $host = $_config->getApiHostname(); if ($host) echo $host; else echo 'https://api.copernica.com;' ?>">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"> 
+                                    Maximum items per run
+                                </td>
+                                <td class="value">
+                                    <input name="qs_max_items" id="qs_max_items" class="input-text" type="text" value="<?php echo $_config->getItemsPerRun(); ?>">
+                                </td>
+                                <td class="label">
+                                    Leave it blank for unlimited
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    Maximum time per run (in seconds)
+                                </td>
+                                <td class="value">
+                                    <input name="qs_max_time" id="qs_max_time" class="input-text" type="text" value="<?php echo $_config->getTimePerRun(); ?>">
+                                </td>
+                                <td class="label">
+                                    Leave it blank for unlimited
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    Use standard scheduler
+                                </td>
+                                <td class="value">
+                                    <input type="checkbox" name="qs_vanilla_crons" <?php if ($_config->getVanillaCrons()) { ?> checked="checked" <?php } ?>>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    Abandoned cart timeout
+                                </td>
+                                <td class="value">
+                                    <input type="text" class="input-text" name="qs_abandoned_timeout" value="<?php echo $_config->getAbandonedTimeout();?>">
+                                </td>
+                                <td class="label">
+                                    Number of minutes that have to pass since last update in cart.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    Abandoned cart period
+                                </td>
+                                <td class="value">
+                                    <input type="text" class="input-text" name="qs_abandoned_period" value="<?php echo $_config->getAbandonedPeriod();?>">
+                                </td>
+                                <td class="label">
+                                    Carts older than supplied number of minutes will not be synchronized with Copernica.
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    Removed finished cart items
+                                </td>
+                                <td class="value">
+                                    <input type="checkbox" name="qs_remove_finished" <?php if ($_config->getRemoveFinishedCartItems()) { ?> checked="checked" <?php } ?>>
+                                </td>
+                                <td class="label">
+                                    Should removed or ordered cart items be deleted from subprofile?
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label">
+                                    <button type="button" name="qs_save" id="qs_save">Save queue settings</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>    
+    </form>
 </div>
 
-<!-- settings help -->
-<div id="settings_help" style="display: none; position: absolute; top: 30%; left: 30%; width: 580px; height: 300px; padding: 20px; border: 1px solid black; z-index:1002;background-color: #FDFAB1; color: black;">
-    <h3 style="text-align: center;">Account Settings HOW-TO</h3>
-    Set your login details used to access your user account available in Copernica Marketing Software:
-    <br/><br/>
-    - Hostname : The URL (http://publisher.copernica.nl) that you use to connect to your Copernica user account
-    <br/>
-    - Username : Your Copernica username
-    <br/>
-    - Account Name: The Copernica master account that hosts your user account
-    <br/>
-    - Password : The password for your Copernica user account
-    <br/><br/>
-    The "Status" field will display the current account information status. If you change values of any account details fields, this status will be updated.
-    <br/><br/>
-    [+] Be sure to "Save connection settings" after specifying new account details. You can do this by using the button in the top-right corner.
-    <br/><br/>
-    [+] A Copernica Database administration can be found in the "Link Fields" submenu under the "Copernica Marketing Software" menu.
-    <br/>
-    <a href="#" onclick="document.getElementById('settings_help').style.display='none';" style="top:0; right:6px; position: absolute; return false;">Close</a>
-</div>
+<div class="entry-edit">
+    <form action="<?php echo $this->getStoresPostUrl(); ?>" method="post" name="ss_form" id="ss_form"> 
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend">
+                Stores settings
+            </h4>
+        </div>
 
-<script type="text/javascript">
-//<![CDATA[
-    var customForm = new varienForm('cp_form', true);
-    cpForm = new varienForm('cp_form', '');
-//]]>
-</script>
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tbody>
+                        <tr>
+                            <td class="label">
+                                Stores to synchronize
+                            </td>
+                            <td class="value">
+                                <input type="checkbox" value="true" id="chk-store-disable" name="chk-store-disable" <?php if (is_null($_config->getEnabledStores())) { ?> checked="checked" <?php } ?>
+                                <label for="chk-store-disable">
+                                    Do not filter stores
+                                </label>
+                                <br>
+                                <?php
+                                    foreach(Mage::app()->getWebsites() as $website){
+                                        foreach($website->getGroups() as $group){
+                                            foreach($group->getStores() as $store) {
+
+                                                $enabledStore = is_array($_config->getEnabledStores()) && in_array($store->getId(), $_config->getEnabledStores());
+
+                                                ?>
+                                                    <input type="checkbox" name="store[]" id="chk-store-<?php echo $store->getId(); ?>" value="<?php echo $store->getId(); ?>" <?php if ($enabledStore) { ?> checked="checked" <?php } ?>>
+                                                    <label for="chk-store-<?php echo $store->getId(); ?>">
+                                                        <?php echo $website->getName().' > '.$group->getName().' > '.$store->getName(); ?>
+                                                    </label>
+                                                    <br>
+                                                <?php
+                                            }
+                                        }
+                                    }
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                <button type="button" name="ss_save" id="ss_save">Save stores settings</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</div>

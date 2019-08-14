@@ -42,27 +42,27 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
      */
     public function setOriginal(Mage_Catalog_Model_Product $original)
     {
-    	if ($attributeSet = Mage::getModel('eav/entity_attribute_set')->load($original->getAttributeSetId())) {
-    		$this->name = $attributeSet->getAttributeSetName();
-    	}    	
-    	
-    	$data = array();
-    	$attributes = $original->getAttributes();
-    	
-    	foreach ($attributes as $attribute) {
-    		if (
-    				$attribute->getIsUserDefined() &&
-    				in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
-    				($label = $attribute->getAttributeCode()) &&
-    				($value = $attribute->getFrontend()->getValue($original))
-    		) {
-    			// is this an object which is not serializable    	
-    			// add the value to the array of data
-    			$data[$label] = $value;
-    		}
-    	}
-    	$this->attributes = $data;
-    	 
+        if ($attributeSet = Mage::getModel('eav/entity_attribute_set')->load($original->getAttributeSetId())) {
+            $this->name = $attributeSet->getAttributeSetName();
+        }       
+        
+        $data = array();
+        $attributes = $original->getAttributes();
+        
+        foreach ($attributes as $attribute) {
+            if (
+                    $attribute->getIsUserDefined() &&
+                    in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
+                    ($label = $attribute->getAttributeCode()) &&
+                    ($value = $attribute->getFrontend()->getValue($original))
+            ) {
+                // is this an object which is not serializable      
+                // add the value to the array of data
+                $data[$label] = $value;
+            }
+        }
+        $this->attributes = $data;
+         
 
         return $this;
     }
@@ -73,7 +73,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
      */
     public function name()
     {
-		return $this->name;
+        return $this->name;
     }
 
     /**
@@ -84,7 +84,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
      */
     public function attributes($useAttribCode = false)
     {
-		return $this->attributes;
+        return $this->attributes;
     }
 
     /**

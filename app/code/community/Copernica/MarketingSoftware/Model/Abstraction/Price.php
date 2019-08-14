@@ -56,72 +56,76 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function setOriginal($original)
     {
-		if ($grandTotal = $original->getGrandTotal()) {
-			$this->total = $grandTotal;
-		} elseif ($rowTotalInclTax = $original->getRowTotalInclTax()) {
-        	$this->total = $rowTotalInclTax;
-		} elseif ($baseRowTotal = $original->getBaseRowTotal()) {
-        	$this->total = $baseRowTotal;
-		}
-    	
+        if ($grandTotal = $original->getGrandTotal()) {
+            $this->total = $grandTotal;
+        } elseif ($rowTotalInclTax = $original->getRowTotalInclTax()) {
+            $this->total = $rowTotalInclTax;
+        } elseif ($baseRowTotal = $original->getBaseRowTotal()) {
+            $this->total = $baseRowTotal;
+        }
+        
         // Used for quotes and orders
         if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
-        	$costs = 0;
+            $costs = 0;
         
-        	// iterate over all visisble items
-        	foreach ($original->getAllVisibleItems() as $item) {
-        		$costs += $item->getBaseCost();
-        	}
+            // iterate over all visisble items
+            foreach ($original->getAllVisibleItems() as $item) {
+                $costs += $item->getBaseCost();
+            }
         
-        	// return the costs
-        	$this->costs = $costs;
+            // return the costs
+            $this->costs = $costs;
         } elseif ($baseCost = $original->getBaseCost()) {
-        	$this->costs = $baseCost;
+            $this->costs = $baseCost;
         }
         
         // no price for an individual item
         if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
-        	$this->itemPrice = 0;
+            $this->itemPrice = 0;
         
         // Used for quote items and order items
         elseif ($price = $original->getPrice())
-        	$this->itemPrice = $price;
+            $this->itemPrice = $price;
         
         // no price for an individual item
         if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
-        	$this->originalPrice = 0;
-        
+            $this->originalPrice = 0;
+
+        // it's not safe to call ::getOriginalPrice() on quote item
+        elseif ($original instanceOf Mage_Sales_Model_Quote_Item)
+            $this->originalPrice = 0;
+
         // Used for quote items and order items
         elseif ($originalPrice = $original->getOriginalPrice())
-        	$this->originalPrice = $originalPrice;
-        
+            $this->originalPrice = $originalPrice;
+
         if ($discountAmount = $original->getDiscountAmount()) 
-        	$this->discount = $discountAmount;
+            $this->discount = $discountAmount;
         
         if ($taxAmount = $original->getTaxAmount()) 
-        	$this->tax = $taxAmount;
+            $this->tax = $taxAmount;
         
         // Shipping is only available for quotes and orders, but not for items
         if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
         {
-        	// Get the shipping amount
-        	if ($shippingAmount = $original->getShippingAmount())
-        		$this->shipping = $shippingAmount;
-        	else
-        		$this->shipping = 0;
+            // Get the shipping amount
+            if ($shippingAmount = $original->getShippingAmount())
+                $this->shipping = $shippingAmount;
+            else
+                $this->shipping = 0;
         }
         else $this->shipping = 0;
         
         if ($currency = $original->getOrderCurrencyCode()) 
-        	$this->currency = $currency;
+            $this->currency = $currency;
         elseif ($currency = $original->getQuoteCurrencyCode())
-        	$this->currency = $currency;
+            $this->currency = $currency;
         elseif (($order = $original->getOrder()) && ($currency = $order->getOrderCurrencyCode()))
-        	$this->currency = $currency;
+            $this->currency = $currency;
         elseif (($quote = $original->getQuote()) && ($currency = $quote->getQuoteCurrencyCode()))
-        	$this->currency = $currency;
+            $this->currency = $currency;
         else
-        	$this->currency = '';
+            $this->currency = '';
         
         return $this;
     }
@@ -132,7 +136,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function total()
     {
-		return $this->total;
+        return $this->total;
     }
     
     /**
@@ -150,7 +154,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function itemPrice()
     {
-		return $this->itemPrice;
+        return $this->itemPrice;
     }
     
     /**

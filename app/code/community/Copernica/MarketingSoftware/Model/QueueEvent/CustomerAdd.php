@@ -36,7 +36,7 @@ class Copernica_MarketingSoftware_Model_QueueEvent_CustomerAdd extends Copernica
     public function process()
     {
         // Get the copernica API
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        $api = Mage::helper('marketingsoftware/api');
 
         // Get the customer
         $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')

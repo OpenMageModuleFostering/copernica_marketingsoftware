@@ -30,7 +30,7 @@
 class Copernica_MarketingSoftware_Model_Copernica_ProfileOrder extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @var Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     protected $order = false;
 
@@ -43,6 +43,33 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileOrder extends Copernica
     {
         $this->order = $order;
         return $this;
+    }
+
+    /** 
+     *  Get profile email.
+     *  @return string
+     */
+    public function email()
+    {
+        // get all addresses associated with order
+        $addresses = $this->order->addresses();
+    
+        // find billing address
+        foreach ($addresses as $address) {
+            if (in_array('billing', $addr->type())) return $address->email();  
+        } 
+
+        // we don't have an address. Return empty string
+        return '';
+    }
+
+    /**
+     *  Return store view associated with profile
+     *  @return string
+     */
+    public function storeView()
+    {
+        return (string)$this->order->storeview();
     }
     
     /** 
@@ -69,9 +96,18 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileOrder extends Copernica
         // fetch the name object
         $name = $address->name();
 
+        // placeholder for copeernica Id
+        $customerId = null;
+
+        // check if we have a customer to generate custoemr Id
+        if ($customer = $this->order->customer()) $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->order->storeview());
+
+        // generate customer Id from email address
+        else $customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), (string)$this->order->storeview());
+
         // return an array with customer data
         return array(
-            'customer_id'   =>  Mage::helper('marketingsoftware')->generateCustomerId($address->email(), (string)$this->order->storeview()),
+            'customer_id'   =>  $customerId,
             'store_view'    =>  (string)$this->order->storeview(),
             'firstname'     =>  is_object($name) ? $name->firstname() : null, 
             'middlename'    =>  is_object($name) ? $name->middlename() : null,

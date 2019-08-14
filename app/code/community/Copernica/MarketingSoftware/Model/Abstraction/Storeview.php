@@ -47,16 +47,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function setOriginal(Mage_Core_Model_Store $original)
     {
-    	if ($original->getWebsite() instanceof Mage_Core_Model_Website) {
-    		$this->id = $original->getId();
-			$this->websiteCode = $original->getWebsite()->getCode();
-			$this->websiteLabel = $original->getWebsite()->getName();
-			$this->storeCode = $original->getGroup()->getId();
-			$this->storeLabel = $original->getGroup()->getName();
-			$this->viewCode = $original->getCode();
-			$this->viewLabel = $original->getName();			
-    	}
-    	 	
+        if ($original->getWebsite() instanceof Mage_Core_Model_Website) {
+            $this->id = $original->getId();
+            $this->websiteCode = $original->getWebsite()->getCode();
+            $this->websiteLabel = $original->getWebsite()->getName();
+            $this->storeCode = $original->getGroup()->getId();
+            $this->storeLabel = $original->getGroup()->getName();
+            $this->viewCode = $original->getCode();
+            $this->viewLabel = $original->getName();            
+        }
+            
         return $this;
     }
 
@@ -66,7 +66,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function id()
     {
-		return $this->id;
+        return $this->id;
     }
 
     /**
@@ -75,7 +75,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function websiteCode()
     {       
-		return $this->websiteCode;
+        return $this->websiteCode;
     }
 
     /**
@@ -84,7 +84,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function websiteLabel()
     {
-		return $this->websiteLabel;
+        return $this->websiteLabel;
     }
 
     /**
@@ -93,7 +93,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function storeCode()
     {
-		return $this->storeCode;
+        return $this->storeCode;
     }
 
     /**
@@ -102,7 +102,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function storeLabel()
     {
-		return $this->storeLabel;
+        return $this->storeLabel;
     }
 
     /**
@@ -111,7 +111,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function viewCode()
     {
-		return $this->viewCode;
+        return $this->viewCode;
     }
 
     /**
@@ -120,7 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function viewLabel()
     {
-		return $this->viewLabel;
+        return $this->viewLabel;
     }
 
     /**

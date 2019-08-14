@@ -43,34 +43,34 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
      */
     public function setOriginal(Mage_Sales_Model_Quote_Item $original)
     {
-    	$this->name = $original->getName();
+        $this->name = $original->getName();
 
-    	$data = array();
-    	if ($optionData = $original->getOptionByCode('info_buyRequest')) {
-    		$product = $optionData->getProduct();
-    		//this converts the options to a usable format (same as order items)
-    		//see: Mage_Sales_Model_Convert_Quote::itemToOrderItem
-    		$options = $original->getProduct()->getTypeInstance(true)->getOrderOptions($original->getProduct());
-    		$attributes = array();
-    		if (isset($options['attributes_info'])) {
-    			//configurable products
-    			$attributes = $options['attributes_info'];
-    		} elseif (isset($options['bundle_options'])) {
-    			//bundle products
-    			$attributes = $options['bundle_options'];
-    		} elseif (isset($options['options'])) {
-    			//generic products
-    			$attributes = $options['options'];
-    		}
-    		
-    		if ($attributes) {
-    			foreach ($attributes as $attribute) {
-    				$data[$attribute['label']] = $attribute['value'];
-    			}
-    			$this->attributes = $data;
-    		}
-    	}
-    	
+        $data = array();
+        if ($optionData = $original->getOptionByCode('info_buyRequest')) {
+            $product = $optionData->getProduct();
+            //this converts the options to a usable format (same as order items)
+            //see: Mage_Sales_Model_Convert_Quote::itemToOrderItem
+            $options = $original->getProduct()->getTypeInstance(true)->getOrderOptions($original->getProduct());
+            $attributes = array();
+            if (isset($options['attributes_info'])) {
+                //configurable products
+                $attributes = $options['attributes_info'];
+            } elseif (isset($options['bundle_options'])) {
+                //bundle products
+                $attributes = $options['bundle_options'];
+            } elseif (isset($options['options'])) {
+                //generic products
+                $attributes = $options['options'];
+            }
+            
+            if ($attributes) {
+                foreach ($attributes as $attribute) {
+                    $data[$attribute['label']] = $attribute['value'];
+                }
+                $this->attributes = $data;
+            }
+        }
+        
         return $this;
     }
 
@@ -80,7 +80,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
      */
     public function name()
     {
-		return $this->name;
+        return $this->name;
     }
 
     /**
@@ -89,7 +89,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
      */
     public function attributes()
     {
-		return $this->attributes;
+        return $this->attributes;
     }
 
     /**

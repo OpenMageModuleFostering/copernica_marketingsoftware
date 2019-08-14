@@ -26,28 +26,17 @@
 
 /** 
  *  Settings Block
- *  
  */
 class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Settings extends Mage_Core_Block_Template
 {
-	/**
-	 * Constructor
-	 * 
-	 */
+    /**
+     * Constructor
+     * 
+     */
     public function __construct()
     {
         parent::__construct();
         $this->setTemplate('marketingsoftware/settings.phtml');
-    }
-
-    /**
-     * Returns the check settings URL.
-     * 
-     * @return string
-     */
-    public function getCheckSettingsUrl()
-    {
-        return $this->getUrl('*/*/checker', array('_secure' => true));
     }
 
     /**
@@ -58,5 +47,32 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Settings ext
     public function getPostUrl()
     {
         return $this->getUrl('*/*/send', array('_secure' => true));
+    }
+
+    /**
+     *  Returns the state URL
+     *  @return string
+     */
+    public function getStateUrl()
+    {
+        return Mage::helper('adminhtml')->getUrl('*/*/state');
+    }
+
+    /**
+     *  Returns the queue URL
+     *  @return string
+     */
+    public function getQueuePostUrl()
+    {
+        return Mage::helper('adminhtml')->getUrl('*/*/queue');
+    }
+
+    /**
+     *  Returns the stores URL
+     *  @return string
+     */
+    public function getStoresPostUrl()
+    {
+        return Mage::helper('adminhtml')->getUrl('*/*/stores');
     }
 }

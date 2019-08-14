@@ -29,6 +29,11 @@
  */
 abstract class Copernica_MarketingSoftware_Model_QueueEvent_QuoteItem extends Copernica_MarketingSoftware_Model_QueueEvent_Abstract
 {
+    /**
+     *  Quote Item
+     */
+    private $quoteItem;
+
      /**
      *  Process this item in the queue
      *  @return boolean was the processing successfull
@@ -36,38 +41,79 @@ abstract class Copernica_MarketingSoftware_Model_QueueEvent_QuoteItem extends Co
     public function process()
     {
         // Get the copernica API and config helper
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        $api = Mage::helper('marketingsoftware/api');
 
         // Get the subscription which has been modified
-        $quoteItem = $this->getObject();
-        $quote = $quoteItem->quote();
-
-        // if there is no customer, we cannot process this so return immediately
-        if (!is_object($customer = $quote->customer())) return true;
+        $this->quoteItem = $this->getObject();
 
         // Get the customer
-        $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
-                            ->setCustomer($quote->customer())
-                            ->setDirection('copernica');
+        $customerData = $this->getCustomerData();
 
+        // if we don't have customer data we don't really care about this item
+        if ($customerData === false) return true;
+
+        // get profile Id
+        $profileId = $api->getProfileId($customerData);
+        
         // Get the profiles from the api
         $api->updateProfiles($customerData);
-        $profiles = $api->searchProfiles($customerData->id());
 
-        // Get the cart item data
-        $cartItemData = Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
-                            ->setQuoteItem($quoteItem)
-                            ->setDirection('copernica')
-                            ->setStatus($this->status());
-
-        // Iterate over the matching profiles and add / update the quote item
-        foreach ($profiles->items as $profile)
+        /*
+         *  It's possible that we will be trying to update a customer that is not
+         *  yet present in copernica database. In such situation we should create
+         *  it's profile so we can use profileId for subprofiles. Thus there is
+         *  no point in waiting till profile is created. Instead we will send 
+         *  request to create profile and respawn this event. This way we will not
+         *  be waitning and therefore we will not block other events.
+         */
+        if ($profileId === false)
         {
-            $api->updateCartItemSubProfiles($profile->id, $cartItemData);
+            // respawn this event with the same data
+            $this->respawn();
+
+            // we are done here
+            return true;
         }
+
+        // update cart item subprofile
+        $api->updateCartItemSubProfiles($profileId, $this->getCartItemData());
 
         // all went allright
         return true;
+    }
+
+    /**
+     *  Get customer data
+     *  @return Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer
+     */
+    private function getCustomerData()
+    {
+        // get and prepare customer data
+        $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer');
+
+        // get the customer from the quote
+        $customer = $this->quoteItem->quote()->customer();
+
+        // if we don't have customer we can not return customer data (that makes sense...)
+        if (!is_object($customer)) return false;
+
+        // set customer and direction
+        $customerData->setCustomer($customer)->setDirection('copernica');
+
+        // return customer data
+        return $customerData;
+    }
+
+    /**
+     *  Get cart item data
+     *  @return Copernica_MarketingSoftware_Model_Copernica_CartItemSubprofile
+     */ 
+    private function getCartItemData()
+    {
+        return Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
+            ->setQuoteItem($this->quoteItem)
+            ->setDirection('copernica')
+            ->setStatus($this->status());
     }
 
     /**

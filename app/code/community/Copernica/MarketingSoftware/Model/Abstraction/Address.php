@@ -69,62 +69,62 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
         $this->telephone = $original->getTelephone();
         $this->fax = $original->getFax();
         
-		if ($type = $original->getAddressType()) {
-        	$this->type = array($type);
+        if ($type = $original->getAddressType()) {
+            $this->type = array($type);
         } else {
-        	$types = array();
-        	if ($customer = $original->getCustomer()) {
-        		$id = $original->getId();
-        		if ($customer->getData('default_billing') == $id) {
-        			$types[] = 'billing';
-        		}
-        		if ($customer->getData('default_shipping') == $id) {
-        			$types[] = 'shipping';
-        		}
-        	}
-        	$this->type = $types;
+            $types = array();
+            if ($customer = $original->getCustomer()) {
+                $id = $original->getId();
+                if ($customer->getData('default_billing') == $id) {
+                    $types[] = 'billing';
+                }
+                if ($customer->getData('default_shipping') == $id) {
+                    $types[] = 'shipping';
+                }
+            }
+            $this->type = $types;
         }
         
-       	//the order quote address model only returns a customer if it exists
-       	if ($customerId = $original->getCustomerId()) {
-       		$this->customerId = $original->getCustomerId();
+        //the order quote address model only returns a customer if it exists
+        if ($customerId = $original->getCustomerId()) {
+            $this->customerId = $original->getCustomerId();
         } elseif ($customer = $original->getCustomer()) {
-        	$this->customerId = $customer->getId();
+            $this->customerId = $customer->getId();
         } 
         
-       	// Get the normal identifier
-       	$id = $original->getId();
+        // Get the normal identifier
+        $id = $original->getId();
         
-       	// switch depending on the type
-       	switch(get_class($original)) {
-        	case "Mage_Sales_Model_Order_Address":
-        		if ($cid = $original->getCustomerAddressId()) {
-        			$this->id = 'ca_'.$cid;
-        		} else {
-        			$this->id = 'oa_'.$id;
-        		}
-        		break;
-        	case "Mage_Sales_Model_Quote_Address":
-        		if ($cid = $original->getCustomerAddressId()) {
-        			$this->id = 'ca_'.$cid;
-        		} else {
-        			$this->id = 'qa_'.$id;
-        		}
-        		break;
-        	case "Mage_Customer_Model_Address": 
-        		$this->id = 'ca_'.$id;
-        		break;
-        	default: 
-        		$this->id = $id;
-       	}
+        // switch depending on the type
+        switch(get_class($original)) {
+            case "Mage_Sales_Model_Order_Address":
+                if ($cid = $original->getCustomerAddressId()) {
+                    $this->id = 'ca_'.$cid;
+                } else {
+                    $this->id = 'oa_'.$id;
+                }
+                break;
+            case "Mage_Sales_Model_Quote_Address":
+                if ($cid = $original->getCustomerAddressId()) {
+                    $this->id = 'ca_'.$cid;
+                } else {
+                    $this->id = 'qa_'.$id;
+                }
+                break;
+            case "Mage_Customer_Model_Address": 
+                $this->id = 'ca_'.$id;
+                break;
+            default: 
+                $this->id = $id;
+        }
 
-		if ($email = $original->getEmail()) {
-			$this->email = $email;
-		} elseif (is_object($order = $original->getOrder()) && $customerEmail = $order->getCustomerEmail()) {
-			$this->email = $customerEmail;
-		} elseif (is_object($quote = $original->getQuote()) && $customerEmail = $quote->getCustomerEmail()) { 
-			$this->email = $customerEmail;
-       	}
+        if ($email = $original->getEmail()) {
+            $this->email = $email;
+        } elseif (is_object($order = $original->getOrder()) && $customerEmail = $order->getCustomerEmail()) {
+            $this->email = $customerEmail;
+        } elseif (is_object($quote = $original->getQuote()) && $customerEmail = $quote->getCustomerEmail()) { 
+            $this->email = $customerEmail;
+        }
         
         return $this;
     }
@@ -135,7 +135,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function type()
     {
-		return $this->type;
+        return $this->type;
     }
     
     /**
@@ -144,10 +144,10 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function customer()
     {
-		if ($this->customerId) {
+        if ($this->customerId) {
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
         } else {
-        	return null;
+            return null;
         }
     }
     
@@ -158,7 +158,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function id()
     {
-		return $this->id;
+        return $this->id;
     }
     
     /**
@@ -167,7 +167,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function name()
     {
-		return $this->name;
+        return $this->name;
     }
 
     /**
@@ -176,7 +176,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function email()
     {
-		return $this->email;
+        return $this->email;
     }
 
     /**
@@ -185,7 +185,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function street()
     {
-		return $this->street;
+        return $this->street;
     }
 
     /**
@@ -194,7 +194,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function city()
     {
-		return $this->city;
+        return $this->city;
     }
 
     /**
@@ -203,7 +203,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function zipcode()
     {
-		return $this->zipcode;
+        return $this->zipcode;
     }
 
     /**
@@ -212,7 +212,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function state()
     {
- 		return $this->state;
+        return $this->state;
     }
 
     /**
@@ -221,7 +221,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function countryCode()
     {
-		return $this->countryCode;
+        return $this->countryCode;
     }
 
     /**
@@ -230,7 +230,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function telephone()
     {
-		return $this->telephone;
+        return $this->telephone;
     }
 
     /**
@@ -239,7 +239,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function fax()
     {
-		return $this->fax;
+        return $this->fax;
     }
 
     /**
@@ -248,7 +248,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      */
     public function company()
     {
-		return $this->company;
+        return $this->company;
     }
 
     /**

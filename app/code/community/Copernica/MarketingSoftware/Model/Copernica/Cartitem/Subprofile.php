@@ -97,40 +97,53 @@ class Copernica_MarketingSoftware_Model_Copernica_Cartitem_Subprofile extends Co
         // Store the quoteItem and the product localy
         $quoteItem = $this->quoteItem;
         $product =  $quoteItem->product();
+        $quote = $quoteItem->quote();
 
-        // Get the store id to make sure that we retrieve the correct url's
-        if (($quote = $quoteItem->quote()) && ($storeview = $quote->storeview())) $storeId = $storeview->id();
-        else $storeId = null;
-
-        // flatten the categories
-        $categories = array();
-        if ($product->categories()) {
-        	foreach ($product->categories() as $category) $categories[] = implode(' > ', $category);
-        }
-
-        // Get the price object
-        $price = $quoteItem->price();
-
-        // construct an array of data
-        return array(
+        // construct most of the data from objects that should be available
+        $data = array(
             'item_id'       =>  $quoteItem->id(),
-            'quote_id'      =>  $quoteItem->quote()->id(),
+            'quote_id'      =>  $quote->id(),
             'product_id'    =>  $product->id(),
-            'price'         =>  is_object($price) ? $price->itemPrice() : null,
             'status'        =>  $this->status,
             'name'          =>  $product->name(),
             'sku'           =>  $product->sku(),
-        	'attribute_set' =>	$product->attributeSet(),
+            'attribute_set' =>  $product->attributeSet(),
             'weight'        =>  $quoteItem->weight(),
             'quantity'      =>  $quoteItem->quantity(),
             'timestamp'     =>  $quoteItem->timestamp(),
-            'store_view'    =>  (string)$quoteItem->quote()->storeView(),
-            'total_price'   =>  is_object($price) ? $price->total() : null,
-            'url'           =>  $product->productUrl($storeId),
-            'image'         =>  $product->imageUrl($storeId),
-            'categories'    =>  implode("\n", $categories),
             'attributes'    =>  (string)$product->attributes(),
-            'options'       =>  (string)$quoteItem->options(),
+            'options'       =>  (string)$quoteItem->options()
         );
+
+        // get store view from quote
+        $storeView = $quote->storeView();
+
+        // check if we have a valid store view
+        if ($storeView) {
+            $storeId = $storeView->id();
+
+            $data['store_view'] = (string)$storeView;
+            $data['url'] = $product->productUrl($storeId);
+            $data['image'] = $product->imageUrl($storeId);
+        }
+        // if we don't have store view then just assign empty strings
+        else {
+            $data['store_view'] = '';
+            $data['url'] = '';
+            $data['image'] = '';
+        }
+
+        // assign price if we have one
+        if ($price = $quoteItem->price()) {
+            $data['price'] = $price->itemPrice();
+            $data['total_price'] = $price->total();
+        }
+
+        // format categories
+        $data['categories'] = implode("\n", array_map(function($category) {
+            return implode(' > ', $category);
+        }, $product->categories()));
+
+        return $data;
     }
 }

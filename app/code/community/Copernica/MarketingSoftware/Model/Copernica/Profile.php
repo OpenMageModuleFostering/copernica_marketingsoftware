@@ -39,6 +39,18 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Profile extends Coper
     }
 
     /**
+     *  Return email associated with profile
+     *  @return string
+     */    
+    abstract public function email();
+
+    /**
+     *  Return store view associated with profile
+     *  @return string
+     */
+    abstract public function storeView();
+
+    /**
      * Fallback method for profile objects not having this method.
      *
      * @return string

@@ -24,65 +24,72 @@
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-require_once(dirname(__FILE__).'/../Error.php');
-
 /**
  * Factory class for getting queue event objects
  */
 class Copernica_MarketingSoftware_Model_QueueEvent_Factory
 {
-	/**
-	 *  Get the right object
-	 *
-	 *  @return Copernica_MarketingSoftware_Model_QueueEvent_Abstract
-	 */
-	public function get($queueItem)
-	{
-		// If we want to start a full synchronisation, we should return a start sync object
-		if ($queueItem->getAction() == 'start_sync') {
-			$classname = Mage::getConfig()->getModelClassName('marketingsoftware/QueueEvent_StartSync');
-			return new $classname($queueItem);
-		}
-	
-		// Prepare the action, to append it to the classname
-		$action = ucfirst($queueItem->getAction());
-		
-		// What kind of class is given
-		switch (get_class($queueItem->getObject()))
-		{
-			case "Copernica_MarketingSoftware_Model_Abstraction_Quote":
-				$classname = "marketingsoftware/QueueEvent_Quote".$action;
-				break;
-	
-			case "Copernica_MarketingSoftware_Model_Abstraction_Quote_Item":
-				$classname = "marketingsoftware/QueueEvent_QuoteItem".$action;
-				break;
-	
-			case "Copernica_MarketingSoftware_Model_Abstraction_Customer":
-				$classname = "marketingsoftware/QueueEvent_Customer".$action;
-				break;
-	
-			case "Copernica_MarketingSoftware_Model_Abstraction_Order":
-				$classname = "marketingsoftware/QueueEvent_Order".$action;
-				break;
-	
-			case "Copernica_MarketingSoftware_Model_Abstraction_Subscription":
-				$classname = "marketingsoftware/QueueEvent_Subscription".$action;
-				break;
-				
-			case "Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct":
-				$classname = "marketingsoftware/QueueEvent_ViewedProduct".$action;
-				break;
-		}
-	
-		// No classname, throw an error
-		if (!isset($classname)) throw new CopernicaError(COPERNICAERROR_UNRECOGNIZEDEVENT);
+    /**
+     *  Get the right object
+     *
+     *  @return Copernica_MarketingSoftware_Model_QueueEvent_Abstract
+     */
+    public function get($queueItem)
+    {
+        // If we want to start a full synchronisation, we should return a start sync object
+        if ($queueItem->getAction() == 'start_sync') 
+        {
+            $classname = Mage::getConfig()->getModelClassName('marketingsoftware/QueueEvent_StartSync');
+            return new $classname($queueItem);
+        }
 
-		// Get correct classname
-		$classname = Mage::getConfig()->getModelClassName($classname);
-		if (!class_exists($classname)) throw new CopernicaError(COPERNICAERROR_UNRECOGNIZEDEVENT);
+        // if we want to upgrade customer, we should return proper event
+        if ($queueItem->getAction() == 'upgrade') 
+        {
+            $classname = Mage::getConfig()->getModelClassName('marketingsoftware/QueueEvent_CustomerUpgrade');
+            return new $classname($queueItem);
+        } 
+    
+        // Prepare the action, to append it to the classname
+        $action = ucfirst($queueItem->getAction());
+        
+        // What kind of class is given
+        switch (get_class($queueItem->getObject()))
+        {
+            case "Copernica_MarketingSoftware_Model_Abstraction_Quote":
+                $classname = "marketingsoftware/QueueEvent_Quote".$action;
+                break;
+    
+            case "Copernica_MarketingSoftware_Model_Abstraction_Quote_Item":
+                $classname = "marketingsoftware/QueueEvent_QuoteItem".$action;
+                break;
+    
+            case "Copernica_MarketingSoftware_Model_Abstraction_Customer":
+                $classname = "marketingsoftware/QueueEvent_Customer".$action;
+                break;
+    
+            case "Copernica_MarketingSoftware_Model_Abstraction_Order":
+                $classname = "marketingsoftware/QueueEvent_Order".$action;
+                break;
+    
+            case "Copernica_MarketingSoftware_Model_Abstraction_Subscription":
+                $classname = "marketingsoftware/QueueEvent_Subscription".$action;
+                break;
+                
+            case "Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct":
+                $classname = "marketingsoftware/QueueEvent_ViewedProduct".$action;
+                break;
+        }
 
-		// construct the object
-		return new $classname($queueItem);
-	}
+        if (!isset($classname))
+            throw Mage::exception('Copernica_MarketingSoftware', 'Event type does not exists: '.$classname, Copernica_MarketingSoftware_Exception::EVENT_NO_TYPE);
+
+        // Get correct classname
+        $classname = Mage::getConfig()->getModelClassName($classname);
+        if (!class_exists($classname)) 
+            throw Mage::exception('Copernica_MarketingSoftware', 'Event type does not exists: '.$classname, Copernica_MarketingSoftware_Exception::EVENT_TYPE_NOT_EXISTS);
+
+        // construct the object
+        return new $classname($queueItem);
+    }
 }

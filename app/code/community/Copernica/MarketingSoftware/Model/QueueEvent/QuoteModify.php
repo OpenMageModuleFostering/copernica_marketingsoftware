@@ -29,54 +29,104 @@
  */
 class Copernica_MarketingSoftware_Model_QueueEvent_QuoteModify extends Copernica_MarketingSoftware_Model_QueueEvent_Abstract
 {
-     /**
+    /**
+     *  Quote object
+     */
+    private $quote;
+
+    /**
+     *  Id of a profile in copernica env
+     *  @var int
+     */
+    private $profileId;
+
+    /**
      *  Process this item in the queue
      *  @return boolean was the processing successfull
      */
     public function process()
     {
-        // Get the copernica API and config helper
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        /*
+         *  We will need Api instnace, quote, customer data and target profile Id
+         */
+        $api = Mage::helper('marketingsoftware/api');
+        $this->quote = $this->getObject();
+        $customerData = $this->getCustomerData();
 
-        // Get the subscription which has been modified
-        $quote = $this->getObject();
-
-        // is there a customer?
-        if (is_object($customer = $quote->customer()))
-        {
-            $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
-                            ->setCustomer($customer);
-        }
-        else
-        {
-            $customerData = Mage::getModel('marketingsoftware/copernica_profilequote')
-                            ->setQuote($quote);
-        }
-
-        // The direction should be set
-        $customerData->setDirection('copernica');
-
-        // Update the profiles given the customer and return the found profiles
+        // update profiles, this will create a profile if it does not exists
         $api->updateProfiles($customerData);
-        $profiles = $api->searchProfiles($customerData->id());
 
-        // iterate over the items to add them to the cart items collection
-        foreach ($quote->items() as $quoteItem)
+        // get profile Id        
+        $profileId = $api->getProfileId($customerData);
+
+        /*
+         *  It's possible that we will be trying to update a customer that is not
+         *  yet present in copernica database. In such situation we should create
+         *  it's profile so we can use profileId for subprofiles. Thus there is
+         *  no point in waiting till profile is created. Instead we will send 
+         *  request to create profile and respawn this event. This way we will not
+         *  be waitning and therefore we will not block other events.
+         */
+        if ($profileId === false)
         {
-            // Get the cart item data
-            $cartItemData = Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
-                                ->setQuoteItem($quoteItem)
-                                ->setDirection('copernica')
-                                ->setStatus('basket');
 
-            // Iterate over the matching profiles and add / update the quote item
-            foreach ($profiles->items as $profile)
-            {
-                $api->updateCartItemSubProfiles($profile->id, $cartItemData);
-            }
+            // respawn this event with the same data
+            $this->respawn();
+
+            // we are done here
+            return true;
         }
 
+        // cache profile Id
+        $this->profileId = $profileId;
+
+        // update quote items
+        $this->updateQuoteItems();
+        
         // This quote was successfully synchronized
         return true;
+    }
+
+    /**
+     *  Get customer data
+     *  @return Copernica_MarketingSoftware_Model_Copernica_ProfileQuote|Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer
+     */
+    private function getCustomerData()
+    {
+        // get customer
+        $customer = $this->quote->customer(); 
+
+        // check if we have real customer instance
+        if (!is_object($customer)) return Mage::getModel('marketingsoftware/copernica_profilequote')->setQuote($this->quote)->setDirection('copernica');
+
+        // return customer data
+        return Mage::getModel('marketingsoftware/copernica_profilecustomer')->setCustomer($customer)->setDirection('copernica');
+    }
+
+    /**
+     *  Update all quote items
+     */
+    private function updateQuoteItems()
+    {
+        // get Api instance
+        $api = Mage::helper('marketingsoftware/api');
+
+        // iterate over all quote items
+        foreach ($this->quote->items() as $item)
+        {
+            // update item subprofile
+            $api->updateCartItemSubProfiles($this->profileId, $this->getQuoteItemData($item));
+        }
+    }
+
+    /**
+     *  Get quote item data
+     */
+    private function getQuoteItemData($quoteItem)
+    {
+        return Mage::getModel('marketingsoftware/copernica_cartitem_subprofile')
+            ->setQuoteItem($quoteItem)
+            ->setDirection('copernica')
+            ->setStatus('basket');
     }
 }

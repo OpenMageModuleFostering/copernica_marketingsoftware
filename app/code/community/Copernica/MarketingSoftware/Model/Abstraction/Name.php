@@ -78,7 +78,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function middlename()
     {
-		return $this->middlename;
+        return $this->middlename;
     }
 
     /**
@@ -87,7 +87,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function lastname()
     {
-		return $this->lastname;
+        return $this->lastname;
     }
 
     /**

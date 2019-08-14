@@ -19,6 +19,10 @@
                     <title>Synchronize Data</title>
                     <action>adminhtml/marketingsoftware_export</action>
                 </export>
+                <!-- <sync translate="title" module="marketingsoftware">
+                    <title>Synchronization profiles</title>
+                    <action>adminhtml/marketingsoftware_sync</action>
+                </sync> -->
             </children>
         </copernica>
     </menu>
@@ -39,6 +43,9 @@
                             <export translate="title">
                                 <title>Synchronize Data</title>
                             </export>
+                            <sync translate="title">
+                                <title>Synchronization profiles</title>
+                            </sync>
                         </children>
                     </copernica>
                </children>

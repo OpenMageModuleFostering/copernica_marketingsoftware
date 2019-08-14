@@ -36,28 +36,20 @@ class Copernica_MarketingSoftware_Model_QueueEvent_SubscriptionModify extends Co
     public function process()
     {
         // Get the copernica API
-        $api = Mage::getSingleton('marketingsoftware/marketingsoftware')->api();
+        $api = Mage::helper('marketingsoftware/api');
 
         // Get the subscription which has been modified
         $subscription = $this->getObject();
 
-        // is there a customer?
-        if (is_object($customer = $subscription->customer()))
+        // is there a customer? We do also want to ensure that customer have an id
+        if (is_object($customer = $subscription->customer()) && $customer->id())
         {
-            // Maybe this is an old subscription which is updated, use the subscriber
-            // identifier, so that the old record is updated, the typo 'subcr' should
-            // remain there for backwards compatibility
-            $identifier = 'subcr_'.$subscription->id();
-
             // get the customer data
             $customerData = Mage::getModel('marketingsoftware/copernica_profilecustomer')
                             ->setCustomer($customer);
         }
         else
         {
-            // use the normal identifier
-            $identifier = false;
-
             // get the customer data
             $customerData = Mage::getModel('marketingsoftware/copernica_profilesubscription')
                             ->setSubscription($subscription);
@@ -72,10 +64,10 @@ class Copernica_MarketingSoftware_Model_QueueEvent_SubscriptionModify extends Co
         // this might result in two profiles with the same customer_id
         $profiles = $api->searchProfiles($customerData->id());
 
-        // we received an invalid response
-        if (!is_object($profiles)) return false;
+        // @todo make a more generic implementation of api result
+        if (isset($profiles['total']) && $profiles['total'] > 0) return true;
 
-        // this subscription is processed
-        return true;
+        // we didn't confirmed that profile is subscribed to newsletter
+        return false;
     }
 }

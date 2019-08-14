@@ -45,7 +45,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
     
     /**
      *  Try to store a quote item
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile
+     *  @param  Copernica_MarketingSoftware_Model_Abstract
      */
     public function setOrder($order)
     {
@@ -79,9 +79,12 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
     {
         // initialize the addresses
         $billingAddress = $shippingAddress = false;
+
+        // get all addresses associated with given order
+        $addresses = $this->order->addresses();
     
         // Get the addresses
-        foreach ($this->order->addresses() as $address) {
+        if (is_array($addresses)) foreach ($addresses as $address) {
             if (in_array('billing', $address->type()))  $billingAddress = $address;
             if (in_array('shipping', $address->type())) $shippingAddress = $address;
         }

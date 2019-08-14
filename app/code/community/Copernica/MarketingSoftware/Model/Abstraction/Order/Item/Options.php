@@ -43,30 +43,30 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-		$this->name = $original->getName();
+        $this->name = $original->getName();
 
-		$attributes = array();
-		$data = array();
-		$options = $original->getProductOptions();
-		
-		if (isset($options['attributes_info'])) {
-			//configurable products
-			$attributes = $options['attributes_info'];
-		} elseif (isset($options['bundle_options'])) {
-			//bundle products
-			$attributes = $options['bundle_options'];
-		} elseif (isset($options['options'])) {
-			//generic products
-			$attributes = $options['options'];
-		}
-		
-		if ($attributes) {
-			foreach ($attributes as $attribute) {
-				$data[$attribute['label']] = $attribute['value'];
-			}
-			$this->attributes = $data;
-		}	
-    	
+        $attributes = array();
+        $data = array();
+        $options = $original->getProductOptions();
+        
+        if (isset($options['attributes_info'])) {
+            //configurable products
+            $attributes = $options['attributes_info'];
+        } elseif (isset($options['bundle_options'])) {
+            //bundle products
+            $attributes = $options['bundle_options'];
+        } elseif (isset($options['options'])) {
+            //generic products
+            $attributes = $options['options'];
+        }
+        
+        if ($attributes) {
+            foreach ($attributes as $attribute) {
+                $data[$attribute['label']] = $attribute['value'];
+            }
+            $this->attributes = $data;
+        }   
+        
         return $this;
     }
 
@@ -76,7 +76,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function name()
     {
-		return $this->name;
+        return $this->name;
     }
 
     /**
@@ -85,7 +85,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function attributes()
     {
-		return $this->attributes;
+        return $this->attributes;
     }
 
     /**

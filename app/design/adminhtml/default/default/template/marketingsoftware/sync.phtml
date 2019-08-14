@@ -1,0 +1,246 @@
+<?php
+    /**
+     *  This site will take care of managing synchronization profiles.
+     */
+?>
+
+<div class="columns">
+    <div class="side-col">
+        <h3>
+            Synchronization profiles
+        </h3>
+        <ul id="profile_list" class="tabs">
+            <?php foreach ($this->getSyncProfiles() as $profile) { ?>
+            <li data-profile-id="<?php echo $profile->getId();?>">
+                <a class="tab-item-link">
+                    <span>
+                        <?php echo $profile->getName(); ?>
+                    </span>
+                </a>
+            </li>
+            <?php } ?>
+        </ul>
+    </div>
+
+    <div class="main-col">
+        <div class="main-col-inner">
+            <div class="content-header">
+                <h3>
+                    Synchronization profile
+                </h3>
+                <div class="content-buttons-placeholder">
+                    <p class="content-buttons form-buttons">
+                        <button type="button" title="Add" class="scalable add" id="form_buttons_add">
+                            <span>
+                                Add
+                            </span>
+                        </button>
+                        <button type="button" title="Save" class="scalable save" id="form_buttons_store">
+                            <span>
+                                Store
+                            </span>
+                        </button>
+                        <button type="button" title="Delete" class="scalable delete" id="form_buttons_delete">
+                            <span>
+                                Delete
+                            </span>
+                        </button>   
+                    </p>
+                </div>
+            </div>
+            <form id="sync_profile_form" action="<?php echo $this->getPostUrl();?>" method="post">
+                <?php echo $this->getBlockHtml('formkey'); ?>
+                <input type="hidden" name="id">
+                <div class="entry-edit">
+                    <div class="entry-edit-head">
+                        <h4>
+                            General 
+                        </h4>
+                    </div>
+                    <div class="fieldset fieldset-wide">
+                        <table class="form-list">
+                            <tbody>
+                                <tr>
+                                    <td class="label">
+                                        Name
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" class="input-text" name="name">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">
+                                        Client secret
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" class="input-text" name="client_secret">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">
+                                        Client key
+                                    </td>
+                                    <td class="value">
+                                        <input type="text" class="input-text" name="client_key">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">
+                                        Status
+                                    </td>
+                                    <td class="value">
+                                        <code id="status">
+                                            unknown
+                                        </code>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">
+                                        Access token
+                                    </td>
+                                    <td class="value">
+                                        <code id="access_token">
+                                            none
+                                        </code>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="entry-edit-head">
+                        <h4>
+                            Stores
+                        </h4>
+                    </div>
+                    <div class="fieldset fieldset-wide">
+                        <table class="form-list">
+                            <tbody>
+                                <tr>
+                                    <td class="label">
+                                        Stores
+                                    </td>
+                                    <td class="value" id="stores">
+                                        <!-- shoule be filled with javascript -->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form> 
+        </div>
+    </div>
+</div>
+
+<script>
+    // assign click handler on 'store' button
+    $('form_buttons_store').onclick = function (event) {
+        $('sync_profile_form').submit();
+    };
+
+    // url that we will use to make synchronization
+    var authorizationUrl = '<?php echo $this->getAuthorizationUrl();?>';
+
+    // helper function to clear from from previos data
+    var clearForm = function () {
+
+        // reset inputs
+        $$('#sync_profile_form input[name="id"]')[0].setValue('');
+        $$('#sync_profile_form input[name="name"]')[0].setValue('');
+        $$('#sync_profile_form input[name="client_key"]')[0].setValue('');
+        $$('#sync_profile_form input[name="client_secret"]')[0].setValue('');
+        $$('#sync_profile_form #access_token')[0].innerHTML = 'none';
+        $$('#sync_profile_form #status')[0].innerHTML = 'unknown';
+
+        // remove all childs from stores container
+        var child;
+        while (child = $('stores').firstChild) $('stores').removeChild(child);
+    };
+
+    // assign click handler on list items
+    $('profile_list').onclick = function (event) {
+        // get clicked profile Id
+        var profileId = $(event.target).up('*[data-profile-id]').getAttribute('data-profile-id');
+
+        // make ajax request to get data about profile
+        new Ajax.Request( '<?php echo $this->getProfileUrl(); ?>', {
+            method: 'post',
+            requestHeaders: { Accept: 'application/json' },
+            parameters: {
+                id: profileId
+            },
+            onSuccess: function (response) {
+                // clear form
+                clearForm();
+
+                // assign inputs
+                $$('#sync_profile_form input[name="id"]')[0].setValue(response.responseJSON['id']);
+                $$('#sync_profile_form input[name="name"]')[0].setValue(response.responseJSON['name']);
+                $$('#sync_profile_form input[name="client_key"]')[0].setValue(response.responseJSON['client_key']);
+                $$('#sync_profile_form input[name="client_secret"]')[0].setValue(response.responseJSON['client_secret']);
+
+                // when we have access token we want to show that it's valid
+                if (response.responseJSON['access_token']) {
+                    $$('#sync_profile_form #access_token')[0].textContent = response.responseJSON['access_token'];
+                    $$('#sync_profile_form #status')[0].innerHTML = 'valid';
+                }
+
+                // we should put activation url
+                else {
+                    var link = document.createElement('A');
+                    link.setAttribute('href', authorizationUrl+'&client_id='+response.responseJSON['client_key']+'&state='+response.responseJSON['state']);
+                    link.textContent = 'authorize';
+
+                    $$('#sync_profile_form #status')[0].innerHTML = '';
+                    $$('#sync_profile_form #status')[0].appendChild(link);
+
+                    $$('#sync_profile_form #access_token')[0].textContent = 'none';
+                }
+
+                // if we have available store we should construct a list of them
+                if (response.responseJSON['stores'])
+                {
+                    // get the stores container
+                    var storesContainer = $('stores');
+
+                    // iterate over stores output and create childs with them
+                    for (var storeId in response.responseJSON['stores'])
+                    {
+                        // create new element
+                        var storeItem = document.createElement('DIV');
+
+                        // create the checkbox
+                        var storeCheckbox = document.createElement('INPUT');
+                        storeCheckbox.setAttribute('type', 'checkbox');
+                        storeItem.appendChild(storeCheckbox);
+
+                        // create the label
+                        var storeLabel = document.createElement('SPAN');
+                        storeLabel.textContent = response.responseJSON['stores'][storeId];
+                        storeItem.appendChild(storeLabel);
+
+                        // append item to container
+                        storesContainer.appendChild(storeItem);
+                    }
+                }
+            }
+        });
+    };
+
+    // install click handler on 'delete' button 
+    $('form_buttons_delete').onclick = function (event) {
+        new Ajax.Request( '<?php echo $this->getDeleteUrl(); ?>', {
+            parameters : {
+                id : $$('#sync_profile_form input[name="id"]')[0].getValue()
+            },
+            onSuccess: function (event) {
+                window.location.reload();
+            }
+        });
+    };
+
+    // install click handler on 'add' button
+    $('form_buttons_add').onclick = function (event) {
+        clearForm();
+    };
+</script>

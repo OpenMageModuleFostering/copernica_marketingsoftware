@@ -53,14 +53,25 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer extends Copern
      */
     public function originalId()
     {
-    	// If the email address has been changed return the old id
-    	if ($this->customer->oldEmail() != $this->customer->email()) {
-    		$email = $this->customer->oldEmail();
-    	} else {
-    		$email = $this->customer->email();
-    	}
-    	
-    	return Mage::helper('marketingsoftware')->generateCustomerId($email, (string) $this->customer->storeview());
+        return Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($this->customer, $this->customer->storeview());
+    }
+
+    /** 
+     *  Get profile email.
+     *  @return string
+     */
+    public function email()
+    {
+        return $this->customer->email();
+    }
+
+    /**
+     *  Return store view associated with profile.
+     *  @return string
+     */
+    public function storeView()
+    {
+        return (string)$this->customer->storeview();
     }
 
     /**
@@ -75,19 +86,37 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer extends Copern
         // fetch the name object
         $name = $this->customer->name();
 
+        // fetch the email
         $email = $this->customer->email();
-        
+
+        // get store view
+        $storeview = $this->customer->storeview();
+
+        // get customer Id
+        $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($this->customer, $storeview);
+
+        // Somehow a birthdate can have different types
+        $customerBirthDate = $this->customer->birthDate();
+
+        // Handle the birthdate
+        if(is_object($customerBirthDate))
+            $birthDate = $customerBirthDate->gmtDate();
+        elseif(is_string($customerBirthDate) && strtotime($customerBirthDate))
+            $birthDate = $customerBirthDate;
+        else $birthDate = '0000-00-00';
+
         // return an array with customer data
         return array(
-            'customer_id'   =>  Mage::helper('marketingsoftware')->generateCustomerId($email, (string)$this->customer->storeview()),
-            'store_view'    =>  (string)$this->customer->storeview(),
+            'customer_id'   =>  $customerId,
+            'store_view'    =>  (string)$storeview,
             'firstname'     =>  is_object($name) ? $name->firstname() : null,
             'middlename'    =>  is_object($name) ? $name->middlename() : null,
             'lastname'      =>  is_object($name) ? $name->lastname() : null,
             'email'         =>  $email,
+            'birthdate'     =>  $birthDate,
             'group'         =>  $this->customer->group(),
             'newsletter'    =>  is_object($subscription) ? $subscription->status() : 'unknown',
-            'gender'        =>  $this->customer->gender() ? $this->customer->gender() : 'unknown'
+            'gender'        =>  $this->customer->gender()
         );
     }
 }

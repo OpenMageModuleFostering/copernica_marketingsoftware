@@ -45,7 +45,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
 
     /**
      *  Try to store a quote item
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
+     *  @return  Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
      */
     public function setOrderItem($item)
     {
@@ -81,39 +81,53 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
         $orderItem = $this->orderItem;
         $product =  $orderItem->product();
 
-        // Get the store id to make sure that we retrieve the correct url's
-        if (($order = $orderItem->order()) && is_object($order) && ($storeview = $order->storeview())) $storeId = $storeview->id();
-        else $storeId = null;
-
-        // flatten the categories
-        $categories = array();
-        if ($product->categories()) {
-        	foreach ($product->categories() as $category) $categories[] = implode(' > ', $category);
-        }
-
-        // Get the price
-        $price = $orderItem->price();
-
-        // construct an array of data
-        return array(
+        $data = array(
             'item_id'       =>  $orderItem->id(),
-            'order_id'      =>  is_object($order) ? $order->id() : null,
-            'increment_id'  =>  is_object($order) ? $order->incrementId() : null,
             'product_id'    =>  $product->id(),
-            'price'         =>  is_object($price) ? $price->itemPrice() : null,
             'name'          =>  $product->name(),
             'sku'           =>  $product->sku(),
-        	'attribute_set' =>	$product->attributeSet(),
+            'attribute_set' =>  $product->attributeSet(),
+            'attributes'    =>  (string)$product->attributes(),
             'weight'        =>  $orderItem->weight(),
             'quantity'      =>  $orderItem->quantity(),
             'timestamp'     =>  $orderItem->timestamp(),
-            'store_view'    =>  is_object($order) ? (string)$order->storeView() : null,
-            'total_price'   =>  is_object($price) ? $price->total() : null,
-            'url'           =>  $product->productUrl($storeId),
-            'image'         =>  $product->imageUrl($storeId),
-            'categories'    =>  implode("\n", $categories),
-            'attributes'    =>  (string)$product->attributes(),
-            'options'       =>  (string)$orderItem->options(),
+            'options'       =>  (string)$orderItem->options()
         );
+
+        // get order item
+        $order = $orderItem->order();
+
+        // check if we have a valid order object
+        if (is_object($order)) 
+        {
+            $data['order_id'] = $order->id();
+            $data['increment_id'] = $order->incrementId();
+
+            $storeView = $order->storeView();
+            $storeId = $storeView->id();
+
+            $data['store_view'] = (string)$storeView;
+            $data['url'] = $product->productUrl($storeId);
+            $data['image'] = $product->imageUrl($storeId);
+        }
+        // even when we don't have order we should provide order_id key, since it's required
+        else $data['order_id'] = null;
+
+        // get price object
+        $price = $orderItem->price();
+
+        // check if we have a proper price
+        if (is_object($price)) 
+        {
+            $data['price'] = $price->itemPrice();
+            $data['total_price'] = $price->total();
+        }
+
+        // format categories
+        $data['categories'] = implode("\n", array_map(function($category) {
+            return implode(' > ', $category);
+        }, $product->categories()));
+
+        return $data;
     }
 }

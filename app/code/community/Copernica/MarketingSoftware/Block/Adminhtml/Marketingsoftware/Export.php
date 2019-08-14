@@ -30,10 +30,9 @@
  */
 class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Export extends Mage_Core_Block_Template
 {
-	/**
-	 * Constructor
-	 * 
-	 */
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         parent::__construct();
@@ -58,5 +57,14 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Export exten
     public function getPostUrl()
     {
         return $this->getUrl('*/*/get', array('_secure' => true));
+    }
+
+    /**
+     *  Get url that will try to start data sync. 
+     *  @return string
+     */
+    public function getDataUrl()
+    {
+        return $this->getUrl('*/*/dataSync', array('_secure' => true));
     }
 }

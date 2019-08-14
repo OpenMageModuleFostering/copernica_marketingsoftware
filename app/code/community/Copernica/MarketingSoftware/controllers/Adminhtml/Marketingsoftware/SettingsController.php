@@ -28,7 +28,7 @@
  * Settings Controller, which takes care of the settings menu.
  *  
  */
-class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController extends Mage_Adminhtml_Controller_Action
+class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController extends Copernica_MarketingSoftware_Controller_Base
 {
     /**
      *  indexAction() takes care of displaying the form which
@@ -36,23 +36,153 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
      */
     public function indexAction()
     {
-        // Call the helper, to validate the settings
-        Mage::helper('marketingsoftware')->validatePluginBehaviour();
-        
         // Load the layout
         $this->loadLayout();
-        
-        // The copernica Menu is active
+
+        // set menu
         $this->_setActiveMenu('copernica');
-        
-        $this->getLayout()
-            ->getBlock('content')->append(
-                    $this->getLayout()->createBlock('marketingsoftware/adminhtml_marketingsoftware_settings')
-                );
-        $this->getLayout()->getBlock('head')->setTitle($this->__('Settings / Copernica Marketing Software / Magento Admin'));
+
+        // get layout
+        $layout = $this->getLayout();
+
+        // get content block
+        $contentBlock = $layout->getBlock('content');
+
+        // create settings block
+        $settingsBlock = $layout->createBlock('marketingsoftware/adminhtml_marketingsoftware_settings');
+
+        // append settings block to content block
+        $contentBlock->append($settingsBlock);
+
+        // set title
+        $layout->getBlock('head')->setTitle($this->__('Settings / Copernica Marketing Software / Magento Admin'));
+  
+        // get session into local scope
+        $session = Mage::getSingleton('adminhtml/session');
+
+        // if we don't have state in session we want to create such entry        
+        if (!$session->getState()) $session->setState($this->generateState());
 
         // Render the layout
         $this->renderLayout();
+    }
+
+    /**
+     *  Handle urls that contain state variable.
+     *  @return Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
+     */
+    public function stateAction() 
+    {
+        // get state parameter
+        $state = $this->getRequest()->getParam('state');
+
+        // check if we have a correct state token
+        if ($state != $this->generateState()) return $this->_redirect('*/*', array('response' => 'invalid-state'));
+
+        // get code parameter
+        $code = $this->getRequest()->getParam('code');
+
+        // get request helper
+        $request = Mage::helper('marketingsoftware/RESTRequest');
+
+        // upgrade out request code into access token
+        $accessToken = Mage::helper('marketingsoftware/api')->upgradeRequest(
+            Mage::helper('marketingsoftware/config')->getClientKey(),
+            Mage::helper('marketingsoftware/config')->getClientSecret(),
+            $code,
+            Mage::helper('adminhtml')->getUrl('*/*/state')
+        );
+
+        // if we have an error here we will just redirect to same view
+        if ($accessToken === false) 
+        {
+            // store error message as json inside session
+            Mage::getSingleton('core/session')->setErrorMessage(json_encode($output['error']));
+
+            // well, we have an error and we have to tell the user that we have an 
+            // error
+            return $this->_redirect('*/*', array('response' => 'authorize-error'));
+        } 
+
+        // store access token inside config
+        Mage::helper('marketingsoftware/config')->setAccessToken($accessToken);
+
+        // return this
+        return $this->_redirect('*/*', array('response' => 'new-access-token'));
+    }
+
+    /**
+     *  Handle queue settings storage
+     *  @return Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
+     */
+    public function queueAction()
+    {
+        // get post variables
+        $post = $this->getRequest()->getPost();
+
+        // get config helper
+        $config = Mage::helper('marketingsoftware/config');
+
+        // set config variables
+        $config->setTimePerRun($post['qs_max_time']);
+        $config->setItemsPerRun($post['qs_max_items']);
+        $config->setApiHostname($post['qs_api_server']);
+        $config->setVanillaCrons(array_key_exists('qs_vanilla_crons', $post));
+        $config->setAbandonedTimeout($post['qs_abandoned_timeout']);
+        $config->setRemoveFinishedCartItems($post['qs_remove_finished']);
+
+        // redirect to same page
+        return $this->_redirect('*/*');
+    }
+
+    /**
+     *  Handles stores settings
+     *  @return Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
+     */
+    public function storesAction()
+    {
+        // get post variables
+        $post = $this->getRequest()->getPost();
+
+        // get config helper
+        $config = Mage::helper('marketingsoftware/config');
+
+        // check if user want to disable store filter
+        if (isset($post['chk-store-disable'])) 
+        {
+            // disable enabled stores filter
+            $config->setEnabledStores(null);
+
+            // redirect to same page
+            return $this->_redirect('*/*');
+        }
+
+        // make an empty variable
+        $enabledStores = array();
+
+        // iterate over all enabled stores
+        foreach($post['store'] as $store)
+        {
+            $enabledStores[] = $store;
+        }
+
+        // set enabled stores
+        $config->setEnabledStores($enabledStores);
+
+        // redirect to same page
+        return $this->_redirect('*/*');
+    }
+
+    /**
+     *  Since we have to generate a state code for REST API we want to make
+     *  it in way that it is possible to regenerate such state for a user in
+     *  resonable time period (one certain day). We will use for that md5 hash
+     *  of user's session id and current day-month-year combination.
+     *  @return string 
+     */
+    protected function generateState()
+    {
+        return md5(Mage::getSingleton('adminhtml/session')->getEncryptedSessionId().date('dmY'));
     }
 
     /**
@@ -65,86 +195,22 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
         // get all post values from the request
         $post = $this->getRequest()->getPost();
 
-        // check to see if there is any POST data along
-        if (empty($post))
-        {
-            Mage::getSingleton('adminhtml/session')->addError('Invalid data.');
-        }
-        // we have post data check if its correct
-        else
-        {
-            // check connection based on sent post data
-            $api = Mage::helper('marketingsoftware/api')->init($post['cp_host'], $post['cp_user'], $post['cp_account'], $post['cp_pass']);
+        // check if we have a client key
+        if (!isset($post['cp_client_key'])) return $this->_redirect('*/*');
 
-            try
-            {
-                // check the data
-                $result = $api->check();
-            }
-            catch(Exception $e)
-            {
-                // No valid result has been retrieved
-                $result = false;
-            
-                // An exception is found add it to the session
-                Mage::getSingleton('adminhtml/session')->addException($e,(string)$e);
-            }
+        // get config to local scope
+        $config = Mage::helper('marketingsoftware/config');
 
-            // The data is verified, store it
-            if ($result)
-            {            
-                // everything is fine store the data in the config
-                Mage::helper('marketingsoftware/config')
-                    ->setHostname($post['cp_host'])
-                    ->setUsername($post['cp_user'])
-                    ->setAccount($post['cp_account'])
-                    ->setPassword($post['cp_pass']);
+        // set client key inside config file
+        $config->setClientKey($post['cp_client_key']);
 
-                // Settings were successfully stored, add the success message
-                Mage::getSingleton('adminhtml/session')->addSuccess('Settings were successfully saved.');
-            }
-       }
+        // set client secret inside config gile
+        $config->setClientSecret($post['cp_client_secret']);
 
-        // load the initial page
+        // unset access token
+        $config->unsAccessToken();
+
+        // we will not be doing anything in this method
         return $this->_redirect('*/*');
-    }
-
-    /**
-     *  recheckAction() takes care of an ajax settings checker
-     */
-    public function checkerAction()
-    {
-        // Get the response, set the header and clear the body
-        $response = $this->getResponse();
-        $response->setHeader('Content-Type', 'text/plain', true);
-        $response->clearBody();
-
-        // Send the headers
-        $response->sendHeaders();
-
-        // get all POST values
-        $post = $this->getRequest()->getPost();
-
-        // check to see if there is any POST data along
-        if (empty($post))
-        {
-            $response->setBody('Invalid Ajax call');
-            return;
-        }
-
-        try
-        {
-            // check connection based on sent post data
-            $api = Mage::helper('marketingsoftware/api')->init($post['cp_host'], $post['cp_user'], $post['cp_account'], $post['cp_pass']);
-            
-            // check the data
-            $result = $api->check();
-        }
-        catch (Exception $e)
-        {
-            $response->setBody((String)$e);
-        }
-
-        // everything seems to be OK, we already cleared the body
     }
 }

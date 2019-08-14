@@ -29,14 +29,14 @@
  */
 class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializable
 {
-	/**
-	 * Getting payment name does not work with Klarna. Klarna gets the
-	 * payment name from a quote shipping address. Since this is an order
-	 * a quote is no longer available.
-	 * 
-	 * @var string
-	 */
-	const PAYMENT_METHOD_KLARNA = 'klarna_partpayment';
+    /**
+     * Getting payment name does not work with Klarna. Klarna gets the
+     * payment name from a quote shipping address. Since this is an order
+     * a quote is no longer available.
+     * 
+     * @var string
+     */
+    const PAYMENT_METHOD_KLARNA = 'klarna_partpayment';
 
     /**
      * Predefine the internal fields
@@ -66,50 +66,65 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function setOriginal(Mage_Sales_Model_Order $original)
     {
-		$this->id = $original->getId();
-		$this->incrementId = $original->getIncrementId();
-		$this->quoteId = $original->getQuoteId();
-		$this->state = $original->getState();
-		$this->status = $original->getStatus();
-		$this->quantity = $original->getTotalQtyOrdered();
-		$this->currency = $original->getOrderCurrencyCode();
-		$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-		$this->weight = $original->getWeight();
-		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
-		$this->timestamp = $original->getUpdatedAt();
-		$this->shippingDescription = $original->getShippingDescription();
-		$this->customerIP = $original->getRemoteIp();
-		
-		$data = array();
-		$items = $original->getAllVisibleItems();
-		foreach ($items as $item) {
-			$data[] = Mage::getModel('marketingsoftware/abstraction_order_item')->setOriginal($item);
-		}
-		$this->items = $data;	
+        // set only the Id
+        $this->id = $original->getId();
 
-		//the order model only returns a customer if it exists
-		if ($customerId = $original->getCustomerId()) {
-			$this->customerId = $customerId;
-		}	
-		
-		$data = array();
-		//retrieve this quote's addresses
-		$addresses = $original->getAddressesCollection();
-		foreach ($addresses as $address) {
-			$data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
-		}
-		$this->addresses = $data;
+        // we are done here
+        return $this;
+        
+    }
 
-		if ($payment = $original->getPayment()) {
-			try {
-				if ($payment->getMethod() == self::PAYMENT_METHOD_KLARNA) {
-					$this->paymentDescription = 'Klarna';
-				} else {
-					$this->paymentDescription = $payment->getMethodInstance()->getTitle();
-				}
-			} catch (Mage_Core_Exception $exception) { }		
-		}
-		
+    /**
+     *  This method will set the state of this order from original magento order
+     *  @param  Mage_Sales_Model_Order
+     */
+    public function importFromOriginal(Mage_Sales_Model_Order $original)
+    {
+        $this->id = $original->getId();
+        $this->incrementId = $original->getIncrementId();
+        $this->quoteId = $original->getQuoteId();
+        $this->state = $original->getState();
+        $this->status = $original->getStatus();
+        $this->quantity = $original->getTotalQtyOrdered();
+        $this->currency = $original->getOrderCurrencyCode();
+        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->weight = $original->getWeight();
+        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+        $this->timestamp = $original->getUpdatedAt();
+        $this->shippingDescription = $original->getShippingDescription();
+        $this->customerIP = $original->getRemoteIp();
+        
+        $data = array();
+        $items = $original->getAllVisibleItems();
+        foreach ($items as $item) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_order_item')->setOriginal($item);
+        }
+        $this->items = $data;   
+
+        //the order model only returns a customer if it exists
+        if ($customerId = $original->getCustomerId()) {
+            $this->customerId = $customerId;
+        }   
+        
+        $data = array();
+        //retrieve this quote's addresses
+        $addresses = $original->getAddressesCollection();
+        foreach ($addresses as $address) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
+        }
+        $this->addresses = $data;
+
+        if ($payment = $original->getPayment()) {
+            try {
+                if ($payment->getMethod() == self::PAYMENT_METHOD_KLARNA) {
+                    $this->paymentDescription = 'Klarna';
+                } else {
+                    $this->paymentDescription = $payment->getMethodInstance()->getTitle();
+                }
+            } catch (Mage_Core_Exception $exception) { }        
+        }
+        
+        // allow chaining
         return $this;
     }
 
@@ -123,7 +138,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
         $order = Mage::getModel('sales/order')->load($orderId);
         if ($order->getId()) {
             //set the original model if the quote exists
-            $this->setOriginal($order);
+            $this->importFromOriginal($order);
         }
         return $this;
     }
@@ -134,7 +149,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function id()
     {
-		return $this->id;
+        return $this->id;
     }
 
     /**
@@ -161,7 +176,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function state()
     {
-		return $this->state;
+        return $this->state;
     }
 
     /**
@@ -179,7 +194,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function quantity()
     {
-		return $this->quantity;
+        return $this->quantity;
     }
 
     /**
@@ -198,7 +213,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function price()
     {
-    	return $this->price;
+        return $this->price;
     }
 
     /**
@@ -246,7 +261,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
         if ($this->customerId) {
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -274,7 +289,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function paymentDescription()
     {
-		return $this->paymentDescription;
+        return $this->paymentDescription;
     }
 
     /**
@@ -291,26 +306,10 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      *  @return     string
      */
     public function serialize()
-    {    	
+    {       
         // serialize the data
         return serialize(array(
-            $this->id(),
-            $this->incrementId(),
-            $this->quoteId(),
-            $this->quantity(),
-            $this->currency(),
-            $this->timestamp(),
-            $this->customerIP(),
-            $this->items(),
-            $this->storeview(),
-            is_object($customer = $this->customer()) ? $customer->id() : null,
-            $this->addresses(),
-            $this->price(),
-            $this->weight(),
-            $this->state(),
-            $this->status(),
-            $this->shippingDescription(),
-            $this->paymentDescription()
+            $this->id()
         ));
     }
 
@@ -322,24 +321,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     public function unserialize($string)
     {
         list(
-            $this->id,
-            $this->incrementId,
-            $this->quoteId,
-            $this->quantity,
-            $this->currency,
-            $this->timestamp,
-            $this->customerIP,
-            $this->items,
-            $this->storeview,
-            $this->customerId,
-            $this->addresses,
-            $this->price,
-            $this->weight,
-            $this->state,
-            $this->status,
-            $this->shippingDescription,
-            $this->paymentDescription
+            $this->id
         ) = unserialize($string);
+
+        // load order by it's Id
+        $this->loadOrder($this->id);
         
         return $this;
     }

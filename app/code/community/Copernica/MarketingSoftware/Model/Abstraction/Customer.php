@@ -22,6 +22,7 @@
  * @package      Copernica_MarketingSoftware
  * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @documentation public
  */
 
 /**
@@ -30,62 +31,36 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializable
 {
     /**
-     * Predefine the internal fields
+     *  The id
+     *  @var    int
      */
     protected $id;
-    protected $name;
-    protected $email;
-    protected $oldemail;
-    protected $subscription;
-    protected $group;
-    protected $addresses;
-    protected $gender;
-    protected $storeview;
+    
+    /**
+     *  The original object
+     *  @var    Mage_Customer_Model_Customer
+     */
+    protected $original;
 
 
     /**
      *  Sets the original model
-     *  @param      Mage_Customer_Model_Customer $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @param  Mage_Customer_Model_Customer $original
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function setOriginal(Mage_Customer_Model_Customer $original)
     {
-		$this->id = $original->getId();
-		$this->name = Mage::getModel('marketingsoftware/abstraction_name')->setOriginal($original);
-		$this->email = $original->getEmail();
-		$this->oldemail = $original->getOrigData('email');		
-		$this->group = Mage::getModel('customer/group')->load($original->getGroupId())->getCode();
-		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
-		
-		$options = $original->getAttribute('gender')->getSource()->getAllOptions();
-		
-		foreach ($options as $option) {
-			if ($option['value'] == $original->getGender()) {
-				$this->gender =  $option['label'];
-			}
-		}		
-		
-		$subscriber = Mage::getModel('newsletter/subscriber');
-		if ($subscriber->loadByCustomer($original)->getId()) {
-			if ($subscriber->getStoreId() === $original->getStoreId()) {
-				$this->subscription = Mage::getModel('marketingsoftware/abstraction_subscription')->setOriginal($subscriber);
-			}
-		}	
+        // we will store only the Id
+        $this->original = $original;
+        $this->id = $original->getId();
 
-		$data = array();
-		//retrieve this customer's addresses
-		$addresses = $original->getAddressesCollection();
-		foreach ($addresses as $address) {
-			$data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
-		}
-		$this->addresses = $data;		
-		
-		return $this;
+        // allow chaining
+        return $this;
     }
 
     /**
      *  Returns the original model
-     *  @return     Mage_Customer_Model_Customer
+     *  @return Mage_Customer_Model_Customer
      */
     protected function original()
     {
@@ -94,20 +69,18 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
 
     /**
      *  Loads a customer model
-     *  @param      integer $customerId
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @param  int $customerId
+     *  @return self
      */
     public function loadCustomer($customerId)
     {
+        // load customer using magento accessor
         $customer = Mage::getModel('customer/customer')->load($customerId);
-        if ($customer->getId()) {
-            //set the original model if the customer exists
-            $this->setOriginal($customer);
-        } else {
-            // We did load a customer to make sure that it works more
-            // or less, we assign the customer id here
-            $this->id = $customerId;
-        }
+        
+        // if we have a proper customer we can set it as original object
+        if ($customer->getId()) $this->setOriginal($customer);
+
+        // allow chaining
         return $this;
     }
 
@@ -117,7 +90,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      */
     public function id()
     {
-        return $this->id;
+        /*
+         *  Why? Cause even when we do have id, but we don't have original that
+         *  id does not matter. Mostly cause there is no object that will be accessible
+         *  under that id. So at such point, id is just some number that does not 
+         *  matter for us at all.
+         */
+        if (!$this->original()) return null;
+
+        // return id of original object
+        return $this->original()->getId();
     }
 
     /**
@@ -127,154 +109,195 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      */
     public function name()
     {
-        return $this->name;
+        // get the data
+        return Mage::getModel('marketingsoftware/abstraction_name')->setOriginal($this->original());
     }
 
     /**
      *  Return the e-mail address of the customer
-     *  @return     string
+     *  @return string
      */
     public function email()
     {
-        return $this->email;
-    }
-    
-    /**
-     * Method to retrieve the previous email if possible
-     * Falls back on self::email()
-     * 
-     * @return string
-     */
-    public function oldEmail()
-    {
-    	if (isset($this->oldemail)) {
-	   		return $this->oldemail;
-    	} else {    	
-    		return $this->email();
-    	}
+        // fetch data
+        return $this->original()->getEmail();
     }
 
     /**
-     * Returns the gender
-     * @return string
+     *  Return a customer's date of birth
+     *  @return string
+     */
+    public function birthDate()
+    {
+        // Return the birthdate
+        return $this->original()->getDob();
+    }
+
+    /**
+     *  Method to retrieve the previous email if possible
+     *  Falls back on self::email()
+     * 
+     *  @return string
+     */
+    public function oldEmail()
+    {
+        // try to get old email
+        $oldEmail = $this->original()->getOrigData('email');
+
+        // check if we have old email
+        if (isset($oldEmail)) return $oldEmail;
+
+        // return current email
+        return $this->email();
+    }
+
+    /**
+     *  Returns the gender
+     *  @return string
      */
     public function gender()
     {
-		return $this->gender;
+        // get original object
+        $original = $this->original();
+
+        // get gender options
+        $options = $original->getAttribute('gender')->getSource()->getAllOptions();
+
+        // iterater over all options to get proper gender
+        foreach ($options as $option) {
+            if ($option['value'] == $original->getGender()) {
+                return $option['label'];
+            }
+        }
+
+        // we don't know
+        return 'unknown';
     }
 
     /**
      *  Return the subscription of the customer
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function subscription()
     {
-		return $this->subscription;
+        // get subscriber moder
+        $subscriber = Mage::getModel('newsletter/subscriber');
+        
+        // check if we have a subscriber
+        if (!$subscriber->loadByCustomer($this->original())->getId()) return null; 
+         
+        // do subscriber belongs to store ?
+        if ($subscriber->getStoreId() !== $this->original()->getStoreId()) return null; 
+        
+        // return the subscription object
+        return Mage::getModel('marketingsoftware/abstraction_subscription')->setOriginal($subscriber);
     }
 
     /**
      *  Return the group to which this customer belongs
-     *  @return     string
+     *  @return string
      */
     public function group()
     {
-		return $this->group;
+        // fetch customer group
+        return Mage::getModel('customer/group')->load($this->original()->getGroupId())->getCode();
     }
 
     /**
      *  Get the quotes for this customer
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @return array of Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function quotes()
     {
+        // placeholder for result data
         $data = array();
-        
+
         //retrieve this customer's quote ids
         $quoteIds = Mage::getResourceModel('sales/quote_collection')
             ->addFieldToFilter('customer_id', $this->id())->getAllIds();
 
-        foreach ($quoteIds as $id) {
-            $data[] = Mage::getModel('marketingsoftware/abstraction_quote')->loadQuote($id);
-        }
+        // create data to return
+        foreach ($quoteIds as $id) $data[] = Mage::getModel('marketingsoftware/abstraction_quote')->loadQuote($id);
+
+        // return data
         return $data;
     }
 
     /**
      *  Get the orders for this customer
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @return array of Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function orders()
     {
+        // placeholder for data to return
         $data = array();
         
         //retrieve this customer's order ids
         $orderIds = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToFilter('customer_id', $this->id())->getAllIds();
             
-        foreach ($orderIds as $id) {
-            $data[] = Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($id);
-        }
+        // create data
+        foreach ($orderIds as $id) $data[] = Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($id);
+
+        // return data
         return $data;
     }
 
     /**
      *  Get the addresses for this customer
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  @return array of Copernica_MarketingSoftware_Model_Abstraction_Address
      */
     public function addresses()
     {
-        return $this->addresses;
+        // placeholder for result data
+        $data = array();
+
+        //retrieve this customer's addresses
+        $addresses = $this->original()->getAddressesCollection();
+
+        // make customer copernica address instance
+        foreach ($addresses as $address) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
+        }
+
+        // return addresses
+        return $data;
     }
 
     /**
      *  To what storeview does this order belong
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
-		return $this->storeview;
+        // fetch store view 
+        return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->original()->getStore());
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  @return string
      */
     public function serialize()
     {
         // serialize the data
-        return serialize(array(
-            $this->id(),
-            $this->name(),
-            $this->email(),
-        	$this->oldEmail(),
-            $this->subscription(),
-            $this->group(),
-            $this->addresses(),
-            $this->gender(),
-            $this->storeview(),
-        ));
+        return serialize(array( $this->id() ));
     }
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @param  string
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function unserialize($string)
     {
         // assign the data to the internal vars
-        list(
-            $this->id,
-            $this->name,
-            $this->email,
-        	$this->oldemail,
-            $this->subscription,
-            $this->group,
-            $this->addresses,
-            $this->gender,
-        	$this->storeview
-        ) = unserialize($string);
+        list( $id ) = unserialize($string);
 
+        // load customer from database
+        $this->loadCustomer($id);
+
+        // allow chaining
         return $this;
     }
 }

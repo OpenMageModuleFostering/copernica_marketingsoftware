@@ -45,31 +45,31 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      */
     public function setOriginal(Mage_Newsletter_Model_Subscriber $original)
     {
-		$this->id = $original->getId();
-		$this->email = $original->getEmail();
-		$this->customerId = $original->getCustomerId();
-		
-		$store = Mage::getModel('core/store')->load($original->getStoreId());
-		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
-		
-		switch ($original->getStatus()) {
-			case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
-				$this->status = 'subscribed';
-				break;
-			case Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE:
-				$this->status = 'not active';
-				break;
-			case Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED:
-				$this->status = 'unsubscribed';
-				break;
-			case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
-				$this->status = 'unconfirmed';
-				break;
-			default:
-				$this->status = 'unknown';
-				break;
-		}		
-				
+        $this->id = $original->getId();
+        $this->email = $original->getEmail();
+        $this->customerId = $original->getCustomerId();
+        
+        $store = Mage::getModel('core/store')->load($original->getStoreId());
+        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
+        
+        switch ($original->getStatus()) {
+            case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
+                $this->status = 'subscribed';
+                break;
+            case Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE:
+                $this->status = 'not active';
+                break;
+            case Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED:
+                $this->status = 'unsubscribed';
+                break;
+            case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
+                $this->status = 'unconfirmed';
+                break;
+            default:
+                $this->status = 'unknown';
+                break;
+        }       
+                
         return $this;
     }
 
@@ -88,7 +88,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      */
     public function email()
     {
-		return $this->email;
+        return $this->email;
     }
 
     /**
@@ -98,7 +98,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      */
     public function status()
     {
-		return $this->status;
+        return $this->status;
     }
 
     /**
@@ -107,11 +107,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      */
     public function customer()
     {
-		if ($this->customerId) {
+        if ($this->customerId) {
             // construct an object given the identifier
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
         } else {
-        	return null;
+            return null;
         }
     }
 
@@ -121,7 +121,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      */
     public function storeView()
     {
-		return $this->storeview;
+        return $this->storeview;
     }
 
     /**

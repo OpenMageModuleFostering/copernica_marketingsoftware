@@ -30,7 +30,7 @@
 class Copernica_MarketingSoftware_Model_Copernica_ProfileQuote extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @var Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     protected $quote = false;
 
@@ -44,6 +44,33 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileQuote extends Copernica
         $this->quote = $quote;
         return $this;
     }
+
+    /** 
+     *  Get profile email.
+     *  @return string
+     */
+    public function email()
+    {
+        // get all addresses associated with order
+        $addresses = $this->quote->addresses();
+    
+        // find billing address
+        foreach ($addresses as $address) {
+            if (in_array('billing', $addr->type())) return $address->email();  
+        } 
+
+        // we don't have an address. Return empty string
+        return '';
+    }
+
+    /**
+     *  Return store view associated with profile
+     *  @return string
+     */
+    public function storeView()
+    {
+        return (string)$this->quote->storeview();
+    }
     
     /** 
      *  Retrieve the data for this object
@@ -54,10 +81,16 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileQuote extends Copernica
         // Get the addresses
         $addresses = $this->quote->addresses();
         
+        // placeholder for real address
+        $address = null;
+        
         // Select an address
-        if (count($addresses) == 1) $address = $addresses[0];
-        else foreach ($addresses as $addr) if (in_array('billing', $addr->type())) $address = $addr;
-
+        if (is_array($addresses))
+        {
+            if (count($addresses) == 1) $address = $addresses[0];
+            else foreach ($addresses as $addr) if (in_array('billing', $addr->type())) $address = $addr;
+        }
+        
         // Get subscription
         if (Mage::getModel('newsletter/subscriber')->loadByEmail($address->email())->getId())
         {
@@ -67,11 +100,20 @@ class Copernica_MarketingSoftware_Model_Copernica_ProfileQuote extends Copernica
         else $subscription = false;
 
         // fetch the name object
-        $name = $address->name();
+        $name = is_object($address) ? $address->name() : null;
+
+        // placeholder for customer Id
+        $customerId = null;
+
+        // check if we have a customer to generate customer ID for copernica platform
+        if ($customer = $this->quote->customer()) $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->quote->storeview());
+
+        // generate customer Id by email address and store view
+        else $customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), $this->quote->storeview());
 
         // return an array with customer data
         return array(
-            'customer_id'   =>  Mage::helper('marketingsoftware')->generateCustomerId($address->email(), (string)$this->quote->storeview()),
+            'customer_id'   =>  $customerId,
             'store_view'    =>  (string)$this->quote->storeview(),
             'firstname'     =>  is_object($name) ? $name->firstname() : null, 
             'middlename'    =>  is_object($name) ? $name->middlename() : null,

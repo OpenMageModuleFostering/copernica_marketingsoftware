@@ -33,4 +33,34 @@ class Copernica_MarketingSoftware_Model_Mysql4_Queue extends Mage_Core_Model_Mys
     {
         $this->_init('marketingsoftware/queue', 'id');
     }
+
+    /**
+     *  Get first free lock that can be aqcuired
+     *  @return string|false
+     */
+    public function getFirstFree()
+    {
+        // we will need a adapter
+        $adapter = $this->_getReadAdapter();
+
+        // fetch all quniqu customer
+        $result = $adapter->query('SELECT DISTINCT customer FROM '.$this->getMainTable().';')->fetchAll();
+
+        // iterate over all unique customer 
+        foreach ($result as $row) {
+
+            // check if lock is free
+            $lockResult = $adapter->query("select is_free_lock('COPERNICA_".$row['customer']."') as 'lock'")->fetchAll();
+
+            // if we have a potential lock to use try to lock it
+            if ($lockResult[0]['lock']) 
+            {
+                $lockResult = $adapter->query("select get_lock('COPERNICA_".$row['customer']."', 1) as 'lock'")->fetchAll();
+                if ($lockResult[0]['lock'] == 1) return $row['customer'];
+            }
+        }
+
+        // we don't have a lock
+        return false;
+    }
 }

@@ -48,20 +48,20 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-    	$this->id = $original->getId();
-    	$this->orderId = $original->getOrder()->getId();
-    	$this->quantity = $original->getQtyOrdered();
-    	$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-    	$this->weight = $original->getWeight();
-    	$this->timestamp = $original->getUpdatedAt();
-    	$this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
-    	
-    	$options = Mage::getModel('marketingsoftware/abstraction_order_item_options')->setOriginal($original);
-    	if ($options->attributes()) {
-    		//only return option object if it this order actually has options
-    		$this->options = $options;
-    	} 
-    	
+        $this->id = $original->getId();
+        $this->orderId = $original->getOrder()->getId();
+        $this->quantity = $original->getQtyOrdered();
+        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->weight = $original->getWeight();
+        $this->timestamp = $original->getUpdatedAt();
+        $this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
+        
+        $options = Mage::getModel('marketingsoftware/abstraction_order_item_options')->setOriginal($original);
+        if ($options->attributes()) {
+            //only return option object if it this order actually has options
+            $this->options = $options;
+        } 
+        
         return $this;
     }
 

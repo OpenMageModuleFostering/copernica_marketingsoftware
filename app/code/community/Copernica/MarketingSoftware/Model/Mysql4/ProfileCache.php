@@ -24,36 +24,16 @@
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Copernica_MarketingSoftware_Model_MarketingSoftware extends Varien_Object
+/**
+ *  This class will present and interface to copernica_profile_cache mysql table.
+ */
+class Copernica_MarketingSoftware_Model_Mysql4_ProfileCache extends Mage_Core_Model_Mysql4_Abstract
 {
-	/**
-	 * Holds API object
-	 * 
-	 * @var Copernica_MarketingSoftware_Helper_Api
-	 */
-	protected $_api;
-	
     /**
-     *  Get the API helper object with the settings as defined in the config.
-     *  
-     *  @return Copernica_MarketingSoftware_Helper_Api
+     *  Construct model
      */
-    public function api()
+    protected function _construct() 
     {
-    	if (!$this->_api) {
-	        // Get the config helper
-	        $config = Mage::helper('marketingsoftware/config');
-	
-	        // Get an api which is logged on on the right Copernica env
-	        $this->_api = Mage::helper('marketingsoftware/api')->init(
-	            $config->getHostname(),
-	            $config->getUsername(),
-	            $config->getAccount(),
-	            $config->getPassword()
-	        );
-    	}
-        
-        // Return the api object
-        return $this->_api;
+        $this->_init('marketingsoftware/profileCache', 'id');
     }
 }

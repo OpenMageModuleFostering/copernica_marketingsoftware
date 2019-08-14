@@ -35,23 +35,28 @@
  */
 class Copernica_MarketingSoftware_Model_Config extends Mage_Core_Model_Abstract
 {
-	/**
-	 * Constructor
-	 * 
-	 * @see Varien_Object::_construct()
-	 */
-	protected function _construct()
-	{
-		$this->_init('marketingsoftware/config');
-	}
+    /**
+     * Constructor
+     * 
+     * @see Varien_Object::_construct()
+     */
+    protected function _construct()
+    {
+        $this->_init('marketingsoftware/config');
+    }
 
-	public function loadByKey($key)
-	{
-		$this->_beforeLoad($key, 'key_name');
-		$this->_getResource()->load($this, $key, 'key_name');
-		$this->_afterLoad();
-		$this->setOrigData();
-		$this->_hasDataChanges = false;
-		return $this;
-	}
+    /**
+     *  Load configuration row by it's key.
+     *  @param  string
+     *  @return Copernica_MarketingSoftware_Model_Config
+     */
+    public function loadByKey($key)
+    {
+        $this->_beforeLoad($key, 'key_name');
+        $this->_getResource()->load($this, $key, 'key_name');
+        $this->_afterLoad();
+        $this->setOrigData();
+        $this->_hasDataChanges = false;
+        return $this;
+    }
 }

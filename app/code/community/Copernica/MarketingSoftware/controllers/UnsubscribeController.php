@@ -46,7 +46,7 @@ class Copernica_MarketingSoftware_UnsubscribeController extends Mage_Core_Contro
             $fields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
         
             // is the 'newsletter' field given
-            if (isset($data->parameters) && $data->parameters->$fields['newsletter'] == 'unsubscribed_copernica')
+            if (isset($data->parameters) && property_exists($data->parameters, $fields['newsletter']) && $data->parameters->$fields['newsletter'] == 'unsubscribed_copernica')
             {
                 // get the customer id
                 $customerID = $data->profile->fields->customer_id;
@@ -55,15 +55,16 @@ class Copernica_MarketingSoftware_UnsubscribeController extends Mage_Core_Contro
                
                 // Get the subscriber
                 $subscriber = Mage::getModel('newsletter/subscriber');
-                if (
-                    $subscriber->loadByCustomer($customer)->getId() ||
-                    $subscriber->loadByEmail($email)->getId()
-                ) {
-                    // we have a valid subscriber object now, so unsubscribe the user                    
-                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
-                    echo 'ok';
-                    return;
-                }
+				if ($customer) {
+					$subscriber->loadByCustomer($customer)->getId();
+				} else {
+	                $subscriber->loadByEmail($email)->getId();
+				}
+				$subscriber->setEmail($email);
+                $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                
+				echo 'ok';
+                return;
             }
         }
         echo 'not ok';

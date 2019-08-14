@@ -74,25 +74,25 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
             $data = array();
             $categoryIds = $original->getCategoryIds();
             foreach ($categoryIds as $categoryId) {
-            	$category = Mage::getModel('catalog/category')->load($categoryId);
-            	$data[] = $this->_getFullCategoryName($category);
+                $category = Mage::getModel('catalog/category')->load($categoryId);
+                $data[] = $this->_getFullCategoryName($category);
             }
             $this->categories = $data;
             
             $from = $original->getNewsFromDate() ? Mage::app()->getLocale()->date($original->getNewsFromDate()) : null;
             $to = $original->getNewsToDate() ? Mage::app()->getLocale()->date($original->getNewsToDate()) : null;
             if ($from || $to) {
-            	$new = true;
-            	$now = Zend_Date::now();
-            	if ($from) {
-            		$new = $new && $from->isEarlier($now);
-            	}
-            	if ($to) {
-            		$new = $new && $to->isLater($now);
-            	}
-            	$this->isNew = $new;
+                $new = true;
+                $now = Zend_Date::now();
+                if ($from) {
+                    $new = $new && $from->isEarlier($now);
+                }
+                if ($to) {
+                    $new = $new && $to->isLater($now);
+                }
+                $this->isNew = $new;
             } else {
-            	$this->isNew = false;
+                $this->isNew = false;
             }
             
             $this->attributes = Mage::getModel('marketingsoftware/abstraction_attributes')->setOriginal($original);
@@ -114,55 +114,55 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
             if ($product->getId()) {
                 //the product exists
                 $this->id = $product->getId();
-	            $this->sku = $product->getSku();
-	            $this->name = $product->getName();
-	            $this->description = $product->getShortDescription();
-	            $this->price = $product->getPrice();
-	            $this->specialPrice = $product->getSpecialPrice();
-	            $this->created = $product->getCreatedAt();
-	            $this->modified = $product->getUpdatedAt();
-	            $this->productUrl = $product->getProductUrl();
-	            $this->imagePath = 'catalog' . DS . 'product' . $product->getImage();
-	            $this->weight = $product->getWeight();
-	            
-	            $data = array();
-	            $categoryIds = $product->getCategoryIds();
-	            foreach ($categoryIds as $categoryId) {
-	            	$category = Mage::getModel('catalog/category')->load($categoryId);
-	            	$data[] = $this->_getFullCategoryName($category);
-	            }
-	            $this->categories = $data;
-	            
-	            $from = $product->getNewsFromDate() ? Mage::app()->getLocale()->date($product->getNewsFromDate()) : null;
-	            $to = $product->getNewsToDate() ? Mage::app()->getLocale()->date($product->getNewsToDate()) : null;
-	            if ($from || $to) {
-	            	$new = true;
-	            	$now = Zend_Date::now();
-	            	if ($from) {
-	            		$new = $new && $from->isEarlier($now);
-	            	}
-	            	if ($to) {
-	            		$new = $new && $to->isLater($now);
-	            	}
-	            	$this->isNew = $new;
-	            } else {
-	            	$this->isNew = false;
-	            }
-	            
-	            $this->attributes = Mage::getModel('marketingsoftware/abstraction_attributes')->setOriginal($product);
-	            
-	            $attributeSetModel = Mage::getModel("eav/entity_attribute_set");
-	            $attributeSetModel->load($product->getAttributeSetId());
-	            
-	            $this->attributeSet = $attributeSetModel->getAttributeSetName();
-	            
-	            $this->timestamp = time();
+                $this->sku = $product->getSku();
+                $this->name = $product->getName();
+                $this->description = $product->getShortDescription();
+                $this->price = $product->getPrice();
+                $this->specialPrice = $product->getSpecialPrice();
+                $this->created = $product->getCreatedAt();
+                $this->modified = $product->getUpdatedAt();
+                $this->productUrl = $product->getProductUrl();
+                $this->imagePath = 'catalog' . DS . 'product' . $product->getImage();
+                $this->weight = $product->getWeight();
+                
+                $data = array();
+                $categoryIds = $product->getCategoryIds();
+                foreach ($categoryIds as $categoryId) {
+                    $category = Mage::getModel('catalog/category')->load($categoryId);
+                    $data[] = $this->_getFullCategoryName($category);
+                }
+                $this->categories = $data;
+                
+                $from = $product->getNewsFromDate() ? Mage::app()->getLocale()->date($product->getNewsFromDate()) : null;
+                $to = $product->getNewsToDate() ? Mage::app()->getLocale()->date($product->getNewsToDate()) : null;
+                if ($from || $to) {
+                    $new = true;
+                    $now = Zend_Date::now();
+                    if ($from) {
+                        $new = $new && $from->isEarlier($now);
+                    }
+                    if ($to) {
+                        $new = $new && $to->isLater($now);
+                    }
+                    $this->isNew = $new;
+                } else {
+                    $this->isNew = false;
+                }
+                
+                $this->attributes = Mage::getModel('marketingsoftware/abstraction_attributes')->setOriginal($product);
+                
+                $attributeSetModel = Mage::getModel("eav/entity_attribute_set");
+                $attributeSetModel->load($product->getAttributeSetId());
+                
+                $this->attributeSet = $attributeSetModel->getAttributeSetName();
+                
+                $this->timestamp = time();
             } else {
                 // unfortunately we do not have the product any more, but we have the information
                 // so we can fill a lot of fields, so the functions still work
                 $this->id           =   $original->getProductId();
                 $this->sku          =   $original->getSKU();
-				$this->attributeSet =  	'';
+                $this->attributeSet =   '';
                 $this->name         =   $original->getName();
                 $this->description  =   $original->getDescription();
                 $this->productUrl   =   '';
@@ -174,8 +174,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
                 $this->created      =   '';
                 $this->modified     =   '';
                 $this->attributes   =   '';
-                $this->customerId   =	$id;
-                $this->storeId 		= 	Mage::app()->getStore()->getStoreId();
+                $this->customerId   =   $id;
+                $this->storeId      =   Mage::app()->getStore()->getStoreId();
             }
 
             return $this;
@@ -253,7 +253,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
      */
     public function specialPrice()
     {
-    	return $this->specialPrice;
+        return $this->specialPrice;
     }
     
 
@@ -357,12 +357,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
 
     public function attributeSet()
     {
-   		return $this->attributeSet;
+        return $this->attributeSet;
     }
 
     public function timestamp()
     {
-    	return $this->timestamp;
+        return $this->timestamp;
     }
     
     
@@ -376,7 +376,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
         return serialize(array(
             $this->id(),
             $this->sku(),
-        	$this->attributeSet(),
+            $this->attributeSet(),
             $this->name(),
             $this->description(),
             $this->productUrl(),
@@ -385,13 +385,13 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
             $this->categories(),
             $this->isNew(),
             $this->price(),
-        	$this->specialPrice(),
+            $this->specialPrice(),
             $this->created(),
             $this->modified(),
             $this->attributes(),
-        	$this->customerId,
-        	$this->storeId,
-        	$this->timestamp()
+            $this->customerId,
+            $this->storeId,
+            $this->timestamp()
         ));
     }
 
@@ -405,7 +405,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
         list(
             $this->id,
             $this->sku,
-        	$this->attributeSet,
+            $this->attributeSet,
             $this->name,
             $this->description,
             $this->productUrl,
@@ -414,13 +414,13 @@ class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Ser
             $this->categories,
             $this->isNew,
             $this->price,
-        	$this->specialPrice,
+            $this->specialPrice,
             $this->created,
             $this->modified,
             $this->attributes,
-        	$this->customerId,
-        	$this->storeId,
-        	$this->timestamp
+            $this->customerId,
+            $this->storeId,
+            $this->timestamp
         ) = unserialize($string);
         return $this;
     }

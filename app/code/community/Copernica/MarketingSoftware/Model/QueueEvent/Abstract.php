@@ -24,7 +24,6 @@
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-require_once(dirname(__FILE__).'/../Error.php');
 /**
  *  A wrapper object around an event
  */
@@ -41,9 +40,26 @@ abstract class Copernica_MarketingSoftware_Model_QueueEvent_Abstract
      *  
      *  @param Copernica_MarketingSoftware_Model_Queue $queueItem
      */
-    public function __construct($queueItem)
+    protected function __construct($queueItem)
     {
         $this->queueItem = $queueItem;
+    }
+
+    /**
+     *  We will use this factory method to create proper event.
+     *  @param  Copernica_MarketingSoftware_Model_Queue
+     *  @return Copernica_MarketingSoftware_Model_QueueEvent_Abstract
+     */
+    static public function create($queueItem)
+    {
+        // get classname of event that we want to create
+        $classname = 'Copernica_MarketingSoftware_Model_QueueEvent_'.ucfirst($queueItem->getName());
+
+        // check if desired class exists
+        if (!class_exists($classname)) return null;
+
+        // create new queue event and return it
+        return new $classname($queueItem);
     }
 
     /**
@@ -56,8 +72,48 @@ abstract class Copernica_MarketingSoftware_Model_QueueEvent_Abstract
     }
 
     /**
+     *  Get entity Id
+     */
+    protected function getEntityId()
+    {
+        return $this->queueItem->getEntityId();
+    }
+
+    /**
+     *  Get customer Id
+     *  @return int
+     */
+    protected function getCustomerId()
+    {
+        return $this->queueItem->getCustomerId();
+    }
+
+    /**
      *  Process this item in the queue
      *  @return boolean was the processing successfull
      */
-    public abstract function process();
+    public function process()
+    {
+        // desired method that we want to call
+        $methodName = 'action'.ucfirst($this->queueItem->getAction());
+
+        // check if desired method exists
+        if (!method_exists($this, $methodName)) return false;
+
+        // run desired method
+        return $this->$methodName();
+    }
+
+    /**
+     *  Respawn event on the queue.
+     */
+    public function respawn() 
+    {
+        // create new item on event queue
+        Mage::getModel('marketingsoftware/queue')
+            ->setObject($this->queueItem->getObject())
+            ->setCustomer($this->queueItem->getCustomer())
+            ->setAction($this->queueItem->getAction())
+            ->save();
+    }
 }

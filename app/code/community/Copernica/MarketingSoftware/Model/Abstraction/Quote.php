@@ -54,51 +54,10 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function setOriginal(Mage_Sales_Model_Quote $original)
     {
-		$this->quoteId = $original->getId();
-		$this->active = (bool) $original->getIsActive();
-		$this->quantity = $original->getItemsQty();
-		$this->currency = $original->getQuoteCurrencyCode();
-		$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
-		$this->timestamp = $original->getUpdatedAt();
-		$this->customerIP = $original->getRemoteIp();
-		
-		if ($address = $original->getShippingAddress()) {
-			$this->weight = $address->getWeight();
-		} 
-		
-		$data = array();
-		$items = $original->getAllVisibleItems();
-		foreach ($items as $item) {
-			$data[] = Mage::getModel('marketingsoftware/abstraction_quote_item')->setOriginal($item);
-		}	
-		$this->items = $data;
-		
-		// The quote model only returns a customer if it exists
-		if ($customerId = $original->getCustomerId()) {
-			$this->customerId = $customerId;
-		}
-		
-		$data = array();
-		//retrieve this quote's addresses
-		//Note: this may return empty addresses, since quotes always have address records. Check the email field of the address.
-		$addresses = $original->getAddressesCollection();
-		foreach ($addresses as $address) {
-			$data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
-		}
-		$this->addresses = $data;
-		
-		if ($address = $original->getShippingAddress()) {
-			$this->shippingDescription = $address->getShippingDescription();
-		} 
-		
-		if ($payment = $original->getPayment()) {
-			//this try/catch is needed because getMethodInstance throws an exception instead of returning null
-			try {
-				$this->paymentDescription = $payment->getMethodInstance()->getTitle();
-			} catch (Mage_Core_Exception $exception) { }
-		}
-		
+        // store quote ID
+        $this->quoteId = $original->getId();
+
+        // we do not want to set whole class in this method
         return $this;
     }
 
@@ -127,13 +86,66 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
         
         // we did load a valid quote, set the original model
         if ($quote->getId()) {
-        	$this->setOriginal($quote);
+            $this->importFromObject($quote);
         } else {
-        	$this->quoteId = $quoteId;
+            $this->quoteId = $quoteId;
         }
         
         // return this
         return $this;
+    }
+
+    /**
+     *  Import this abstract from a real magento one
+     *  @param  Mage_Sales_Model_Quote
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Quote
+     */
+    protected function importFromObject(Mage_Sales_Model_Quote $original)
+    {
+        $this->quoteId = $original->getId();
+        $this->active = (bool) $original->getIsActive();
+        $this->quantity = $original->getItemsQty();
+        $this->currency = $original->getQuoteCurrencyCode();
+        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+        $this->timestamp = $original->getUpdatedAt();
+        $this->customerIP = $original->getRemoteIp();
+        
+        if ($address = $original->getShippingAddress()) {
+            $this->weight = $address->getWeight();
+        } 
+        
+        $data = array();
+        $items = $original->getAllVisibleItems();
+        foreach ($items as $item) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_quote_item')->setOriginal($item);
+        }   
+        $this->items = $data;
+        
+        // The quote model only returns a customer if it exists
+        if ($customerId = $original->getCustomerId()) {
+            $this->customerId = $customerId;
+        }
+        
+        $data = array();
+        //retrieve this quote's addresses
+        //Note: this may return empty addresses, since quotes always have address records. Check the email field of the address.
+        $addresses = $original->getAddressesCollection();
+        foreach ($addresses as $address) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
+        }
+        $this->addresses = $data;
+        
+        if ($address = $original->getShippingAddress()) {
+            $this->shippingDescription = $address->getShippingDescription();
+        } 
+        
+        if ($payment = $original->getPayment()) {
+            //this try/catch is needed because getMethodInstance throws an exception instead of returning null
+            try {
+                $this->paymentDescription = $payment->getMethodInstance()->getTitle();
+            } catch (Mage_Core_Exception $exception) { }
+        } 
     }
 
     /**
@@ -142,7 +154,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function id()
     {
-		return $this->quoteId;
+        return $this->quoteId;
     }
 
     /**
@@ -151,7 +163,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function active()
     {
-		return $this->active;
+        return $this->active;
     }
 
     /**
@@ -160,7 +172,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function quantity()
     {
-		return $this->quantity;
+        return $this->quantity;
     }
 
     /**
@@ -169,7 +181,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function currency()
     {
-		return $this->currency;
+        return $this->currency;
     }
 
     /**
@@ -206,7 +218,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function items()
     {
-		return $this->items;
+        return $this->items;
     }
 
     /**
@@ -224,11 +236,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function customer()
     {
-		if ($this->customerId) {
+        if ($this->customerId) {
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
         } else {
-        	// default fallback
-        	return null;
+            // default fallback
+            return null;
         }
     }
 
@@ -238,7 +250,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function addresses()
     {
-		return $this->addresses;
+        return $this->addresses;
     }
 
     /**
@@ -247,7 +259,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function customerIP()
     {
-		return $this->customerIP;
+        return $this->customerIP;
     }
 
     /**
@@ -256,7 +268,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function shippingDescription()
     {
-		return $this->shippingDescription;
+        return $this->shippingDescription;
     }
 
     /**
@@ -265,7 +277,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function paymentDescription()
     {
-		return $this->paymentDescription;
+        return $this->paymentDescription;
     }
 
     /**
@@ -274,6 +286,10 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function serialize()
     {
+        return serialize(array(
+            $this->id()
+        ));
+
         // serialize the data
         return serialize(array(
             $this->id(),
@@ -300,6 +316,17 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function unserialize($string)
     {
+        // unserialize data
+        list (
+            $this->quoteId 
+        ) = unserialize($string);
+
+        // load quote by it's Id
+        $this->loadQuote($this->quoteId);
+
+        // return same object
+        return $this;
+
         list(
             $this->quoteId,
             $this->quantity,
