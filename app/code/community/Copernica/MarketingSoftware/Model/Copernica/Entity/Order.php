@@ -298,7 +298,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
 
         $data = array();
 
-        foreach ($this->_order->getAllVisibleItems() as $orderItem) {
+        foreach ($this->_order->getAllItems() as $orderItem) {
         	$orderItemEntity = Mage::getModel('marketingsoftware/copernica_entity_order_item');
         	$orderItemEntity->setOrderItem($orderItem);
         	

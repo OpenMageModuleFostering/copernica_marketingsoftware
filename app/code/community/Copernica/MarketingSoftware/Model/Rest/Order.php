@@ -149,9 +149,9 @@ class Copernica_MarketingSoftware_Model_Rest_Order extends Copernica_MarketingSo
     /**
      *  Set REST order entity
      *
-     *  @param	Copernica_MarketingSoftwarer_Model_Copernica_Entity_Order	$orderEntity
+     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Order	$orderEntity
      */
-    public function setOrderEntity(Copernica_MarketingSoftwarer_Model_Copernica_Entity_Order $orderEntity)
+    public function setOrderEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Order $orderEntity)
     {
     	$this->_orderEntity = $orderEntity;
     }

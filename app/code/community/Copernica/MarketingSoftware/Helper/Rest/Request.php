@@ -168,6 +168,9 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         	$request.=$this->_buildQueryString(is_null($data) ? array() : $data);
         }
 
+        // Check to remove unnecessary slashes from the request 
+        $request = ltrim($request, '/');
+        
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
@@ -194,6 +197,9 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         }
 
         $curl = $this->_prepareCurl();
+        
+        // Check to remove unnecessary slashes from the request 
+        $request = ltrim($request, '/');
         
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -231,6 +237,9 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         }
 
         $curl = $this->_prepareCurl();
+        
+        // Check to remove unnecessary slashes from the request
+        $request = ltrim($request, '/');        
 
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -264,6 +273,9 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         $curl = $this->_prepareCurl();
 
         $request.='?access_token='.$this->_accessToken;
+        
+        // Check to remove unnecessary slashes from the request
+        $request = ltrim($request, '/');        
 
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");

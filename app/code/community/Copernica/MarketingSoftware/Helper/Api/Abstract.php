@@ -384,6 +384,10 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     protected function _getProfileIdByEmail($email, $storeView)
     {
         $customerLinkedFields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
+        
+        if (!isset($customerLinkedFields['email']) || !isset($customerLinkedFields['storeView'])) {
+        	return false;
+        } 
 
         $requestParams = array(
             $customerLinkedFields['email'].'=='.$email,

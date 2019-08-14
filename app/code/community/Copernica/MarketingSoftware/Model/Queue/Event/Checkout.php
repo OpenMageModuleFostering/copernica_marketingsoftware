@@ -80,7 +80,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Checkout extends Copernica_M
             	$request->delete('/subprofile/'.$subprofile['ID']);  
             }
         } else {
-            foreach ($quote->getAllVisibleItems() as $quoteItem) {
+            foreach ($quote->getAllItems() as $quoteItem) {
             	$quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
             	$quoteItemEntity->setQuoteItem($quoteItem);
             	

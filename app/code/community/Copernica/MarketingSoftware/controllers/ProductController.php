@@ -44,19 +44,21 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $request = $this->getRequest();
 
         if ($request->getParam('identifier') == 'sku') {
-        	$product = Mage::getModel('catalog/product')->loadByAttribute('sku', $request->getParam('id'));
+            $productId = Mage::getModel("catalog/product")->getIdBySku($request->getParam('id'));
         } else {
-        	$product = Mage::getModel('catalog/product')->load($request->getParam('id'));
+            $productId = $request->getParam('id');
         }
 
-        if (!$product->getId()) {
-        	return $this->norouteAction();
-        }
- 
-        $productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
-        $productEntity->setProduct($product->getId());
+        $product = Mage::getModel('catalog/product')->load($productId);
 
-        $xml = $this->_buildProductXML($productEntity);
+        if ($product->getId() && $product->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
+        	$productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
+        	$productEntity->setProduct($product->getId());
+
+        	$xml = $this->_buildProductXML($productEntity);
+        } else {
+        	$xml = $this->_buildErrorXml("Product not found with ID: ". $request->getParam('id'));
+        }
 
         $this->_prepareResponse($xml);
     }
@@ -97,6 +99,14 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
 
         $this->_prepareResponse($xml);
     }
+    
+    protected function _buildErrorXml($message)
+    {
+    	$element = $this->_document->createElement('error');    
+    	$this->_appendSimpleNode($element, 'message', $message);
+    	return $element;
+    }
+    	 
 
     /**
      *  Prepare xml tree for one product instance.
