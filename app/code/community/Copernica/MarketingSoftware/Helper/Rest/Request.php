@@ -142,17 +142,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     {
         $curl = curl_init();
 
-        if (is_null(self::$_cryptoLib)) {
-            $version = curl_version();
-
-            if (strpos($version['ssl_version'], 'NSS') !== false) {
-            	self::$_cryptoLib = 'nss';
-            } else {
-            	self::$_cryptoLib = 'openssl';
-            }
-        }
-
-        curl_setopt($curl, CURLOPT_SSL_CIPHER_LIST, self::$_cipherList[self::$_cryptoLib]);        
+        // Sometimes ssl gives problems so the verification is off.
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
         return $curl;

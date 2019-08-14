@@ -123,7 +123,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
         	if ($this->_orderItem->getQuote()) {
         		return $this->_orderItem->getQuote()->getStoreId();
         	} else {
-        		return Mage::getModel('sales/quote')->load($this->_orderItem->getQuoteId())->getStoreId();
+        		return Mage::getModel('sales/quote')->loadByIdWithoutStore($this->_orderItem->getQuoteId())->getStoreId();
         	}
         } elseif ($this->_orderItem instanceof Mage_Sales_Model_Order_Item) {
         	return $this->_orderItem->getOrder()->getStoreId();

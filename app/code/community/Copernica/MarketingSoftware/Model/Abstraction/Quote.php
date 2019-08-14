@@ -311,23 +311,6 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
         return serialize(array(
             $this->id()
         ));
-
-        return serialize(array(
-            $this->id(),
-            $this->quantity(),
-            $this->currency(),
-            $this->timestamp(),
-            $this->customerIP(),
-            $this->items(),
-            $this->storeview(),
-            is_object($customer = $this->customer()) ? $customer->id() : null,
-            $this->addresses(),
-            $this->price(),
-            $this->weight(),
-            $this->active(),
-            $this->shippingDescription(),
-            $this->paymentDescription()
-        ));
     }
 
     /**
@@ -345,25 +328,6 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
 
         $this->loadQuote($this->_quoteId);
 
-        return $this;
-
-        list(
-            $this->_quoteId,
-            $this->_quantity,
-            $this->_currency,
-            $this->_timestamp,
-            $this->_customerIP,
-            $this->_items,
-            $this->_storeview,
-            $this->_customerId,
-            $this->_addresses,
-            $this->_price,
-            $this->_weight,
-            $this->_active,
-            $this->_shippingDescription,
-            $this->_paymentDescription
-        ) = unserialize($string);
-        
         return $this;
     }
 }

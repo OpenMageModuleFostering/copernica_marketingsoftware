@@ -26,11 +26,11 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Subscription extends Coperni
 
         $profileLinkedFields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
 
-        if (!$object->email && !$object->store_id) {
+        if (!$object->email && !$object->storeId) {
         	return false;
         }
 
-        $store = Mage::getModel('core/store')->load($object->store_id);
+        $store = Mage::getModel('core/store')->load($object->storeId);
         $website = $store->getWebsite();
         $group = $store->getGroup();
 
