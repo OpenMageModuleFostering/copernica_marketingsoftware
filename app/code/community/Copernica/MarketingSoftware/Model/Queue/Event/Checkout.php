@@ -32,17 +32,17 @@
  */
 class Copernica_MarketingSoftware_Model_Queue_Event_Checkout extends Copernica_MarketingSoftware_Model_Queue_Event_Abstract
 {
-	/**
-	 * Customer entity
-	 *
-	 * @var Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
-	 */
-	protected $_customerEntity;
-	
+    /**
+     * Customer entity
+     *
+     * @var Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
+     */
+    protected $_customerEntity;
+    
     /**
      *  Process add action
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function actionAdd()
     {
@@ -52,15 +52,15 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Checkout extends Copernica_M
     /**
      *  Modify action on checkout event
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function actionModify()
     {
-    	$customerEntity = $this->_getCustomerEntity();
-    	
-    	if (!$customerEntity) {
-    		return false;
-    	}
+        $customerEntity = $this->_getCustomerEntity();
+        
+        if (!$customerEntity) {
+            return false;
+        }
 
         $quote = Mage::getModel('sales/quote')->loadByIdWithoutStore($this->_getEntityId());
         
@@ -71,21 +71,23 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Checkout extends Copernica_M
             $quoteItemCollection = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
             if ($quoteItemCollection) {
-				$response = $request->get('/profile/'.$customerEntity->getProfileId().'/subprofiles/'.$quoteItemCollection, array(            
-					'fields' => array('quote_id=='.$this->_getEntityId())
-            	));
+                $response = $request->get(
+                    '/profile/'.$customerEntity->getProfileId().'/subprofiles/'.$quoteItemCollection, array(            
+                    'fields' => array('quote_id=='.$this->_getEntityId())
+                    )
+                );
             }
 
             foreach ($response['data'] as $subprofile) {
-            	$request->delete('/subprofile/'.$subprofile['ID']);  
+                $request->delete('/subprofile/'.$subprofile['ID']);  
             }
         } else {
             foreach ($quote->getAllItems() as $quoteItem) {
-            	$quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
-            	$quoteItemEntity->setQuoteItem($quoteItem);
-            	
-            	$restQuoteItem = $quoteItemEntity->getRestQuoteItem();
-            	$restQuoteItem->syncWithQuote($customerEntity, $quote->getId());
+                $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+                $quoteItemEntity->setQuoteItem($quoteItem);
+                
+                $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
+                $restQuoteItem->syncWithQuote($customerEntity, $quote->getId());
             }
         }
 
@@ -96,19 +98,19 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Checkout extends Copernica_M
     
     protected function _getCustomerEntity()
     {
-    	if ($this->_customerEntity) {
-    		return $this->_customerEntity;
-    	} else {
-    		$object = $this->_getObject();
+        if ($this->_customerEntity) {
+            return $this->_customerEntity;
+        } else {
+            $object = $this->_getObject();
     
-    		if (property_exists($object, 'customerId') && is_numeric($object->customerId)) {
-    			$customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
-    			$customerEntity->setCustomer($object->customerId);
-    	   
-    			return $this->_customerEntity = $customerEntity;
-    		} else {
-    			return false;
-    		}
-    	}
+            if (property_exists($object, 'customerId') && is_numeric($object->customerId)) {
+                $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+                $customerEntity->setCustomer($object->customerId);
+           
+                return $this->_customerEntity = $customerEntity;
+            } else {
+                return false;
+            }
+        }
     }
 }

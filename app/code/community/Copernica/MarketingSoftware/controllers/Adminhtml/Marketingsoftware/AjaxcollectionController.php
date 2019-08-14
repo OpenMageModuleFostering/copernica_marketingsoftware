@@ -44,7 +44,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
 
         try {
             if ($post['type'] == 'main') {
-            	try {
+                try {
                     $validator->validateDatabase($post['name']);    
                 } catch (Copernica_MarketingSoftware_Exception $exception) {
                     array_push($problems, $exception->getMessage());
@@ -102,9 +102,13 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         $response = $this->getResponse();
 
         if (!isset($post['name'])) {
-        	return $response->setBody(json_encode(array(
-            	'message' => 'Invalid input'
-        	)));
+            return $response->setBody(
+                json_encode(
+                    array(
+                    'message' => 'Invalid input'
+                    )
+                )
+            );
         }
 
         $config = Mage::helper('marketingsoftware/config');
@@ -112,16 +116,20 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
 
         $database = $config->getDatabaseName();
 
-        $db_not_needed = false;
+        $dbNotNeeded = false;
         
-        if($post['name'] == 'main') {
-        	$db_not_needed = true;
+        if ($post['name'] == 'main') {
+            $dbNotNeeded = true;
         }
         
-        if (empty($database) && !$db_not_needed) {
-        	return $response->setBody(json_encode(array(
-            	'error' => 'no database'
-        	)));
+        if (empty($database) && !$dbNotNeeded) {
+            return $response->setBody(
+                json_encode(
+                    array(
+                    'error' => 'no database'
+                    )
+                )
+            );
         }
 
         $linkedName = '';
@@ -174,11 +182,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
                 break;
                 
             case 'wishlistproducts':
-            	$linkedName = $config->getWishlistItemCollectionName();
-            	$supportedFields = $data->supportedWishlistItemFields();
-            	$linkedFields = $config->getLinkedWishlistItemFields();
-            	$label = 'Wishlist items collection';
-            	break;            	
+                $linkedName = $config->getWishlistItemCollectionName();
+                $supportedFields = $data->supportedWishlistItemFields();
+                $linkedFields = $config->getLinkedWishlistItemFields();
+                $label = 'Wishlist items collection';
+                break;                
         }
 
         $fields = array();
@@ -191,12 +199,16 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
             );
         }
 
-        $response->setBody(json_encode(array(
-            'name'          => $post['name'],
-            'linkedName'    => $linkedName,
-            'label'         => $label,
-            'fields'        => $fields,
-        )));
+        $response->setBody(
+            json_encode(
+                array(
+                'name'          => $post['name'],
+                'linkedName'    => $linkedName,
+                'label'         => $label,
+                'fields'        => $fields,
+                )
+            )
+        );
     }
 
     /**
@@ -253,11 +265,18 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
 
                 $profileCacheCollection = Mage::getModel('marketingsoftware/profile_cache')->getCollection();
                 
-                foreach($profileCacheCollection as $profileCache) {
-                	$profileCache->delete();
+                foreach ($profileCacheCollection as $profileCache) {
+                    $profileCache->delete();
                 }
                 
                 $config->unsDatabaseId();
+                $config->unsOrdersCollectionId();
+                $config->unsOrderItemCollectionId();
+                $config->unsAddressCollectionId();
+                $config->unsViewedProductCollectionId();
+                $config->unsQuoteItemCollectionId();
+                $config->unsWishlistItemCollectionId();
+
                 $config->setDatabaseName($post['name']);
 
                 $fields = array();
@@ -319,11 +338,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
                         $config->setLinkedQuoteItemFields($fields);
                         break;
                         
-					case 'wishlistproducts':
+                    case 'wishlistproducts':
                         $config->unsWishlistItemCollectionId();
                         $config->setWishlistItemCollectionName($post['name']);
-                       	$config->setLinkedWishlistItemFields($fields);
-						break;                        
+                           $config->setLinkedWishlistItemFields($fields);
+                        break;                        
                 }
                 break;
         }
@@ -349,8 +368,8 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
 
         $profileCacheCollection = Mage::getModel('marketingsoftware/profile_cache')->getCollection();
         
-        foreach($profileCacheCollection as $profileCache) {
-        	$profileCache->delete();
+        foreach ($profileCacheCollection as $profileCache) {
+            $profileCache->delete();
         }
         
         $supportedFields = $data->supportedCustomerFields();
@@ -366,7 +385,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Quote items collection
          */        
-        $builder->createCollection($databaseName, 'Cart_Items' ,'cartproducts');
+        $builder->createCollection($databaseName, 'Cart_Items', 'cartproducts');
         $config->setQuoteItemCollectionName('Cart_Items');
         $supportedFields = $data->supportedQuoteItemFields();
         $linkedFields = array();
@@ -381,7 +400,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Orders collection
          */        
-        $builder->createCollection($databaseName, 'Orders' ,'orders');
+        $builder->createCollection($databaseName, 'Orders', 'orders');
         $config->setOrdersCollectionName('Orders');
         $supportedFields = $data->supportedOrderFields();
         $linkedFields = array();
@@ -396,7 +415,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Orders items collection
          */
-        $builder->createCollection($databaseName, 'Orders_Items' ,'orderproducts');
+        $builder->createCollection($databaseName, 'Orders_Items', 'orderproducts');
         $config->setOrderItemCollectionName('Orders_Items');
         $supportedFields = $data->supportedOrderItemFields();
         $linkedFields = array();
@@ -411,7 +430,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Addresses collection
          */
-        $builder->createCollection($databaseName, 'Addresses' ,'addresses');
+        $builder->createCollection($databaseName, 'Addresses', 'addresses');
         $config->setAddressCollectionName('Addresses');
         $supportedFields = $data->supportedAddressFields();
         $linkedFields = array();
@@ -426,7 +445,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Viewed products collection
          */
-        $builder->createCollection($databaseName, 'Viewed_Products' ,'viewedproducts');
+        $builder->createCollection($databaseName, 'Viewed_Products', 'viewedproducts');
         $config->setViewedProductCollectionName('Viewed_Products');
         $supportedFields = $data->supportedViewedProductFields();
         $linkedFields = array();
@@ -441,14 +460,14 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         /*
          *  Wishlist items collection
          */
-        $builder->createCollection($databaseName, 'Wishlist_Items' ,'wishlistproducts');
+        $builder->createCollection($databaseName, 'Wishlist_Items', 'wishlistproducts');
         $config->setWishlistItemCollectionName('Wishlist_Items');
         $supportedFields = $data->supportedWishlistItemFields();
         $linkedFields = array();
         
         foreach ($supportedFields as $name => $label) {
-        	$builder->createCollectionField($databaseName, 'Wishlist_Items', 'wishlistproducts', $name, $name);
-        	$linkedFields[$name] = $name;
+            $builder->createCollectionField($databaseName, 'Wishlist_Items', 'wishlistproducts', $name, $name);
+            $linkedFields[$name] = $name;
         }
         
         $config->setLinkedWishlistItemFields($linkedFields);

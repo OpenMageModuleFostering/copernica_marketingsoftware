@@ -28,7 +28,8 @@ $installer = $this;
 $installer->startSetup();
 
 try {
-	$installer->run("
+    $installer->run(
+        "
 		DROP TABLE IF EXISTS {$this->getTable('marketingsoftware/config_data')};
 		CREATE TABLE `{$this->getTable('marketingsoftware/config_data')}` (
 			`config_id` int(11) NOT NULL auto_increment,
@@ -36,7 +37,10 @@ try {
 			`value` TEXT NOT NULL,
 			PRIMARY KEY (`config_id`),
 			UNIQUE config_data_key_name (`key_name`)
-		) ENGINE = InnoDB DEFAULT CHARSET = utf8;");
-} catch(Exception $e) {}
+		) ENGINE = InnoDB DEFAULT CHARSET = utf8;"
+    );
+} catch(Exception $e) {
+    Mage::logException($e);
+}
 
 $installer->endSetup();

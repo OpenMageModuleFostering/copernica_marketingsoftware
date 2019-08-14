@@ -32,14 +32,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
     /**
      *  Magento product that will be used during sync
      *  
-     *  @var	Mage_Catalog_Model_Product
+     *  @var    Mage_Catalog_Model_Product
      */
     protected $_product = null;
     
     /**
      * Timestamp of when the product was viewed
      * 
-     * @var	int
+     * @var    int
      */
     protected $_timestamp;
 
@@ -121,7 +121,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function fetchTimestamp()
     {
-    	return $this->_timestamp;
+        return $this->_timestamp;
     }
 
     /**
@@ -134,7 +134,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
         $url = $this->_product->getProductUrl($this->getStoreId());
         
         if (strpos($url, 'processQueue.php')) {
-        	$url = str_replace('processQueue.php', 'index.php', $url);
+            $url = str_replace('processQueue.php', 'index.php', $url);
         }
 
         return $url;
@@ -147,7 +147,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      *  When image can't be found or identified or magento has some other 
      *  problems with beforementioned image empty string will be returned.
      *
-     *  @return	string
+     *  @return    string
      */ 
     protected function _getImageByType($type)
     {
@@ -162,7 +162,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
     /**
      *  Get URL to product image
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchImage()
     {
@@ -172,7 +172,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
     /**
      *  Get URL to product thumbnail
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchThumbnail()
     {
@@ -188,11 +188,11 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function getStoreId()
     {
-    	if ($this->_product->getStoreId()) {
-    		return $this->_product->getStoreId();
-    	} else {
-    		return 0;
-    	}
+        if ($this->_product->getStoreId()) {
+            return $this->_product->getStoreId();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -202,9 +202,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function fetchId()
     {
-    	if (!$this->_product) {
-    		throw new Exception('asdf');
-    	}
+        if (!$this->_product) {
+            throw new Exception('asdf');
+        }
         return $this->_product->getId();
     }
 
@@ -215,9 +215,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function fetchStoreView()
     {
-    	$store = Mage::getModel('core/store')->load($this->getStoreId());
-    	
-    	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
+        $store = Mage::getModel('core/store')->load($this->getStoreId());
+        
+        return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
     }
     
     /**
@@ -266,7 +266,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
 
             $parent = Mage::getModel('catalog/category')->load($id);
 
-            while($parent->getId() > 1) {
+            while ($parent->getId() > 1) {
                 $categoryName [] = $parent->getName();
                 
                 $parent = $parent->getParentCategory();
@@ -325,13 +325,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
 
         foreach ($attributes as $attr) {
             if (!$attr->getIsUserDefined()) {
-            	continue;
+                continue;
             }
 
             $compareArray = array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect');
             
             if (!in_array($attr->getFrontendInput(), $compareArray)) {
-            	continue;
+                continue;
             }
 
             if ($attr->getAttributeCode() && $value = $attr->getFrontend()->getValue($this->_product)) {
@@ -358,7 +358,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
         $newsTo = $this->_product->getNewsToDate();
 
         if (!$newsFrom && !$newsTo) {
-        	return false;
+            return false;
         }
 
         $from = Mage::app()->getLocale()->date($newsFrom);
@@ -380,15 +380,17 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function fetchAttributes()
     {
-        $attributes = array_map( function ($item) {
+        $attributes = array_map(
+            function ($item) {
             return sprintf("%s: %s", $item['code'], $item['value']);
-        }, $this->getAttributesList());
+            }, $this->getAttributesList()
+        );
 
         if (!is_array($attributes)) {
-        	return '';
+            return '';
         }
 
-        return implode ("\n", $attributes);
+        return implode("\n", $attributes);
     }
 
     /**
@@ -410,25 +412,25 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function getRestProduct()
     {
-    	$restProduct = Mage::getModel('marketingsoftware/rest_product');
-    	$restProduct->setProductEntity($this);
-    	 
-    	return $restProduct;
+        $restProduct = Mage::getModel('marketingsoftware/rest_product');
+        $restProduct->setProductEntity($this);
+         
+        return $restProduct;
     }
     
     /**
      *  Set product entity
      *
-     *  @param	int	$productId
+     *  @param    int    $productId
      *  @param  int $storeId
      */
     public function setProduct($productId, $storeId = null)
     {
-    	if (!$storeId) {
-    		$storeId = Mage::app()->getStore()->getId();
-    	}
-    	
-    	$this->_product = Mage::getModel('catalog/product')->setStoreId($storeId)->load($productId);
+        if (!$storeId) {
+            $storeId = Mage::app()->getStore()->getId();
+        }
+        
+        $this->_product = Mage::getModel('catalog/product')->setStoreId($storeId)->load($productId);
     }
     
     
@@ -439,6 +441,6 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function setTimestamp($viewedAt)
     {
-    	$this->_timestamp = $viewedAt;
+        $this->_timestamp = $viewedAt;
     }
 }

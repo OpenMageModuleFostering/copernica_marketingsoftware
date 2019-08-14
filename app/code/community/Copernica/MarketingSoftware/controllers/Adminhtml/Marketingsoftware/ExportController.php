@@ -30,17 +30,17 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController extends Copernica_MarketingSoftware_Controller_Action
 {
-	/**
-	 * Check if cache management is allowed
-	 *
-	 * @return bool
-	 */
-	protected function _isAllowed()
-	{
-		return Mage::getSingleton('admin/session')->isAllowed('copernica/export');
-	}
-		
-	
+    /**
+     * Check if cache management is allowed
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('copernica/export');
+    }
+        
+    
     /**
      * Takes care of displaying the form which 
      * contains the details used for the SOAP connection.
@@ -116,7 +116,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
             Mage::getSingleton('adminhtml/session')
                     ->addError('A synchronization has already been scheduled, please be patient for it to finish.');
         } else {
-        	$this->_startSync();
+            $this->_startSync();
         }
 
         return $this->_redirect('*/*');
@@ -136,7 +136,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
         $syncStatus = Mage::getModel('marketingsoftware/sync_status');
 
         if ($enabledStores = $config->getEnabledStores()) {
-        	$syncStatus->setStoresFilter($enabledStores);
+            $syncStatus->setStoresFilter($enabledStores);
         }
 
         $queue = Mage::getModel('marketingsoftware/queue_item')

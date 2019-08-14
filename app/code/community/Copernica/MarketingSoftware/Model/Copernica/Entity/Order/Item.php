@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
     /**
      *  Cached item
      *  
-     *  @var	Mage_Sales_Model_Order_Item|Mage_Sales_Model_Quote_Item
+     *  @var    Mage_Sales_Model_Order_Item|Mage_Sales_Model_Quote_Item
      */
     protected $_orderItem = null;
 
@@ -43,7 +43,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function fetchId()
     {
-    	return $this->_orderItem->getId();	
+        return $this->_orderItem->getId();    
     }
     
     /**
@@ -54,7 +54,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
     public function fetchQuantity()
     {
         if ($this->_orderItem instanceOf Mage_Sales_Model_Quote_Item) {
-        	return $this->_orderItem->getQty();
+            return $this->_orderItem->getQty();
         }
 
         return $this->_orderItem->getQtyOrdered();
@@ -107,9 +107,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function fetchStoreView()
     {
-    	$store = Mage::getModel('core/store')->load($this->getStoreId());
-    	
-    	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);        
+        $store = Mage::getModel('core/store')->load($this->getStoreId());
+        
+        return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);        
     }
     
     /**
@@ -119,7 +119,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function getUpdatedAt()
     {
-    	return $this->_orderItem->getUpdatedAt();
+        return $this->_orderItem->getUpdatedAt();
     }
     
     /**
@@ -129,7 +129,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function getCreatedAt()
     {
-    	return $this->_orderItem->getCreatedAt();
+        return $this->_orderItem->getCreatedAt();
     }  
 
     /**
@@ -139,7 +139,11 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function fetchStatus()
     {
-    	return $this->_orderItem->getStatus();
+        if ($this->_orderItem->getParentItem()) {
+            return $this->_orderItem->getParentItem()->getStatus();
+        } else {
+            return $this->_orderItem->getStatus();
+        }
     }
 
     /**
@@ -150,15 +154,15 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
     public function getStoreId()
     { 
         if ($this->_orderItem instanceof Mage_Sales_Model_Quote_Item) {
-        	if ($this->_orderItem->getQuote()) {
-        		return $this->_orderItem->getQuote()->getStoreId();
-        	} elseif ($this->_orderItem->getQuoteId())  {
-        		return Mage::getModel('sales/quote')->loadByIdWithoutStore($this->_orderItem->getQuoteId())->getStoreId();
-        	} else {
-        		throw new Exception(Mage::helper('marketingsoftware')->__("Could not load store id from quote."));
-        	}
+            if ($this->_orderItem->getQuote()) {
+                return $this->_orderItem->getQuote()->getStoreId();
+            } elseif ($this->_orderItem->getQuoteId()) {
+                return Mage::getModel('sales/quote')->loadByIdWithoutStore($this->_orderItem->getQuoteId())->getStoreId();
+            } else {
+                throw new Exception(Mage::helper('marketingsoftware')->__("Could not load store id from quote."));
+            }
         } elseif ($this->_orderItem instanceof Mage_Sales_Model_Order_Item) {
-        	return $this->_orderItem->getOrder()->getStoreId();
+            return $this->_orderItem->getOrder()->getStoreId();
         }
 
         return 0;
@@ -177,8 +181,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
     /** 
      *  Options can be nested so this function will allow us to parse them in recursive manner. 
      *  
-     *  @param	mixed	$values
-     *  @param	string	$prefix
+     *  @param    mixed    $values
+     *  @param    string    $prefix
      *  @return string
      */
     protected function _stringifyOptions($values, $prefix = '')
@@ -188,12 +192,12 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
         foreach ($values as $value) {
             if (is_array($value['value'])) {
                 if (isset($value['value'][0]) && count($value['value']) == 1) {
-                	$value['value'] = $value['value'][0];
+                    $value['value'] = $value['value'][0];
                 }
 
                 $result .= $prefix.$value['label'].":\n".$this->_stringifyOptions($value['value'], $prefix.'  ');
             } else {
-            	$result .= $prefix.$value['label'].":".$value['value']."\n";
+                $result .= $prefix.$value['label'].":".$value['value']."\n";
             }
         }
 
@@ -207,24 +211,24 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function getRestOrderItem()
     {
-    	$restOrderItem = Mage::getModel('marketingsoftware/rest_order_item');
-    	$restOrderItem->setOrderItemEntity($this);
-    	 
-    	return $restOrderItem;    	
+        $restOrderItem = Mage::getModel('marketingsoftware/rest_order_item');
+        $restOrderItem->setOrderItemEntity($this);
+         
+        return $restOrderItem;        
     }
     
     /**
      *  Set copernica order item
      *
-     *  @param	Mage_Sales_Model_Order_Item|Mage_Sales_Model_Quote_Item	$orderItem
+     *  @param    Mage_Sales_Model_Order_Item|Mage_Sales_Model_Quote_Item    $orderItem
      */
     public function setOrderItem($orderItem)
     {
-    	if ($orderItem->getId()) {
-    		$this->_orderItem = $orderItem;
-    		$this->setProduct($orderItem->getProductId(), $this->getStoreId());
-    	} else {
-    		throw new Exception(Mage::helper('marketingsoftware')->__('Set an empty quote item or order item object.'));
-    	}
+        if ($orderItem->getId()) {
+            $this->_orderItem = $orderItem;
+            $this->setProduct($orderItem->getProductId(), $this->getStoreId());
+        } else {
+            throw new Exception(Mage::helper('marketingsoftware')->__('Set an empty quote item or order item object.'));
+        }
     }
 }

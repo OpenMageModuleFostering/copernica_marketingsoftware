@@ -46,7 +46,7 @@ class Copernica_MarketingSoftware_AdminHtml_MarketingSoftware_AccesstokenControl
         $session = Mage::getSingleton('adminhtml/session');
         
         if (!$session->getState()) {
-        	$session->setState($this->generateState());
+            $session->setState($this->generateState());
         }
 
         $this->renderLayout();

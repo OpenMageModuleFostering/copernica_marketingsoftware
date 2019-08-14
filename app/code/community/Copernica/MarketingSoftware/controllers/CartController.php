@@ -28,30 +28,32 @@
  * Marketing software cart controller
  */
 class Copernica_MarketingSoftware_CartController extends Mage_Core_Controller_Front_Action
-{  
-	public function resumeAction()
-	{
-		$emailAddress = $this->getRequest()->getParam('email');
-		$quoteId = $this->getRequest()->getParam('quote_id');
-		
-		/* @var $quote Mage_Sales_Model_Quote */
-		$quote = Mage::getModel('sales/quote')->load($quoteId);
-		
-		if ($quote->getCustomerEmail() == $emailAddress) {
-			Mage::getSingleton('checkout/session')->replaceQuote($quote);
-		
-			$customer = Mage::getModel('customer/customer')
-			->setWebsiteId(Mage::app()->getStore()->getWebsiteId())
-			->loadByEmail($emailAddress);
-			
-			if ($customerId = $customer->getId()) {
-				$session = Mage::getSingleton('customer/session');
-				if ($session->isLoggedIn() && $customerId != $session->getCustomerId()) {
-					$session->logout();
-				}			
-			}
-		}
-		
-		$this->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
-	}
+{
+    public function resumeAction()
+    {
+        $emailAddress = $this->getRequest()->getParam('email');
+        $quoteId = $this->getRequest()->getParam('quote_id');
+        
+        /* @var $quote Mage_Sales_Model_Quote */
+        $quote = Mage::getModel('sales/quote')->load($quoteId);
+        $quote->setIsActive(true);
+        $quote->save();
+        
+        if ($quote->getCustomerEmail() == $emailAddress) {
+            Mage::getSingleton('checkout/session')->replaceQuote($quote);
+        
+            $customer = Mage::getModel('customer/customer')
+                ->setWebsiteId(Mage::app()->getStore()->getWebsiteId())
+                ->loadByEmail($emailAddress);
+            
+            if ($customerId = $customer->getId()) {
+                $session = Mage::getSingleton('customer/session');
+                if ($session->isLoggedIn() && $customerId != $session->getCustomerId()) {
+                    $session->logout();
+                }            
+            }
+        }
+        
+        $this->getResponse()->setRedirect(Mage::getUrl('checkout/cart'));
+    }
 }

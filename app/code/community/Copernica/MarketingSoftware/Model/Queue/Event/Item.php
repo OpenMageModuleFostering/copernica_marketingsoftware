@@ -38,12 +38,12 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
     {
         $object = $this->_getObject();        
 
-        if(!$object->quoteId || !is_numeric($object->quoteId)) {
-        	return false;
+        if (!$object->quoteId || !is_numeric($object->quoteId)) {
+            return false;
         }
         
         if ($object->customerId && is_numeric($object->customerId) ) {
-        	$this->syncQuote();
+            $this->syncQuote();
         }
 
         $collection = Mage::getModel('marketingsoftware/abandoned_cart')->getCollection()->addFieldToFilter('quote_id', $object->quoteId);
@@ -51,7 +51,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
         $abandonedCart = $collection->getFirstItem();
 
         if ($abandonedCart->isObjectNew()) {
-        	return true;
+            return true;
         }               
 
         $abandonedCart->delete();
@@ -87,7 +87,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
         $object = $this->_getObject();
 
         if (!$object->quoteId || !is_numeric($object->quoteId) || !$object->customerId || !is_numeric($object->customerId) || !$object->quoteItem) {
-        	return false;
+            return false;
         }        
         
         $quoteItemData = get_object_vars($object->quoteItem);
@@ -107,38 +107,42 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
         $customerEntity->setStore($storeview);
 
         if (($profileId = $customerEntity->getProfileId()) === false) {
-        	return false;
+            return false;
         }
         
         $quoteItemCollectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         
-        $response = $request->get('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
-        	'item_id' => $itemId,
-        	'quote_id' => $quoteId,            
-        ));
+        $response = $request->get(
+            '/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
+            'item_id' => $itemId,
+            'quote_id' => $quoteId,            
+            )
+        );
         
-		if (!array_key_exists('data', $response) || count($response['data']) == 0) {
-			if (!Mage::helper('marketingsoftware/config')->getRemoveFinishedQuoteItem()) {
-				$request->post('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, $quoteItemData);
-			}                
+        if (!array_key_exists('data', $response) || count($response['data']) == 0) {
+            if (!Mage::helper('marketingsoftware/config')->getRemoveFinishedQuoteItem()) {
+                $request->post('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, $quoteItemData);
+            }                
 
-			return true;
-		}
+            return true;
+        }
 
         if (Mage::helper('marketingsoftware/config')->getRemoveFinishedQuoteItem()) {
             foreach ($response['data'] as $subprofile) {
-            	$request->delete('/subprofile/'.$subprofile['ID']);
+                $request->delete('/subprofile/'.$subprofile['ID']);
             }
         } else {
-            $request->put('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
+            $request->put(
+                '/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
                 'status' => 'deleted'
-            ), array (
+                ), array (
                 'fields' => array(
                     'quote_id=='.$quoteId,
                     'item_id=='.$itemId
                 )
-            ));
+                )
+            );
         }
 
         return true;
@@ -152,27 +156,27 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
         $object = $this->_getObject();
 
         if (!$object->customerId || !is_numeric($object->customerId)) {
-        	return false;
+            return false;
         }        
         
-        if($object->quoteId && is_numeric($object->quoteId)) {
-        	$quoteId = $object->quoteId;
+        if ($object->quoteId && is_numeric($object->quoteId)) {
+            $quoteId = $object->quoteId;
         } else {
-        	$quote = Mage::getModel('sales/quote')->loadByCustomer($object->customerId);
-        	$quoteId = $quote->getId();
+            $quote = Mage::getModel('sales/quote')->loadByCustomer($object->customerId);
+            $quoteId = $quote->getId();
         }
         
         $quoteItem = Mage::getModel('sales/quote_item')->load($object->quoteItemId);
         
         if ($quoteId && $quoteItem->getId()) {
-	        $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
-	        $customerEntity->setCustomer($object->customerId);
-	        
-	        $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
-	        $quoteItemEntity->setQuoteItem($quoteItem);       
-	
-	        $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
-	        $restQuoteItem->syncWithQuote($customerEntity, $quoteId);
+            $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+            $customerEntity->setCustomer($object->customerId);
+            
+            $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+            $quoteItemEntity->setQuoteItem($quoteItem);       
+    
+            $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
+            $restQuoteItem->syncWithQuote($customerEntity, $quoteId);
         }
     }
 }

@@ -52,8 +52,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Quote|Mage_Sales_Model_Order|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @param    Mage_Sales_Model_Quote|Mage_Sales_Model_Order|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function setOriginal($original)
     {
@@ -106,7 +106,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
                 $this->_shipping = 0;
             }
         } else { 
-        	$this->_shipping = 0;
+            $this->_shipping = 0;
         }
         
         if ($currency = $original->getOrderCurrencyCode()) { 
@@ -127,7 +127,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the total price
      *  
-     *  @return	float
+     *  @return    float
      */
     public function total()
     {
@@ -137,7 +137,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the price for the individual item
      *  
-     *  @return	float
+     *  @return    float
      */
     public function costs()
     {
@@ -147,7 +147,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the price for the individual item
      *  
-     *  @return	float
+     *  @return    float
      */
     public function itemPrice()
     {
@@ -157,7 +157,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the original price for the individual item
      *  
-     *  @return	float
+     *  @return    float
      */
     public function originalPrice()
     {
@@ -167,7 +167,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the discount which was given
      *  
-     *  @return	float
+     *  @return    float
      */
     public function discount()
     {
@@ -177,7 +177,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the tax which was paid
      *  
-     *  @return	float
+     *  @return    float
      */
     public function tax()
     {
@@ -187,7 +187,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the shipping costs
      *  
-     *  @return	float
+     *  @return    float
      */
     public function shipping()
     {
@@ -197,7 +197,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Return the currency code
      *  
-     *  @return	float
+     *  @return    float
      */
     public function currency()
     {
@@ -207,11 +207,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->total(),
             $this->costs(),
             $this->itemPrice(),
@@ -220,14 +221,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
             $this->tax(),
             $this->shipping(),
             $this->currency(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function unserialize($string)
     {

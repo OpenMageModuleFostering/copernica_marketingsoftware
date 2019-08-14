@@ -33,7 +33,8 @@
 $installer = $this;
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 INSERT INTO `{$installer->getTable('core_config_data')}` (path, value)
 SELECT  'marketingsoftware/hostname', hostname
 FROM    {$installer->getTable('copernica_marketingsoftware')}
@@ -105,6 +106,7 @@ CREATE TABLE `{$installer->getTable('marketingsoftware/queue_item')}` (
     `result_time` timestamp NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB default CHARSET=utf8;
-");
+"
+);
 
 $installer->endSetup();

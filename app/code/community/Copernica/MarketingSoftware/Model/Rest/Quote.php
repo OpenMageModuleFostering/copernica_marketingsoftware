@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Rest_Quote extends Copernica_MarketingSo
     /**
      *  Copernica entity
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Quote
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Quote
      */
     protected $_quoteEntity;
 
@@ -59,22 +59,23 @@ class Copernica_MarketingSoftware_Model_Rest_Quote extends Copernica_MarketingSo
     /** 
      *  Sync quote with customer
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$customer
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $customer
      */
     public function syncWithCustomer(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customer)
     {
         foreach ($this->_quoteEntity->getItems() as $quoteItemEntity) {
-        	$restQuoteItem = $quoteItemEntity->getRestQuoteItem();
-        	$restQuoteItem->syncWithQuote($customer, $this->_quoteEntity->getId());
+            $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
+            $restQuoteItem->syncWithQuote($customer, $this->_quoteEntity->getId());
         }
     }
     
     /**
      *  Set REST quote entity
      *
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Quote	$quoteEntity
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Quote    $quoteEntity
      */
-    public function setQuoteEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Quote $quoteEntity) {
-    	$this->_quoteEntity = $quoteEntity;
+    public function setQuoteEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Quote $quoteEntity) 
+    {
+        $this->_quoteEntity = $quoteEntity;
     }
 }

@@ -40,8 +40,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Customer_Model_Customer|Mage_Customer_Model_Customer_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  @param    Mage_Customer_Model_Customer|Mage_Customer_Model_Customer_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function setOriginal($original)
     {
@@ -56,7 +56,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
     /**
      *  Return the firstname of the customer
      *  
-     *  @return	string
+     *  @return    string
      */
     public function firstname()
     {
@@ -67,7 +67,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      *  Return the prefix of the customer
      *  NOTE: the prefix field is not displayed by default
      *  
-     *  @return	string
+     *  @return    string
      */
     public function prefix()
     {
@@ -78,7 +78,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      *  Return the middlename of the customer
      *  NOTE: the middlename field is not displayed by default
      *  
-     *  @return	string
+     *  @return    string
      */
     public function middlename()
     {
@@ -88,7 +88,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
     /**
      *  Return the lastname of the customer
      *  
-     *  @return	string
+     *  @return    string
      */
     public function lastname()
     {
@@ -98,23 +98,25 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->firstname(),
             $this->prefix(),
             $this->middlename(),
             $this->lastname(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function unserialize($string)
     {

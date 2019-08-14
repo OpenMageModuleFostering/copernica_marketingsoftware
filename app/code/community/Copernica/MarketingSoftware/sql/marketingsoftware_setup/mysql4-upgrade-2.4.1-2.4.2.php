@@ -46,32 +46,42 @@ try
     $table = $installer->getConnection()->newTable($tableName);
 
     // add Id column
-    $table->addColumn('id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+    $table->addColumn(
+        'id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'unsigned'  => true,
         'nullable'  => false,
         'primary'   => true,
         'identity'  => true,
-    ), 'Sync profile Id');
+        ), 'Sync profile Id'
+    );
 
     // add customer Id column
-    $table->addColumn('client_key', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'client_key', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => false
-    ), 'Copernica client key');
+        ), 'Copernica client key'
+    );
 
     // add copernica customer Id column
-    $table->addColumn('client_secret', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'client_secret', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => false
-    ), 'Copernica client secret');
+        ), 'Copernica client secret'
+    );
 
     // add profile id column
-    $table->addColumn('access_token', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'access_token', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => true
-    ), 'Client access token');
+        ), 'Client access token'
+    );
 
     // add email column
-    $table->addColumn('name', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'name', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => false
-    ), 'Name of the sync profile');
+        ), 'Name of the sync profile'
+    );
 
     // tell connection to create table
     $installer->getConnection()->createTable($table);

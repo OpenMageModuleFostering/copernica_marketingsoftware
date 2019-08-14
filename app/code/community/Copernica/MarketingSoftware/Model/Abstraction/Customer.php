@@ -33,22 +33,22 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  The id
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_id;
     
     /**
      *  The original object
      *  
-     *  @var	Mage_Customer_Model_Customer
+     *  @var    Mage_Customer_Model_Customer
      */
     protected $_original;
 
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Customer_Model_Customer	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @param    Mage_Customer_Model_Customer    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function setOriginal(Mage_Customer_Model_Customer $original)
     {
@@ -61,7 +61,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Returns the original model
      *  
-     *  @return	Mage_Customer_Model_Customer
+     *  @return    Mage_Customer_Model_Customer
      */
     protected function _original()
     {
@@ -71,7 +71,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Loads a customer model
      *  
-     *  @param	int	$customerId
+     *  @param    int    $customerId
      *  @return Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function loadCustomer($customerId)
@@ -79,7 +79,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
         $customer = Mage::getModel('customer/customer')->load($customerId);
         
         if ($customer->getId()) {
-        	$this->setOriginal($customer);
+            $this->setOriginal($customer);
         }
 
         return $this;
@@ -88,12 +88,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Return the id of the customer
      *  
-     *  @return	string
+     *  @return    string
      */
     public function id()
     {
         if (!$this->_original()) {
-        	return null;
+            return null;
         }
 
         return $this->_original()->getId();
@@ -103,7 +103,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      *  Return the name of this customer
      *  Note that null may also be returned to indicate that the name is not known
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function name()
     {
@@ -113,7 +113,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Return the e-mail address of the customer
      *  
-     *  @return	string
+     *  @return    string
      */
     public function email()
     {
@@ -123,7 +123,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Return a customer's date of birth
      *  
-     *  @return	string
+     *  @return    string
      */
     public function birthDate()
     {
@@ -134,14 +134,14 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      *  Method to retrieve the previous email if possible
      *  Falls back on self::email()
      *  
-     *  @return	string
+     *  @return    string
      */
     public function oldEmail()
     {
         $oldEmail = $this->_original()->getOrigData('email');
 
         if (isset($oldEmail)) {
-        	return $oldEmail;
+            return $oldEmail;
         }
 
         return $this->email();
@@ -150,7 +150,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Returns the gender
      *  
-     *  @return	string
+     *  @return    string
      */
     public function gender()
     {
@@ -170,18 +170,18 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Return the subscription of the customer
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function subscription()
     {
         $subscriber = Mage::getModel('newsletter/subscriber');
         
         if (!$subscriber->loadByCustomer($this->_original())->getId()) {
-        	return null; 
+            return null; 
         }
          
         if ($subscriber->getStoreId() !== $this->_original()->getStoreId()) {
-        	return null; 
+            return null; 
         }
         
         return Mage::getModel('marketingsoftware/abstraction_subscription')->setOriginal($subscriber);
@@ -190,7 +190,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Return the group to which this customer belongs
      *  
-     *  @return	string
+     *  @return    string
      */
     public function group()
     {
@@ -200,7 +200,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Get the quotes for this customer
      *  
-     *  @return	array
+     *  @return    array
      */
     public function quotes()
     {
@@ -210,7 +210,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
             ->addFieldToFilter('customer_id', $this->id())->getAllIds();
 
         foreach ($quoteIds as $id) {
-        	$data[] = Mage::getModel('marketingsoftware/abstraction_quote')->loadQuote($id);
+            $data[] = Mage::getModel('marketingsoftware/abstraction_quote')->loadQuote($id);
         }
 
         return $data;
@@ -229,7 +229,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
             ->addAttributeToFilter('customer_id', $this->id())->getAllIds();
             
         foreach ($orderIds as $id) {
-        	$data[] = Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($id);
+            $data[] = Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($id);
         }
 
         return $data;
@@ -242,16 +242,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      */
     public function wishlist()
     {
-    	$data = array();
+        $data = array();
     
-    	$wishlistIds = Mage::getResourceModel('wishlist/wishlist_collection')
-    	->addAttributeToFilter('customer_id', $this->id())->getAllIds();
+        $wishlistIds = Mage::getResourceModel('wishlist/wishlist_collection')
+        ->addAttributeToFilter('customer_id', $this->id())->getAllIds();
     
-    	foreach ($wishlistIds as $id) {
-    		$data[] = Mage::getModel('marketingsoftware/abstraction_wishlist')->loadWishlist($id);
-    	}
+        foreach ($wishlistIds as $id) {
+            $data[] = Mage::getModel('marketingsoftware/abstraction_wishlist')->loadWishlist($id);
+        }
     
-    	return $data;
+        return $data;
     }
     
     /**
@@ -275,7 +275,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  To what storeview does this order belong
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     { 
@@ -285,7 +285,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
@@ -295,8 +295,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function unserialize($string)
     {

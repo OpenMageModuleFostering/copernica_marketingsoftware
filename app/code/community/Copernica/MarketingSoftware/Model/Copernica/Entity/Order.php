@@ -32,14 +32,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     /**
      *  Cached order instance
      *  
-     *  @var	Mage_Sales_Model_Order
+     *  @var    Mage_Sales_Model_Order
      */
     protected $_order = null;
 
     /**
      *  Cache for order items
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_items = null;
 
@@ -165,13 +165,45 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     }
 
     /**
+     *  Get product creation date
+     *
+     *  @return string
+     */
+    public function fetchTrackAndTrace()
+    {
+        $trackAndTrace = '';
+
+        $shipments = $this->_order->getShipmentsCollection();
+
+        if (count($shipments) > 0) {
+            /* @var Mage_Sales_Model_Order_Shipment $shipment */
+            foreach ($shipments as $shipment) {
+                $tracks = $shipment->getAllTracks();
+
+                if (count($tracks) > 0) {
+                    /* @var Mage_Sales_Model_Order_Shipment_Track $track */
+                    foreach ($tracks as $track) {
+                        $trackAndTrace .= "shipment_id:" . $shipment->getId();
+                        $trackAndTrace .= "|title:" . $track->getTitle();
+                        $trackAndTrace .= "|track_number:" . $track->getNumber();
+                        $trackAndTrace .= "\n";
+                    }
+                }
+            }
+        }
+
+        return $trackAndTrace;
+    }
+
+
+    /**
      *  Get last modification date
      *
      *  @return string
      */
     public function fetchUpdatedAt()
     {
-    	return $this->_order->getUpdatedAt();
+        return $this->_order->getUpdatedAt();
     }
     
     /**
@@ -181,7 +213,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
      */
     public function fetchCreatedAt()
     {
-    	return $this->_order->getCreatedAt();
+        return $this->_order->getCreatedAt();
     }  
 
     /**
@@ -215,7 +247,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
             try {
                 if ($payment->getMethod() == 'klarna_partpayment') return 'Klarna';
                 else return $payment->getMethodInstance()->getTitle();
-            } catch (Mage_Core_Exception $exception) { }
+            } catch (Mage_Core_Exception $exception) {
+                Mage::logException($exception);
+            }
         }
 
         return '';
@@ -232,10 +266,10 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
         $address = $this->_order->getShippingAddress();
 
         if (is_object($address)) {
-        	$addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
-        	$addressEntity->setAddress($address);
-        	
-        	return $addressEntity;
+            $addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
+            $addressEntity->setAddress($address);
+            
+            return $addressEntity;
         }
 
         // $addresses = $this->_order->getAddressesCollection();
@@ -247,17 +281,17 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
      *  Get billing address. When no valid address can be found this method will
      *  return null value.
      *
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Entity_Address
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Entity_Address
      */
     public function fetchBillingAddress()
     {
         $address = $this->_order->getBillingAddress();
 
         if (is_object($address)) {
-        	$addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
-        	$addressEntity->setAddress($address);
-        	
-        	return $addressEntity;
+            $addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
+            $addressEntity->setAddress($address);
+            
+            return $addressEntity;
         }
 
         // foreach($this->_order->getAddressCollection() as $magentoAddress) {
@@ -275,7 +309,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     public function fetchShippingAddressId()
     {
         if (is_object($address = $this->getShippingAddress())) {
-        	return $address->getId();
+            return $address->getId();
         }
 
         return null;
@@ -289,7 +323,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     public function fetchBillingAddressId()
     {
         if (is_object($address = $this->getBillingAddress())) {
-        	return $address->getId();
+            return $address->getId();
         }
 
         return null;
@@ -303,16 +337,16 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     public function getItems()
     {
         if (!is_null($this->_items)) {
-        	return $this->_items;
+            return $this->_items;
         }
 
         $data = array();
 
         foreach ($this->_order->getAllItems() as $orderItem) {
-        	$orderItemEntity = Mage::getModel('marketingsoftware/copernica_entity_order_item');
-        	$orderItemEntity->setOrderItem($orderItem);
-        	
-        	$data[] = $orderItemEntity;
+            $orderItemEntity = Mage::getModel('marketingsoftware/copernica_entity_order_item');
+            $orderItemEntity->setOrderItem($orderItem);
+            
+            $data[] = $orderItemEntity;
         }
 
         return $this->_items = $data;
@@ -330,9 +364,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
         $convertedAddresses = array();
 
         foreach ($addresses as $address) {
-        	$addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
-        	$addressEntity->setAddress($address);
-        	
+            $addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
+            $addressEntity->setAddress($address);
+            
             $convertedAddresses[] = $addressEntity;  
         } 
 
@@ -356,19 +390,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
      */
     public function getRestOrder()
     {
-    	$restOrder = Mage::getModel('marketingsoftware/rest_order');
-    	$restOrder->setOrderEntity($this);
-    	 
-    	return $restOrder;
+        $restOrder = Mage::getModel('marketingsoftware/rest_order');
+        $restOrder->setOrderEntity($this);
+         
+        return $restOrder;
     }
     
     /**
      *  Set copernica order
      *
-     *  @param	Mage_Sales_Model_Order	$order
+     *  @param    Mage_Sales_Model_Order    $order
      */
     public function setOrder($order)
     {
-    	$this->_order = $order;
+        $this->_order = $order;
     }
 }

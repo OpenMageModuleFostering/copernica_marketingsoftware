@@ -30,14 +30,14 @@
 class Copernica_MarketingSoftware_Model_Copernica_Profile_Subscription extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     protected $_abstractSubscription = false;
 
     /**
      * Set the subscription object to this object.
      * 
-     * @param	Copernica_MarketingSoftware_Model_Abstraction_Subscription	$subscription
+     * @param    Copernica_MarketingSoftware_Model_Abstraction_Subscription    $subscription
      * @return Copernica_MarketingSoftware_Model_Copernica_Profile_Subscription
      */
     public function setSubscription(Copernica_MarketingSoftware_Model_Abstraction_Subscription $subscription)
@@ -77,9 +77,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Subscription extends C
         $customerId = null;
 
         if ($customer = $this->_abstractSubscription->customer()) {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_abstractSubscription->storeView());
+            $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_abstractSubscription->storeView());
         } else {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($this->_abstractSubscription->email(), $this->_abstractSubscription->storeView());
+            $customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($this->_abstractSubscription->email(), $this->_abstractSubscription->storeView());
         }
 
         return array(

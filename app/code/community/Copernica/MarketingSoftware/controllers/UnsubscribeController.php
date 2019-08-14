@@ -48,16 +48,26 @@ class Copernica_MarketingSoftware_UnsubscribeController extends Mage_Core_Contro
                 $email = $data->profile->fields->$fields['email'];
                
                 $subscriber = Mage::getModel('newsletter/subscriber');
-				
-            	if (
-					$subscriber->loadByCustomer($customer)->getId() ||
-					$subscriber->loadByEmail($email)->getId()
-				) {
-					// we have a valid subscriber object now, so unsubscribe the user
-					$subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
-					echo 'ok';
-					return;
-				}
+                if (
+                    $subscriber->loadByCustomer($customer)->getId() ||
+                    $subscriber->loadByEmail($email)->getId()
+                ) {
+                    // we have a valid subscriber object now, so unsubscribe the user
+                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                    echo 'ok';
+                    return;
+                } elseif ($customer->getId()) {
+                    $subscriber->setCustomerId($customer->getId());
+                    $subscriber->setEmail($email);
+                    $subscriber->setStoreId($customer->getStoreId());
+                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                    echo 'ok';
+                } else {
+                    $subscriber->setEmail($email);
+                    $subscriber->setStoreId(Mage::app()->getStore()->getId());
+                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+                    echo 'ok';
+                }
             }
         }
         echo 'not ok';

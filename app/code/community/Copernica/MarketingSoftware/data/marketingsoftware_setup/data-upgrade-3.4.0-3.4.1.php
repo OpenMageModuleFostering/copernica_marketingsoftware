@@ -34,14 +34,12 @@ return;
 $linkedFieldConfigs = array('linked_customer_fields', 'linked_cart_item_fields', 'linked_order_fields', 'linked_order_item_fields', 'linked_address_fields', 'linked_viewed_product_fields');
 
 // iterate over all linked fields configs
-foreach ($linkedFieldConfigs as $config)
-{
+foreach ($linkedFieldConfigs as $config) {
     // get model
     $model = Mage::getModel('marketingsoftware/config')->loadByKey($config);
 
     // we have tocheck if model is ok
-    if ($model->getId())
-    {
+    if ($model->getId()) {
         // get json value
         $json = $model->getValue();
 
@@ -49,8 +47,7 @@ foreach ($linkedFieldConfigs as $config)
         $array = json_decode($json, true);
 
         // we have to convert all unverscore case keys to camel case keys
-        foreach ($array as $key => $value)
-        {
+        foreach ($array as $key => $value) {
             // unset old value
             unset($array[$key]);
 

@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
     /**
      *  Our subscriber
      *  
-     *  @var	Mage_Newsletter_Model_Subscriber
+     *  @var    Mage_Newsletter_Model_Subscriber
      */
     protected $_subscriber;
 
@@ -88,9 +88,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
      */
     public function fetchStoreView()
     {
-    	$store = Mage::getModel('core/store')->load($this->getStoreId());
-    	
-    	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);   
+        $store = Mage::getModel('core/store')->load($this->getStoreId());
+        
+        return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);   
     }
 
     /**
@@ -105,9 +105,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
         $customer = Mage::getModel('customer/customer')->setWebsiteId($store->getWebsiteId())->loadByEmail($this->_subscriber->getEmail());
 
         if ($customer->isObjectNew()) {
-        	$identifier = $this->_subscriber->getEmail();
+            $identifier = $this->_subscriber->getEmail();
         } else {
-        	$identifier = $customer->getId();
+            $identifier = $customer->getId();
         }
 
         return $identifier.'|'.$this->_subscriber->getStoreId();
@@ -120,11 +120,11 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
      */
     public function getStoreId()
     {
-    	if($this->_subscriber->getStoreId()) {
-    		return $this->_subscriber->getStoreId();
-    	} else {
-    		return 0;
-    	}        
+        if ($this->_subscriber->getStoreId()) {
+            return $this->_subscriber->getStoreId();
+        } else {
+            return 0;
+        }        
     }
 
     /**
@@ -134,19 +134,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
      */
     public function getRestSubscription()
     {
-    	$restSubscription = Mage::getModel('marketingsoftware/rest_subscription');
-    	$restSubscription->setSubscriptionEntity($this);
-    	
-    	return $restSubscription;
+        $restSubscription = Mage::getModel('marketingsoftware/rest_subscription');
+        $restSubscription->setSubscriptionEntity($this);
+        
+        return $restSubscription;
     }
     
     /**
      *  Set subscription entity
      *
-     *  @param	Mage_Newsletter_Model_Subscriber	$subscriber
+     *  @param    Mage_Newsletter_Model_Subscriber    $subscriber
      */
     public function setSubscription($subscriber)
     {
-    	$this->_subscriber = $subscriber;
+        $this->_subscriber = $subscriber;
     }
 }

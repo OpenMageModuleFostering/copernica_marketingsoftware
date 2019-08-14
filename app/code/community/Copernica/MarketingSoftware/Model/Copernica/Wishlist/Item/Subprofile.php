@@ -47,8 +47,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile exten
     /**
      *  Try to store a wishlist item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item	$item
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile;
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item    $item
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile;
      */
     public function setWishlistItem(Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item $item)
     {
@@ -74,7 +74,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile exten
      */
     public function requiredFields()
     {
-    	return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
+        return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
     }
 
     /**
@@ -123,9 +123,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile exten
             $data['total_price'] = $price->total();
         }
 
-        $data['categories'] = implode("\n", array_map(function($category) {
-            return implode(' > ', $category);
-        }, $product->categories()));
+        $data['categories'] = implode(
+            "\n", array_map(
+                function($category) {
+                return implode(' > ', $category);
+                }, $product->categories()
+            )
+        );
 
         return $data;
     }

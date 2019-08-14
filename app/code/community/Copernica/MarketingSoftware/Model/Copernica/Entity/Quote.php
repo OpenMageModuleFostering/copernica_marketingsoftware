@@ -32,14 +32,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote extends Copernica
     /**
      *  Cached quote instance
      *  
-     *  @var	Mage_Sales_Model_Quote
+     *  @var    Mage_Sales_Model_Quote
      */
     protected $_quote;
 
     /**
      *  Cached quote items
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_quoteItems;
 
@@ -49,16 +49,16 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote extends Copernica
     public function getItems()
     {
         if (!is_null($this->_quoteItems)) {
-        	return $this->_quoteItems;
+            return $this->_quoteItems;
         }
 
         $quoteItems = array();
 
         foreach ($this->_quote->getAllItems() as $quoteItem) {
-        	$quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
-        	$quoteItemEntity->setQuoteItem($quoteItem);
-        	        	
-        	$quoteItems[] = $quoteItemEntity;
+            $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+            $quoteItemEntity->setQuoteItem($quoteItem);
+                        
+            $quoteItems[] = $quoteItemEntity;
         }
 
         return $this->_quoteItems = $quoteItems;
@@ -71,19 +71,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote extends Copernica
      */ 
     public function getRestQuote()
     {
-    	$restQuote = Mage::getModel('marketingsoftware/rest_quote');
-    	$restQuote->setQuoteEntity($this);
-    	 
-    	return $restQuote;
+        $restQuote = Mage::getModel('marketingsoftware/rest_quote');
+        $restQuote->setQuoteEntity($this);
+         
+        return $restQuote;
     }
     
     /**
      *  Set quote entity
      *
-     *  @param	Mage_Sales_Model_Quote	$quote
+     *  @param    Mage_Sales_Model_Quote    $quote
      */
     public function setQuote($quote)
     {
-    	$this->_quote = $quote;
+        $this->_quote = $quote;
     }
 }

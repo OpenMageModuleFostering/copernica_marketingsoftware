@@ -28,7 +28,8 @@
  *  Brigde class between Copernica subprofile and magento quote item
  */
 class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item extends Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item
-{	
+{
+    
     /**
      *  Fetch status of an item.
      *
@@ -47,7 +48,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item extends Cope
         $order = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('quote_id', $quoteId)->getFirstItem();
 
         if ($order->getId() > 0) {
-        	return 'completed';
+            return 'completed';
         }
 
         $forgottenCollection = Mage::getResourceModel('reports/quote_collection');
@@ -62,7 +63,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item extends Cope
         $forgottenCollection->prepareForAbandonedReport(array());
 
         if (count($forgottenCollection)) {
-        	return 'abandoned';  
+            return 'abandoned';  
         }
 
         return 'basket';
@@ -75,19 +76,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item extends Cope
      */
     public function getRestQuoteItem()
     {
-    	$restQuoteItem = Mage::getModel('marketingsoftware/rest_quote_item');
-    	$restQuoteItem->setQuoteItemEntity($this);
-    	 
-    	return $restQuoteItem;
+        $restQuoteItem = Mage::getModel('marketingsoftware/rest_quote_item');
+        $restQuoteItem->setQuoteItemEntity($this);
+         
+        return $restQuoteItem;
     }
     
     /**
      *  Set copernica quote item
      *
-     *  @param	Mage_Sales_Model_Quote_Item	$quoteItem
+     *  @param    Mage_Sales_Model_Quote_Item    $quoteItem
      */
     public function setQuoteItem(Mage_Sales_Model_Quote_Item $quoteItem)
     {
-    	$this->setOrderItem($quoteItem);
+        $this->setOrderItem($quoteItem);
     }
 }

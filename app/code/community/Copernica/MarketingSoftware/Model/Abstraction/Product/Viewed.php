@@ -53,8 +53,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function setOriginal($original, $id)
     {
@@ -201,8 +201,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Loads a product model
      *  
-     *  @param	integer	$productId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    integer    $productId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function loadProduct($productId)
     {
@@ -220,7 +220,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the identifier for this object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -231,7 +231,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
      *  Return the sku (stock keeping unit), which is an unique identifier
      *  for a magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function sku()
     {
@@ -241,7 +241,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the name of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function name()
     {
@@ -251,7 +251,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the description of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function description()
     {
@@ -261,7 +261,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the price of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function price()
     {
@@ -271,7 +271,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the price of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function specialPrice()
     {
@@ -282,7 +282,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the creation date of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function created()
     {
@@ -292,7 +292,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the modification date of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function modified()
     {
@@ -302,8 +302,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the product url of this magento product
      *  
-     *  @param	integer	$storeId
-     *  @return	string
+     *  @param    integer    $storeId
+     *  @return    string
      */
     public function productUrl($storeId = null)
     {
@@ -313,8 +313,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the image url of this magento product
      *  
-     *  @param	integer	$storeId
-     *  @return	string
+     *  @param    integer    $storeId
+     *  @return    string
      */
     public function imageUrl($storeId = null)
     {
@@ -324,7 +324,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the weight of this magento product
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -334,7 +334,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the categories of this product
      *  
-     *  @return	array
+     *  @return    array
      */
     public function categories()
     {
@@ -344,8 +344,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the flattened tree of the given category
      *  
-     *  @param	Mage_Catalog_Model_Category	$category
-     *  @return	array
+     *  @param    Mage_Catalog_Model_Category    $category
+     *  @return    array
      */
     protected function _getFullCategoryName(Mage_Catalog_Model_Category $category)
     {
@@ -365,7 +365,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return whether this product is new
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function isNew()
     {
@@ -375,7 +375,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Return the attributes for this product
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function attributes()
     {
@@ -396,7 +396,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
@@ -406,8 +406,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed implements Se
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function unserialize($string)
     {

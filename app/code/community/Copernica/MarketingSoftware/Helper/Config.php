@@ -34,30 +34,30 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Define a prefix used for the config
      *  
-     *  @name	CONFIG_BASE
+     *  @name    CONFIG_BASE
      */
     const CONFIG_BASE = 'marketingsoftware/';
 
     /**
      * Holds a list of previously requested key names
      * 
-     * @var	array
+     * @var    array
      */
     protected static $_keyNameCache = array();
 
     /**
      * List of already requested or used config entries
      *
-     * @var	array
+     * @var    array
      */
     protected static $_configEntryCache = array();
 
     /**
      * Magic method to get configurations from the database
      * 
-     * @param	string $method
-     * @param	array  $params
-     * @return	string
+     * @param    string $method
+     * @param    array  $params
+     * @return    string
      */
     public function __call($method, $params)
     {
@@ -70,7 +70,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
 
             case 'set':
                 if (!isset($params) || !isset($params[0])) {
-                	return false;
+                    return false;
                 }
 
                 $key = $this->_toKeyName(substr($method, 3));
@@ -109,8 +109,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      * Tries to get config value from custom config table
      * 
-     * @param	string $key
-     * @return	string
+     * @param    string $key
+     * @return    string
      */
     protected function _getCustomConfig($key)
     {
@@ -130,8 +130,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      * Sets a config entry in the custom config tab
      * 
-     * @param	string $key
-     * @param	string $value
+     * @param    string $key
+     * @param    string $value
      */
     protected function _setCustomConfig($key, $value)
     {
@@ -157,8 +157,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      * Checks if an entry exists in the custom config table
      * 
-     * @param	string $key
-     * @return	boolean
+     * @param    string $key
+     * @return    boolean
      */
     protected function _hasCustomConfig($key)
     {
@@ -168,8 +168,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      * Loads the requested model config object if possible
      *
-     * @param	string $key
-     * @return	Copernica_MarketingSoftware_Model_Config
+     * @param    string $key
+     * @return    Copernica_MarketingSoftware_Model_Config
      */
     protected function _getModel($key)
     {
@@ -188,8 +188,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      * Prepends uppercase characters with underscores and lowers
      * the whole string
      *
-     * @param	string $name
-     * @return	string
+     * @param    string $name
+     * @return    string
      */
     protected function _toKeyName($name)
     {
@@ -207,7 +207,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  Get the config item from the custom config table, otherwise from
      *  the basic magento component.
      *  
-     *  @param	string  $name
+     *  @param    string  $name
      */
     protected function _getConfig($name)
     {
@@ -223,26 +223,28 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the config item from the basic magento component
      *  
-     *  @param	string  $name
+     *  @param    string  $name
      *  @param  string  $value
      */
     protected function _setConfig($name, $value)
     {
         if ($value === $this->_getConfig($name)) {
-        	return;
+            return;
         }
 
         $this->_setCustomConfig($name, $value);
 
         // Some config items are not needed
-        if (in_array($name, array(
+        if (in_array(
+            $name, array(
             'customer_progress_status',
             'order_progress_status',
             'subscription_progress_status',
             'cronjob_starttime',
             'cronjob_endtime',
             'cronjob_processedtasks',
-        ))) return;
+            )
+        )) return;
 
         $this->setCustomerProgressStatus('0');
         
@@ -254,15 +256,15 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Check if store is enabled.
      *  
-     *  @param	int
-     *  @return	bool
+     *  @param    int
+     *  @return    bool
      */
     public function isEnabledStore($storeId)
     {
         $stores = @unserialize($this->_getConfig('enabled_stores'));
 
         if (!is_array($stores)) {
-        	return true;
+            return true;
         }
 
         return in_array($storeId, $stores);
@@ -271,8 +273,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set stores. Pass null to disable store filtering.
      *  
-     *  @param	array|null
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array|null
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setEnabledStores($collectionOfStoresId)
     {
@@ -284,7 +286,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get list of enabled stores
      *  
-     *  @return	array|null
+     *  @return    array|null
      */
     public function getEnabledStores()
     {
@@ -294,7 +296,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the hostname from the config
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getHostname()
     {
@@ -304,7 +306,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the hostname from the config
      *  
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setHostname($value)
     {
@@ -316,7 +318,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the database
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getDatabaseName()
     {
@@ -326,8 +328,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the name of the database
      *  
-     *  @param	string	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    string    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setDatabaseName($value)
     {
@@ -339,7 +341,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the linked customer fields
      *  
-     *  @return	array
+     *  @return    array
      */
     public function getLinkedCustomerFields()
     {
@@ -347,7 +349,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $value = empty($value) ? array() : json_decode($value, true);
 
         if (!isset($value['customer_email'])) {
-        	return $value;
+            return $value;
         }
 
         $oldValues = $value;
@@ -368,8 +370,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the linked customer fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedCustomerFields($value)
     {
@@ -381,37 +383,37 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the id of the quote item collection
      *
-     *  @return	int
+     *  @return    int
      */
     public function getQuoteItemCollectionId()
     {
-    	$id = $this->_getConfig('quote_item_collection_id');
+        $id = $this->_getConfig('quote_item_collection_id');
     
-    	if ($id) {
-    		return $id;
-    	}
+        if ($id) {
+            return $id;
+        }
     
-    	$name = $this->getQuoteItemCollectionName();
+        $name = $this->getQuoteItemCollectionName();
     
-    	if (!$name) {
-    		return null;
-    	}
+        if (!$name) {
+            return null;
+        }
     
-    	$id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
+        $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
     
-    	if (!$id) {
-    		return null;
-    	}
+        if (!$id) {
+            return null;
+        }
     
-    	$this->_setConfig('quote_item_collection_id', $id);
+        $this->_setConfig('quote_item_collection_id', $id);
     
-    	return $id;
+        return $id;
     }
     
     /**
      *  Get the name of the quote item collection
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getQuoteItemCollectionName()
     {
@@ -421,8 +423,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the name of the quote item collection
      *  
-     *  @param	string	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    string    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setQuoteItemCollectionName($value)
     {
@@ -434,24 +436,24 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the linked quote item fields
      *  
-     *  @return	array
+     *  @return    array
      */
     public function getLinkedQuoteItemFields()
     {
         $value = $this->_getConfig('linked_quote_item_fields');
 
         if (empty($value)) {
-        	return array();
+            return array();
         } else {
-        	return json_decode($value, true);
+            return json_decode($value, true);
         }
     }
 
     /**
      *  Get the linked quote item fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedQuoteItemFields($value)
     {
@@ -463,7 +465,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the orders collection
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getOrdersCollectionName()
     {
@@ -473,26 +475,26 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the id of the orders collection
      *  
-     *  @return	int
+     *  @return    int
      */
     public function getOrdersCollectionId()
     {
         $id = $this->_getConfig('orders_collection_id');
 
         if ($id) {
-        	return $id;
+            return $id;
         }
 
         $name = $this->getOrdersCollectionName();
 
         if (!$name) {
-        	return null;
+            return null;
         }
 
         $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
 
         if (!$id) {
-        	return null;
+            return null;
         }
 
         $this->_setConfig('orders_collection_id', $id);
@@ -503,8 +505,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the name of the orders collection
      *  
-     *  @param	string	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    string    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setOrdersCollectionName($value)
     {
@@ -516,15 +518,15 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the linked order fields
      *  
-     *  @return	array
+     *  @return    array
      */
     public function getLinkedOrderFields()
     {
         $value = $this->_getConfig('linked_order_fields');
         $value = empty($value) ? array() : json_decode($value, true);
 
-        if (!isset($value['order_timestamp']))  {
-        	return $value;
+        if (!isset($value['order_timestamp'])) {
+            return $value;
         }
 
         $oldValues = $value;
@@ -545,8 +547,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the linked order fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedOrderFields($value)
     {
@@ -558,7 +560,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the collection were all the orders are stored
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getOrderItemCollectionName()
     {
@@ -568,26 +570,26 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the id of the order item collection
      *  
-     *  @return	int
+     *  @return    int
      */
     public function getOrderItemCollectionId()
     {
         $id = $this->_getConfig('order_item_collection_id');
 
         if ($id) {
-        	return $id;
+            return $id;
         }
 
         $name = $this->getOrderItemCollectionName();
 
         if (!$name) {
-        	return null;
+            return null;
         }
 
         $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
 
         if (!$id) {
-        	return null;
+            return null;
         }
 
         $this->_setConfig('order_item_collection_id', $id);
@@ -598,7 +600,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the collection were all the orders are stored
      *  
-     *  @param	string
+     *  @param    string
      */
     public function setOrderItemCollectionName($value)
     {
@@ -610,7 +612,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the linked order item fields
      *  
-     *  @return	array
+     *  @return    array
      */
     public function getLinkedOrderItemFields()
     {
@@ -618,7 +620,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $value = empty($value) ? array() : json_decode($value, true);
 
         if (!isset($value['product_internal_id'])) {
-        	return $value;
+            return $value;
         }
 
         $oldValues = $value;
@@ -626,19 +628,19 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $newValues = array();
 
         foreach ($oldValues as $key => $value) {
-        	switch($key) {
-        		case 'product_qty':
-        			$key = 'quantity';
-        			break;
-        			
-        		case 'product_base_row_total':
-        			$key = 'total_price';
-        			break;
-        			
-        		default:
-        			$key = str_replace('product_', '', $key);
-        			break;
-        	}            
+            switch($key) {
+                case 'product_qty':
+                    $key = 'quantity';
+                    break;
+                    
+                case 'product_base_row_total':
+                    $key = 'total_price';
+                    break;
+                    
+                default:
+                    $key = str_replace('product_', '', $key);
+                    break;
+            }            
 
             $newValues[$key] = $value;
         }
@@ -651,8 +653,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the linked order item fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedOrderItemFields($value)
     {
@@ -680,19 +682,19 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $id = $this->_getConfig('address_collection_id');
 
         if ($id) {
-        	return $id;
+            return $id;
         }
 
         $name = $this->getAddressesCollectionName();
 
         if (!$name) {
-        	return null;
+            return null;
         }
 
         $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
 
         if (!$id) {
-        	return null;
+            return null;
         }
 
         $this->_setConfig('address_collection_id', $id);
@@ -713,7 +715,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the linked address fields
      *  
-     *  @return	array
+     *  @return    array
      */
     public function getLinkedAddressFields()
     {
@@ -721,7 +723,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $value = empty($value) ? array() : json_decode($value, true);
         
         if (!isset($value['address_firstname'])) {
-        	return $value;
+            return $value;
         }
 
         $oldValues = $value;
@@ -742,8 +744,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  set the linked address fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedAddressFields($value)
     {
@@ -755,7 +757,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the viewed products collection
      *  
-     *  @return	string
+     *  @return    string
      */
     public function getViewedProductCollectionName()
     {
@@ -765,26 +767,26 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the id of the address collection
      *  
-     *  @return	int
+     *  @return    int
      */
     public function getViewedProductCollectionId()
     {
         $id = $this->_getConfig('viewed_product_collection_id');
 
         if ($id) {
-        	return $id;
+            return $id;
         }
 
         $name = $this->getViewedProductCollectionName();
 
         if (!$name) {
-        	return null;
+            return null;
         }
 
         $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
 
         if (!$id) {
-        	return null;
+            return null;
         }
 
         $this->_setConfig('viewed_product_collection_id', $id);
@@ -795,7 +797,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the name of the viewed products collection
      *  
-     *  @param string	$value
+     *  @param string    $value
      *  @return Copernica_MarketingSoftware_Helper_Config
      */
     public function setViewedProductCollectionName($value)
@@ -815,17 +817,17 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
         $value = $this->_getConfig('linked_viewed_product_fields');
 
         if (empty($value)) {
-        	return array();
+            return array();
         } else {
-        	return json_decode($value, true);
+            return json_decode($value, true);
         }
     }
 
     /**
      *  Get the linked customer fields
      *  
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedViewedProductFields($value)
     {
@@ -837,54 +839,54 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the name of the wishlist item collection
      *
-     *  @return	string
+     *  @return    string
      */
     public function getWishlistItemCollectionName()
     {
-    	return $this->_getConfig('wishlist_item_collection_name');
+        return $this->_getConfig('wishlist_item_collection_name');
     }
     
     /**
      *  Get the id of the wishlist item collection
      *
-     *  @return	int
+     *  @return    int
      */
     public function getWishlistItemCollectionId()
     {
-    	$id = $this->_getConfig('wishlist_item_collection_id');
+        $id = $this->_getConfig('wishlist_item_collection_id');
     
-    	if ($id) {
-    		return $id;
-    	}
+        if ($id) {
+            return $id;
+        }
     
-    	$name = $this->getWishlistItemCollectionName();
+        $name = $this->getWishlistItemCollectionName();
     
-    	if (!$name) {
-    		return null;
-    	}
+        if (!$name) {
+            return null;
+        }
     
-    	$id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
+        $id = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($name);
     
-    	if (!$id) {
-    		return null;
-    	}
+        if (!$id) {
+            return null;
+        }
     
-    	$this->_setConfig('wishlist_item_collection_id', $id);
+        $this->_setConfig('wishlist_item_collection_id', $id);
     
-    	return $id;
+        return $id;
     }
     
     /**
      *  Set the name of the wishlist item collection
      *
-     *  @param string	$value
+     *  @param string    $value
      *  @return Copernica_MarketingSoftware_Helper_Config
      */
     public function setWishlistItemCollectionName($value)
     {
-    	$this->_setConfig('wishlist_item_collection_name', $value);
+        $this->_setConfig('wishlist_item_collection_name', $value);
     
-    	return $this;
+        return $this;
     }
     
     /**
@@ -894,26 +896,26 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      */
     public function getLinkedWishlistItemFields()
     {
-    	$value = $this->_getConfig('linked_wishlist_item_fields');
+        $value = $this->_getConfig('linked_wishlist_item_fields');
     
-    	if (empty($value)) {
-    		return array();
-    	} else {
-    		return json_decode($value, true);
-    	}
+        if (empty($value)) {
+            return array();
+        } else {
+            return json_decode($value, true);
+        }
     }
     
     /**
      *  Set the linked wishlist item fields
      *
-     *  @param	array	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    array    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLinkedWishlistItemFields($value)
     {
-    	$this->_setConfig('linked_wishlist_item_fields', json_encode($value), true);
+        $this->_setConfig('linked_wishlist_item_fields', json_encode($value), true);
     
-    	return $this;
+        return $this;
     }
 
     /**
@@ -921,7 +923,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  This is the created timestamp of the most recent customer which has
      *  been queued for synchronisation
      *  
-     *  @return	datetime
+     *  @return    datetime
      */
     public function getCustomerProgressStatus()
     {
@@ -933,8 +935,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  This is the created timestamp of the most recent customer which has
      *  been queued for synchronisation
      *  
-     *  @param	datetime	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    datetime    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setCustomerProgressStatus($value)
     {
@@ -960,8 +962,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  This is the created timestamp of the most recent order which has
      *  been queued for synchronisation
      *  
-     *  @param	datetime	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    datetime    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setOrderProgressStatus($value)
     {
@@ -987,8 +989,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  This is the created timestamp of the most recent subscription which has
      *  been queued for synchronisation
      *  
-     *  @param	datetime	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    datetime    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setSubscriptionProgressStatus($value)
     {
@@ -1000,7 +1002,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the last start time of the cronjob.
      *  
-     *  @return	datetime
+     *  @return    datetime
      */
     public function getLastStartTimeCronjob()
     {
@@ -1010,8 +1012,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the last start time of the cronjob.
      *  
-     *  @param	datetime	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    datetime    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLastStartTimeCronjob($value)
     {
@@ -1023,7 +1025,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get the last end time of the cronjob.
      *  
-     *  @return	datetime
+     *  @return    datetime
      */
     public function getLastEndTimeCronjob()
     {
@@ -1033,8 +1035,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the last end time of the cronjob.
      *  
-     *  @param	datetime	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    datetime    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLastEndTimeCronjob($value)
     {
@@ -1056,8 +1058,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set the last end time of the cronjob.
      *  
-     *  @param	integer	$value
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    integer    $value
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setLastCronjobProcessedTasks($value)
     {
@@ -1070,8 +1072,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  Should our extension use vanilla magento cron schedulers to execute 
      *  queue? Or should we sync all data by processQueue.php file?
      *  
-     *  @param	boolean	$vanilla
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    boolean    $vanilla
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setVanillaCrons($vanilla)
     {
@@ -1083,7 +1085,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Get stored config about vanilla crons schedulers.
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function getVanillaCrons()
     {
@@ -1105,8 +1107,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Set timestamp when we did check forgotten carts list
      *  
-     *  @param	string	$time
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    string    $time
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setAbandonedLastCheck($time = null)
     {
@@ -1119,7 +1121,7 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  Set number of minutes that have to pass from last quote item update to consider
      *  cart abandonded.
      *  
-     *  @param	int	$timeout
+     *  @param    int    $timeout
      *  @return Copernica_MarketingSoftware_Helper_Config
      */
     public function setAbandonedTimeout($timeout)
@@ -1146,8 +1148,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
      *  Carts older than supplied number of minutes will not be synchronized 
      *  with Copernica.
      *  
-     *  @param	int	$timeout
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    int    $timeout
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setAbandonedPeriod($timeout)
     {
@@ -1172,8 +1174,8 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
     /**
      *  Should finished (removed or ordered) quote item be removed from profile?
      *  
-     *  @param	boolean	$remove
-     *  @return	Copernica_MarketingSoftware_Helper_Config
+     *  @param    boolean    $remove
+     *  @return    Copernica_MarketingSoftware_Helper_Config
      */
     public function setRemoveFinishedQuoteItem($remove)
     {

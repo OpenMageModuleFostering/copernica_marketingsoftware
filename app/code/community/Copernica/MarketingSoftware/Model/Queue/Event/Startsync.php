@@ -34,7 +34,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
     /** 
      *  How many events we want to spawn for each of customers/orders/subscriptions
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_eventsLimit = 500;
 
@@ -43,7 +43,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
      *  scheduled for synchronization. Also it does contain stores id that should
      *  be used to filter entites results.
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Sync_Status
+     *  @var    Copernica_MarketingSoftware_Model_Sync_Status
      */
     protected $_currentStatus;
 
@@ -52,27 +52,28 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
      *  event will respawn with new set of data. Note that this event will be 
      *  respawning till all entities will be scheduled to sync.
      *  
-     *  @return	boolean 
+     *  @return    boolean 
      */
-    public function process() {
+    public function process() 
+    {
         $this->_currentStatus = Copernica_MarketingSoftware_Model_Sync_Status::fromStd($this->_getObject());
 
         $shouldRespawn = false;
 
         if ($this->_addCustomersToQueue() == $this->_eventsLimit) {
-        	$shouldRespawn = true;
+            $shouldRespawn = true;
         }
 
         if ($this->_addOrdersToQueue() == $this->_eventsLimit) {
-        	$shouldRespawn = true;
+            $shouldRespawn = true;
         }
 
         if ($this->_addSubscriptionsToQueue() == $this->_eventsLimit) {
-        	$shouldRespawn = true;
+            $shouldRespawn = true;
         }
 
         if ($shouldRespawn) {
-        	$this->respawn();
+            $this->respawn();
         }
 
         return true;
@@ -103,7 +104,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
         $enabledStores = $this->_currentStatus->getStoresFilter();
 
         if (count($enabledStores) == 0) {
-        	return null;
+            return null;
         }
 
         $filterArray = array();
@@ -164,17 +165,21 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
         $addedEvents = 0;
 
         $ordersCollection = Mage::getModel('sales/order')->getCollection();
-        $ordersCollection->addAttributeToFilter('entity_id', array (
+        $ordersCollection->addAttributeToFilter(
+            'entity_id', array (
             'gt' => $this->_currentStatus->getLastOrderId()
-        ));
+            )
+        );
 
         if ($filterArray = $this->_getStoresFilter()) { 
             $ordersCollection->addAttributeToFilter('store_id', $filterArray);
         }
 
-        $ordersCollection->addFieldToFilter('customer_id', array(
+        $ordersCollection->addFieldToFilter(
+            'customer_id', array(
             'null' => true
-        ));
+            )
+        );
         $ordersCollection->addAttributeToSort('entity_id', 'ASC');
         $ordersCollection->setPageSize($this->_eventsLimit);
 
@@ -209,14 +214,18 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
         $addedEvents = 0;
 
         $subscriptionsCollection = Mage::getModel('newsletter/subscriber')->getCollection();
-        $subscriptionsCollection->addFieldToFilter('subscriber_id', array(
+        $subscriptionsCollection->addFieldToFilter(
+            'subscriber_id', array(
             'gt' => $this->_currentStatus->getLastSubscriptionId()
-        ));
+            )
+        );
         $subscriptionsCollection->setOrder('subscriber_id', 'ASC');
-        $subscriptionsCollection->addFieldToFilter('customer_id', array(
+        $subscriptionsCollection->addFieldToFilter(
+            'customer_id', array(
             'eq' => 0, 
             'null' => true
-        ));
+            )
+        );
 
         if ($filterArray = $this->_getStoresFilter()) { 
             $subscriptionsCollection->addFieldToFilter('store_id', $filterArray);

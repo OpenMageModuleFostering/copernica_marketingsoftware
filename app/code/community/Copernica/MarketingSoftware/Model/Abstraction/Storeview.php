@@ -43,8 +43,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Core_Model_Store $original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @param    Mage_Core_Model_Store $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function setOriginal(Mage_Core_Model_Store $original)
     {
@@ -64,7 +64,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the id for the storeview
      *  
-     *  @return	int
+     *  @return    int
      */
     public function id()
     {
@@ -74,7 +74,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the code for the website
      *  
-     *  @return	string
+     *  @return    string
      */
     public function websiteCode()
     {       
@@ -84,7 +84,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the label for the website
      *  
-     *  @return	string
+     *  @return    string
      */
     public function websiteLabel()
     {
@@ -94,7 +94,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the code for the store
      *  
-     *  @return	string
+     *  @return    string
      */
     public function storeCode()
     {
@@ -104,7 +104,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the label for the store
      *  
-     *  @return	string
+     *  @return    string
      */
     public function storeLabel()
     {
@@ -114,7 +114,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the code for the store
      *  
-     *  @return	string
+     *  @return    string
      */
     public function viewCode()
     {
@@ -124,7 +124,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Return the label for the store
      *  
-     *  @return	string
+     *  @return    string
      */
     public function viewLabel()
     {
@@ -134,25 +134,28 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      *  Convert this value to a string
      *  
-     *  @return	String
+     *  @return    String
      */
     public function __toString()
     {
-        return implode(' > ', array(
+        return implode(
+            ' > ', array(
             $this->websiteLabel(),
             $this->storeLabel(),
             $this->viewLabel(),
-        ));
+            )
+        );
     }
 
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             $this->websiteCode(),
             $this->websiteLabel(),
@@ -160,14 +163,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
             $this->storeLabel(),
             $this->viewCode(),
             $this->viewLabel(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function unserialize($string)
     {

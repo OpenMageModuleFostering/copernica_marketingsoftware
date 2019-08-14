@@ -28,9 +28,13 @@ $installer = $this;
 $installer->startSetup();
 
 try {
-    $installer->run("
+    $installer->run(
+        "
         ALTER TABLE {$this->getTable('marketingsoftware/queue_item')}
-        MODIFY object LONGTEXT;");
-} catch(Exception $e) {}
+        MODIFY object LONGTEXT;"
+    );
+} catch(Exception $e) {
+    Mage::logException($e);
+}
 
 $installer->endSetup();

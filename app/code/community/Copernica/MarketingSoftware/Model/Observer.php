@@ -48,14 +48,14 @@ class Copernica_MarketingSoftware_Model_Observer
      * This method is fired during checkout process, after the customer has entered billing address
      * and saved the shipping method
      * 
-     * @param	Varien_Event_Observer	$observer
+     * @param    Varien_Event_Observer    $observer
      */
     public function checkoutSaveStep(Varien_Event_Observer $observer)
     {
-    	$quote = $observer->getEvent()->getQuote();
-    	
+        $quote = $observer->getEvent()->getQuote();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quote)) {
-        	return;
+            return;
         }
         
         $customerId = $quote->getCustomerId(); 
@@ -76,14 +76,14 @@ class Copernica_MarketingSoftware_Model_Observer
      *  Method for event 'sales_quote_item_delete_before'.
      *  An item is removed from a quote
      *  
-     *  @param	Varien_Event_Observer	$observer
+     *  @param    Varien_Event_Observer    $observer
      */
     public function quoteItemRemoved(Varien_Event_Observer $observer)
     {
-    	$quoteItem = $observer->getEvent()->getItem();
-    	
+        $quoteItem = $observer->getEvent()->getItem();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quoteItem) || $quoteItem->getParentItemId()) {
-        	return;
+            return;
         }
 
         $quote = $quoteItem->getQuote();
@@ -91,24 +91,24 @@ class Copernica_MarketingSoftware_Model_Observer
         $customerId = $quote->getCustomerId();
         
         if (!$customerId) {
-        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-        		return;
-        	}
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+                return;
+            }
         
-        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+            $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
         
-        	if (!$customerId) {
-        		return;
-        	}
+            if (!$customerId) {
+                return;
+            }
         }
 
         $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
         $quoteItemEntity->setQuoteItem($quoteItem);
         
         $quoteItemData = array(
-        	'item_id' => $quoteItemEntity->getId(),
-        	'storeview_id' => $quoteItemEntity->getStoreView()->id(),
-        	'status' => 'deleted',
+            'item_id' => $quoteItemEntity->getId(),
+            'storeview_id' => $quoteItemEntity->getStoreView()->id(),
+            'status' => 'deleted',
         );
 
         $queue = Mage::getModel('marketingsoftware/queue_item')
@@ -124,14 +124,14 @@ class Copernica_MarketingSoftware_Model_Observer
      *  Method for event 'sales_quote_item_save_after'.
      *  An item is added or modified
      *  
-     *  @param	Varien_Event_Observer	$observer
+     *  @param    Varien_Event_Observer    $observer
      */
     public function quoteItemModified(Varien_Event_Observer $observer)
     {
-    	$quoteItem = $observer->getEvent()->getItem();
-    	
+        $quoteItem = $observer->getEvent()->getItem();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quoteItem) || $quoteItem->getParentItemId()) {
-        	return;
+            return;
         }
         
         if (method_exists($quoteItem, 'hasDataChanges') && !$quoteItem->hasDataChanges()) {
@@ -144,50 +144,50 @@ class Copernica_MarketingSoftware_Model_Observer
 
         if (!$customerId) {
             if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-            	return;
+                return;
             }
 
             $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
 
             if (!$customerId) {
-            	return;
+                return;
             }
         }
         
         $queue = Mage::getModel('marketingsoftware/queue_item')
-        	->setObject(array('quoteItemId' => $quoteItem->getId(), 'quoteId' => $quote->getId(), 'customerId' => $customerId))
-        	->setCustomer($customerId)
-        	->setName('item')
-        	->setAction($quoteItem->isObjectNew() ? 'add' : 'modify')
-        	->setEntityId($quoteItem->getId())
-        	->save();       
+            ->setObject(array('quoteItemId' => $quoteItem->getId(), 'quoteId' => $quote->getId(), 'customerId' => $customerId))
+            ->setCustomer($customerId)
+            ->setName('item')
+            ->setAction($quoteItem->isObjectNew() ? 'add' : 'modify')
+            ->setEntityId($quoteItem->getId())
+            ->save();       
     }
 
     /**
      *  Listen to when quote is removed.
      *  
-     *  @todo	Review this one
-     *  @param	Varien_Event_Observer	$observer
+     *  @todo    Review this one
+     *  @param    Varien_Event_Observer    $observer
      */
     public function quoteDelete(Varien_Event_Observer $observer)
     {
-    	$quote = $observer->getEvent()->getQuote();
-    	
+        $quote = $observer->getEvent()->getQuote();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quote)) {
-        	return;
+            return;
         }
 
         $customerId = $quote->getCustomerId();
 
         if (!$customerId) {
             if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-            	return;
+                return;
             }
 
             $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
 
             if (!$customerId) {
-            	return;
+                return;
             }
         }
 
@@ -202,13 +202,13 @@ class Copernica_MarketingSoftware_Model_Observer
         $storeView = implode(' > ', array ($website->getName(), $group->getName(), $store->getName()));
 
         if ($email) {
-        	Mage::getModel('marketingsoftware/queue_item')
-        		->setObject(array('storeView' => $storeView, 'quoteId' => $quote->getId(), 'customerId' => $customerId))
-            	->setCustomer($customerId)
-            	->setName('quote')
-            	->setAction('remove')            
-            	->setEntityId($quote->getEntityId())
-            	->save();
+            Mage::getModel('marketingsoftware/queue_item')
+                ->setObject(array('storeView' => $storeView, 'quoteId' => $quote->getId(), 'customerId' => $customerId))
+                ->setCustomer($customerId)
+                ->setName('quote')
+                ->setAction('remove')            
+                ->setEntityId($quote->getEntityId())
+                ->save();
         }
     }
 
@@ -218,10 +218,10 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function orderModified(Varien_Event_Observer $observer)
     {
-    	$order = $observer->getEvent()->getOrder();
-    	
+        $order = $observer->getEvent()->getOrder();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($order) || !$order->getState()) {
-        	return;
+            return;
         }
 
         $customerId = $order->getCustomerId();
@@ -241,10 +241,10 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function wishlistItemModified(Varien_Event_Observer $observer)
     {
-	    $wishlistItem = $observer->getEvent()->getItem();	    	    
-	    
+        $wishlistItem = $observer->getEvent()->getItem();                
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($wishlistItem)) {
-        	return;
+            return;
         }               
         
         $wishlist = Mage::getModel('wishlist/wishlist')->load($wishlistItem->getWishlistId());
@@ -252,12 +252,12 @@ class Copernica_MarketingSoftware_Model_Observer
         $customerId = $wishlist->getCustomerId();
         
         $queue = Mage::getModel('marketingsoftware/queue_item')
-        	->setObject(array('wishlistItemId' => $wishlistItem->getId(), 'customerId' => $customerId))
-        	->setCustomer($customerId)
-        	->setName('wishlist_item')
-        	->setAction($wishlistItem->isObjectNew() ? 'add' : 'modify')
-        	->setEntityId($wishlistItem->getId())
-        	->save();  
+            ->setObject(array('wishlistItemId' => $wishlistItem->getId(), 'customerId' => $customerId))
+            ->setCustomer($customerId)
+            ->setName('wishlist_item')
+            ->setAction($wishlistItem->isObjectNew() ? 'add' : 'modify')
+            ->setEntityId($wishlistItem->getId())
+            ->save();  
     }
     
     /**
@@ -266,10 +266,10 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function newsletterSubscriptionRemoved(Varien_Event_Observer $observer)
     {
-    	$subscriber = $observer->getEvent()->getSubscriber();
-    	
+        $subscriber = $observer->getEvent()->getSubscriber();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($subscriber)) {
-        	return;
+            return;
         }
 
         $customerId = $subscriber->getCustomerId();
@@ -289,10 +289,10 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function newsletterSubscriptionModified(Varien_Event_Observer $observer)
     {
-    	$subscriber = $observer->getEvent()->getSubscriber();
-    	
+        $subscriber = $observer->getEvent()->getSubscriber();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($subscriber)) {
-        	return;
+            return;
         }
         
         if (method_exists($subscriber, 'hasDataChanges') && !$subscriber->hasDataChanges()) {
@@ -315,24 +315,24 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function customerRemoved(Varien_Event_Observer $observer)
     {
-    	$customer = $observer->getEvent()->getCustomer();
-    	
+        $customer = $observer->getEvent()->getCustomer();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($customer)) {
-        	return;
+            return;
         }
 
         $customerId = $customer->getId();
         
         if (!$customerId) {
-        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-        		return;
-        	}
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+                return;
+            }
         
-        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+            $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
         
-        	if (!$customerId) {
-        		return;
-        	}
+            if (!$customerId) {
+                return;
+            }
         }
         
         $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
@@ -353,30 +353,30 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function customerModified(Varien_Event_Observer $observer)
     {
-    	$address = $observer->getEvent()->getCustomerAddress();
-    	
-    	if(is_object($address)) {
-    		$customer = $address->getCustomer();
-    	} else {
-    		$customer = $observer->getEvent()->getCustomer();
-    	}
-    	    	    
+        $address = $observer->getEvent()->getCustomerAddress();
+        
+        if (is_object($address)) {
+            $customer = $address->getCustomer();
+        } else {
+            $customer = $observer->getEvent()->getCustomer();
+        }
+                    
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($customer)) {
-        	return;
+            return;
         }
 
         $customerId = $customer->getId();
         
-		if (!$customerId) {
-        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-        		return;
-        	}
+        if (!$customerId) {
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+                return;
+            }
         
-        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+            $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
         
-        	if (!$customerId) {
-        		return;
-        	}
+            if (!$customerId) {
+                return;
+            }
         }
 
         $queue = Mage::getModel('marketingsoftware/queue_item')
@@ -394,10 +394,10 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function productViewed(Varien_Event_Observer $observer)
     {
-    	$product = $observer->getEvent()->getProduct();
-    	
+        $product = $observer->getEvent()->getProduct();
+        
         if (!$this->_enabled() || !$this->_isValidStore() || !is_object($product)) {
-        	return;
+            return;
         }
 
         $customer = Mage::getSingleton('customer/session')->getCustomer();
@@ -405,15 +405,15 @@ class Copernica_MarketingSoftware_Model_Observer
         $customerId = $customer->getId();
         
         if (!$customerId) {
-        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
-        		return;
-        	}
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+                return;
+            }
         
-        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+            $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
         
-        	if (!$customerId) {
-        		return;
-        	}
+            if (!$customerId) {
+                return;
+            }
         }
         
         $queue = Mage::getModel('marketingsoftware/queue_item')
@@ -432,7 +432,7 @@ class Copernica_MarketingSoftware_Model_Observer
     public function detectAbandonedCarts()
     {
         if (!$this->_enabled()) {
-        	return;
+            return;
         }
 
         $processor = Mage::getModel('marketingsoftware/abandoned_carts_processor');
@@ -457,7 +457,7 @@ class Copernica_MarketingSoftware_Model_Observer
     public function processQueue()
     {
         if (!$this->_enabled() || !Mage::helper('marketingsoftware/config')->getVanillaCrons()) {
-        	return;
+            return;
         }
 
         $queueProcessor = Mage::getModel('marketingsoftware/queue_processor');

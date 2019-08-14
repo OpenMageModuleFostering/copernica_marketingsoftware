@@ -67,7 +67,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         $config = Mage::helper('marketingsoftware/config');
 
         if ($hostname = $config->getApiHostname()) {
-        	$this->_hostname = $hostname;
+            $this->_hostname = $hostname;
         } else {
             $this->_hostname = 'https://api.copernica.com';
 
@@ -77,7 +77,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         $accessToken = $config->getAccessToken();
 
         if ($accessToken) {
-        	$this->_accessToken = $accessToken;
+            $this->_accessToken = $accessToken;
         }
     }
 
@@ -87,7 +87,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     public function __destruct()
     {
         if (!is_null($this->_multi)) {
-        	$this->commit();
+            $this->commit();
         }
     }
 
@@ -100,11 +100,11 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     public function check ()
     {
         if (empty($this->_accessToken)) {
-        	return false;
+            return false;
         }
 
         if (empty($this->_hostname)) {
-        	return false;
+            return false;
         }
 
         return true;
@@ -113,7 +113,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     /**
      *  Helper method to build up a query string
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      *  @return string
      */
     protected function _buildQueryString($data)
@@ -126,7 +126,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
                     $parts[] = $key.'[]='.urlencode(strval($valueItem));
                 }
             } else {
-            	$parts[] = $key.'='.urlencode(strval($value));
+                $parts[] = $key.'='.urlencode(strval($value));
             }
         }
 
@@ -152,7 +152,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
      *  Make a GET requst
      *  
      *  @param  string  $request
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      *  @return assoc
      */
     public function get($request, $data = null)
@@ -160,12 +160,15 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         $curl = $this->_prepareCurl();
 
         if ($this->_accessToken) {
-        	$request.=$this->_buildQueryString(array_merge(array(
-            	'access_token' => $this->_accessToken),
-            	is_null($data) ? array() : $data
-        	));
+            $request.=$this->_buildQueryString(
+                array_merge(
+                    array(
+                    'access_token' => $this->_accessToken),
+                    is_null($data) ? array() : $data
+                )
+            );
         } else {
-        	$request.=$this->_buildQueryString(is_null($data) ? array() : $data);
+            $request.=$this->_buildQueryString(is_null($data) ? array() : $data);
         }
 
         // Check to remove unnecessary slashes from the request 
@@ -184,16 +187,16 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     /**
      *  Make a POST request
      *  
-     *  @param  string	$request
-     *  @param  assoc	$data
-     *  @param  assoc	$query
+     *  @param  string    $request
+     *  @param  assoc    $data
+     *  @param  assoc    $query
      */
     public function post($request, $data = null, $query = null)
     {
         if (is_array($query)) {
-            $request.= $this->_buildQueryString(array_merge( $query, array('access_token' => $this->_accessToken) ));
+            $request.= $this->_buildQueryString(array_merge($query, array('access_token' => $this->_accessToken)));
         } else {
-        	$request.='?access_token='.$this->_accessToken;
+            $request.='?access_token='.$this->_accessToken;
         }
 
         $curl = $this->_prepareCurl();
@@ -204,14 +207,16 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER, array(
             'content-type: application/json',
             'accept: application/json'
-        ));
+            )
+        );
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
 
         if ($this->_appendMulti($curl)) {
-        	return true;
+            return true;
         }
 
         curl_exec($curl);
@@ -224,16 +229,16 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     /**
      *  Make a PUT request
      *  
-     *  @param  string	$request
-     *  @param  assoc	$data
-     *  @param	assoc	$query
+     *  @param  string    $request
+     *  @param  assoc    $data
+     *  @param    assoc    $query
      */
     public function put($request, $data = null, $query = null)
     {
         if (is_array($query)) {
-            $request.= $this->_buildQueryString(array_merge( $query, array('access_token' => $this->_accessToken) ));
+            $request.= $this->_buildQueryString(array_merge($query, array('access_token' => $this->_accessToken)));
         } else {
-        	$request.='?access_token='.$this->_accessToken;
+            $request.='?access_token='.$this->_accessToken;
         }
 
         $curl = $this->_prepareCurl();
@@ -244,15 +249,17 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER, array(
             'content-type: application/json',
             'accept: application/json'
-        ));
+            )
+        );
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         if ($this->_appendMulti($curl)) {
-        	return true;
+            return true;
         }
 
         curl_exec($curl);
@@ -279,13 +286,15 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
 
         curl_setopt($curl, CURLOPT_URL, $this->_hostname.'/'.$request);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER, array(
             'content-type: application/json',
             'accept: application/json'
-        ));
+            )
+        );
 
         if ($this->_appendMulti($curl)) {
-        	return true;
+            return true;
         }
 
         curl_exec($curl);
@@ -314,24 +323,29 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
         $active = true;
 
         if (is_null($this->_multi)) {
-        	return $this;
+            return $this;
         }
 
         do {
-            while (CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->_multi, $running));          
-	        if (!$running) {
-	           	break;
-	        }
-	            
-            while (($res = curl_multi_select($this->_multi)) === 0){};
-           	
-           	if ($res === false) {
-            	break;
+            do {
+                $res = curl_multi_exec($this->_multi, $running);
+            } while ($res === CURLM_CALL_MULTI_PERFORM);
+
+            if (!$running) {
+                break;
             }
-        } while(true);
+
+            do {
+                $res = curl_multi_select($this->_multi);
+            } while ($res === 0);
+
+            if ($res === false) {
+                break;
+            }
+        } while (true);
 
         foreach ($this->_children as $child) {
-        	curl_multi_remove_handle($this->_multi, $child);
+            curl_multi_remove_handle($this->_multi, $child);
         }
 
         curl_multi_close($this->_multi);
@@ -347,7 +361,7 @@ class Copernica_MarketingSoftware_Helper_Rest_Request
     protected function _appendMulti($curl)
     {
         if (!is_resource($this->_multi)) {
-        	return false;
+            return false;
         }
 
         $code = curl_multi_add_handle($this->_multi, $curl);

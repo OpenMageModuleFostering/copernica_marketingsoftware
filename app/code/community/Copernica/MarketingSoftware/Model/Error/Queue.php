@@ -50,7 +50,7 @@ class Copernica_MarketingSoftware_Model_Error_Queue extends Mage_Core_Model_Abst
     /**
      *  Set object instance
      *  
-     *  @param	object	$object
+     *  @param    object    $object
      */
     public function setObject($object)
     {
@@ -60,7 +60,7 @@ class Copernica_MarketingSoftware_Model_Error_Queue extends Mage_Core_Model_Abst
     /**
      *  Set customer Id
      *  
-     *  @param	int	$customerId
+     *  @param    int    $customerId
      */
     public function setCustomerId($customerId)
     {
@@ -87,10 +87,10 @@ class Copernica_MarketingSoftware_Model_Error_Queue extends Mage_Core_Model_Abst
 
     /**
      *  This method will create instance from processing queue item
-     *  
-     *  @param Copernica_MarketingSoftware_Model_Queue_Event_Item	$queueItem
+     *
+     * @param Copernica_MarketingSoftware_Model_Queue_Item $queueItem
      */
-    static public function createFromQueueItem(Copernica_MarketingSoftware_Model_Queue_Event_Item $queueItem)
+    static public function createFromQueueItem(Copernica_MarketingSoftware_Model_Queue_Item $queueItem)
     {
         $errorModel = Mage::getModel('marketingsoftware/error_queue');
         $errorModel->setObject($queueItem->getObject());

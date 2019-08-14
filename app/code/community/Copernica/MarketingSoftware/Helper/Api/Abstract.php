@@ -34,14 +34,14 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  Since Magento is cheating with theirs singleton implementation, we want
      *  to use static fields for storing request instance.
      *
-     *  @var	Copernica_MarketingSoftware_Helper_Rest_Request
+     *  @var    Copernica_MarketingSoftware_Helper_Rest_Request
      */
     static protected $_restRequest = null;
 
     /**
      *  Database id that is on Copernica platform.
      *  
-     *  @var	int
+     *  @var    int
      */
     static protected $_databaseId = false;
 
@@ -71,7 +71,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     /**
      *  Initialize helper.
      *  
-     *  @return	Copernica_MarketingSoftware_Helper_Api_Abstract
+     *  @return    Copernica_MarketingSoftware_Helper_Api_Abstract
      */
     public function init()
     {
@@ -88,12 +88,12 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  API and circumstances. That is why we don't want to rely on magento
      *  helpers as a final solution for reqeust instance.
      *  
-     *  @return	Copernica_MarketingSoftware_Helper_Rest_Request
+     *  @return    Copernica_MarketingSoftware_Helper_Rest_Request
      */
     protected function _restRequest()
     {
         if (!is_null(self::$_restRequest)) {
-        	return self::$_restRequest;
+            return self::$_restRequest;
         }
 
         return self::$_restRequest = Mage::helper('marketingsoftware/rest_request');
@@ -102,7 +102,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     /**
      *  Set database Id
      *  
-     *  @param int	$id
+     *  @param int    $id
      */
     protected function _setDatabaseId($id)
     {
@@ -112,7 +112,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     /**
      *  Check if this API instance is valid.
      *  
-     *  @param  boolean	$extensive
+     *  @param  boolean    $extensive
      *  @return boolean
      */
     public function check($extensive = false)
@@ -131,7 +131,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         $databaseId = Mage::helper('marketingsoftware/config')->getDatabaseId();
 
         if ($databaseId) {
-        	return $databaseId;
+            return $databaseId;
         }
 
         $databaseName = Mage::helper('marketingsoftware/config')->getDatabaseName();
@@ -153,7 +153,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  Get database Id by its name. This method will return false when we can
      *  not fetch database.
      *  
-     *  @param  string	$databaseName
+     *  @param  string    $databaseName
      *  @return int|false
      */
     protected function _getDatabaseIdByName($databaseName)
@@ -172,15 +172,15 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     /**
      *  Get database id that will be used inside Copernica platform
      *  
-     *  @param  string|false	$databaseName
+     *  @param  string|false    $databaseName
      *  @return int
      */
     public function getDatabaseId($databaseName = false)
     {
         if ($databaseName === false) {
-        	$databaseId = $this->_getStoredDatabaseID();
+            $databaseId = $this->_getStoredDatabaseID();
         } else {
-        	$databaseId = $this->_getDatabaseIdByName($databaseName);
+            $databaseId = $this->_getDatabaseIdByName($databaseName);
         }
 
         return $databaseId;
@@ -189,13 +189,13 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
     /**
      *  Translate collection name into an ID.
      *  
-     *  @param  string	$name
+     *  @param  string    $name
      *  @return int
      */
     public function getCollectionId($name)
     {
         if (!is_null(self::$_collectionIdCache) && array_key_exists($name, self::$_collectionIdCache)) {
-        	return self::$_collectionIdCache[$name];
+            return self::$_collectionIdCache[$name];
         }
 
         $output = $this->_restRequest()->get(
@@ -203,7 +203,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         );
 
         if ($output['total'] == 0) {
-        	return false;
+            return false;
         }
 
         self::$_collectionIdCache = array();
@@ -213,7 +213,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         }
 
         if (array_key_exists($name, self::$_collectionIdCache)) {
-        	return self::$_collectionIdCache[$name];
+            return self::$_collectionIdCache[$name];
         }
 
         return false;
@@ -224,7 +224,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  This method is little bit more flexible. It's possible to supply customer
      *  data by copernica model or by array with 'id', 'storeView', 'email' fields.
      *
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Customer|array	$customer
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Customer|array    $customer
      *  @return int     the copernica profile Id
      */
     public function getProfileId($customer)
@@ -242,14 +242,14 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         $profileId = false;
 
         if ($customerId === false) {
-        	return false;
+            return false;
         }
 
         $profileCacheCollection = Mage::getModel('marketingsoftware/profile_cache')
             ->getCollection()
             ->setPageSize(1)
             ->addFieldToFilter('copernica_id', $customerId)
-        	->addFieldToFilter('store_view', $storeView);
+            ->addFieldToFilter('store_view', $storeView);
 
         $profileCache = $profileCacheCollection->getFirstItem();
         
@@ -257,9 +257,9 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
             $profileId = $profileCache->getProfileId();
 
             if ($profileId > 0 && $profileId !== false && !is_null($profileId)) {
-            	return $profileId;
+                return $profileId;
             } else {
-            	$profileCache->delete();
+                $profileCache->delete();
             }
         }
 
@@ -290,7 +290,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
             $profileId = $profileCache->getProfileId();
                         
             if ($profileId > 0 && $profileId !== false && !is_null($profileId)) {
-            	return $profileId;
+                return $profileId;
             }
         }
 
@@ -300,21 +300,21 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
          *  a customer Id.
          */
         if (!is_null($customerId) && strlen($customerId)) {
-        	$profileId = $this->_getProfileIdByCustomerId($customerId);
+            $profileId = $this->_getProfileIdByCustomerId($customerId);
         }
 
         if ($profileId !== false) {
             if ($profileId > 0 && $profileId !== false && !is_null($profileId)) {
                 if (strlen($email)) {
-                	$profileCache->setEmail($email);
+                    $profileCache->setEmail($email);
                 }
                 
                 if (strlen($storeView)) {
-                	$profileCache->setStoreView($storeView);
+                    $profileCache->setStoreView($storeView);
                 }
                 
                 if (!is_null($customerId)) {
-                	$profileCache->setCopernicaId($customerId);
+                    $profileCache->setCopernicaId($customerId);
                 }
                 
                 $profileCache->setProfileId($profileId);
@@ -325,14 +325,14 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         }
 
         if (strlen($email) == 0) {
-        	return false;
+            return false;
         }
 
         $profileId = $this->_getProfileIdByEmail($email, $storeView);
 
         if ($profileId !== false) {
             if (!is_null($customerId)) {
-            	$profileCache->setCopernicaId($customerId);
+                $profileCache->setCopernicaId($customerId);
             }
             
             $profileCache->setStoreView($storeView);
@@ -350,7 +350,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  Get profile Id by customer Id. When profile can not be found FALSE will
      *  be returned.
      *  
-     *  @param  string	$customerId
+     *  @param  string    $customerId
      *  @return int|false
      */
     protected function _getProfileIdByCustomerId($customerId)
@@ -363,11 +363,11 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         );
 
         if (!isset($profiles['data'][0])) {
-        	return false;
+            return false;
         }
 
         if (is_null($profiles['data'][0]['ID']) || (int)$profiles['data'][0]['ID'] == 0) {
-        	return false;
+            return false;
         }
 
         return $profiles['data'][0]['ID'];
@@ -377,8 +377,8 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  Get profile Id by email address. FALSE will be returned if profile was not
      *  found.
      *  
-     *  @param  string	$email
-     *  @param  string	$storeView
+     *  @param  string    $email
+     *  @param  string    $storeView
      *  @return int
      */
     protected function _getProfileIdByEmail($email, $storeView)
@@ -386,7 +386,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         $customerLinkedFields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
         
         if (!isset($customerLinkedFields['email']) || !isset($customerLinkedFields['storeView'])) {
-        	return false;
+            return false;
         } 
 
         $requestParams = array(
@@ -397,11 +397,11 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         $profiles = $this->_restRequest()->get('database/'.$this->getDatabaseId().'/profiles', array ( 'fields' => $requestParams ));
 
         if (!isset($profiles['data'][0])) {
-        	return false;
+            return false;
         }
 
         if (is_null($profiles['data'][0]['ID']) || (int)$profiles['data'][0]['ID'] == 0) {
-        	return false;
+            return false;
         }
 
         return $profiles['data'][0]['ID'];
@@ -411,7 +411,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
      *  Get profile Id from cache
      *  
      *  @todo not used, why??
-     *  @param  string	$customerId
+     *  @param  string    $customerId
      *  @return int
      */
     protected function _getProfileIdFromCache($customerId)
@@ -425,7 +425,7 @@ class Copernica_MarketingSoftware_Helper_Api_Abstract extends Mage_Core_Helper_A
         $profileId = $profileCache->getProfileId();
 
         if (!is_null($profileId)) {
-        	return $profileId;
+            return $profileId;
         }
     }
 }

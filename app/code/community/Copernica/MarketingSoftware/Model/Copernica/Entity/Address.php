@@ -29,7 +29,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Magento address model
      *  
-     *  @var	Mage_Customer_Model_Address
+     *  @var    Mage_Customer_Model_Address
      */
     protected $_address = null;
 
@@ -42,50 +42,48 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     {
         switch (get_class($this->_address)) {
             case 'Mage_Customer_Model_Address': 
-            	return 'ca_'.$this->_address->getId();
-            	
+                return 'ca_'.$this->_address->getId();
+                
             case 'Mage_Sales_Model_Order_Address':
                 if ($customerAddressId = $this->_address->getCustomerAddressId()) {
-                	return 'ca_'.$customerAddressId;
-                }
-                else {
-                	return 'oa_'.$this->_address->getId();
+                    return 'ca_'.$customerAddressId;
+                } else {
+                    return 'oa_'.$this->_address->getId();
                 }
                 
             case 'Mage_Sales_Model_Quote_Address':
                 if ($customerAddressId = $this->_address->getCustomerAddressId()) {
-                	return 'ca_'.$customerAddressId;
-                }
-                else {
-                	return 'ca_'.$customerAddressId;
+                    return 'ca_'.$customerAddressId;
+                } else {
+                    return 'ca_'.$customerAddressId;
                 }
                 
             default: 
-            	return $this->_address->getId();
+                return $this->_address->getId();
         }
     }
 
     /**
      *  Fetch email
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchEmail()
     {
         if ($email = $this->_address->getEmail()) {
-        	return $email;
+            return $email;
         }
 
         if (is_object($order = $this->_address->getOrder()) && $email = $order->getCustomerEmail()) {
-        	return $email;
+            return $email;
         }
 
         if (is_object($quote = $this->_address->getQuote()) && $email = $quote->getCustomerEmail()) {
-        	return $email;
+            return $email;
         }
 
         if (is_object($customer = $this->_address->getCustomer()) && $email = $customer->getEmail()) {
-        	return $email;
+            return $email;
         }
 
         return '';
@@ -94,7 +92,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch name object for this address
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function fetchName()
     {
@@ -104,7 +102,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch firstname
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchFirstname()
     {
@@ -114,7 +112,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch middlename
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchMiddlename()
     {
@@ -124,7 +122,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch lastname
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchLastname()
     {
@@ -134,7 +132,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch prefix
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchPrefix()
     {
@@ -144,7 +142,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch street
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchStreet()
     {
@@ -154,7 +152,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch city
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchCity()
     {
@@ -164,7 +162,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch postal code
      *   
-     *  @return	string
+     *  @return    string
      */
     public function fetchZipcode()
     {
@@ -174,7 +172,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch state
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchState()
     {
@@ -184,7 +182,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch country
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchCountryId()
     {
@@ -194,7 +192,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch company
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchCompany()
     {
@@ -204,7 +202,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch telephone
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchTelephone()
     {
@@ -214,7 +212,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Fetch fax
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fetchFax()
     {
@@ -224,14 +222,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
     /**
      *  Get REST address entity
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Rest_Address
+     *  @return    Copernica_MarketingSoftware_Model_Rest_Address
      */
     public function getRestAddress()
     {
-    	$restAddress = Mage::getModel('marketingsoftware/rest_address');
-    	$restAddress->setAddressEntity($this);
-    	 
-    	return $restAddress;
+        $restAddress = Mage::getModel('marketingsoftware/rest_address');
+        $restAddress->setAddressEntity($this);
+         
+        return $restAddress;
     }
     
     
@@ -239,10 +237,10 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Address extends Coperni
      *  Set address entity
      *  It is expecting to receive one of magento address types. 
      *
-     *  @param	Mage_Customer_Model_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address	$address
+     *  @param    Mage_Customer_Model_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address    $address
      */
     public function setAddress($address) 
     {
-    	$this->_address = $address;
+        $this->_address = $address;
     }
 }

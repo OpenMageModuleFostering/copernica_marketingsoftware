@@ -30,16 +30,16 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController extends Copernica_MarketingSoftware_Controller_Action
 {
-	/**
-	 * Check if cache management is allowed
-	 *
-	 * @return bool
-	 */
-	protected function _isAllowed()
-	{
-		return Mage::getSingleton('admin/session')->isAllowed('copernica/links');
-	}	
-	
+    /**
+     * Check if cache management is allowed
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('copernica/links');
+    }    
+    
     /**
      *  indexAction() takes care of displaying the form which
      *  contains the details used for the SOAP connection
@@ -67,7 +67,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
 
     /**
      *  This action will save all form data.
-     *  @todo	Never used, Ajaxcollection is always called to perform the save per collection.
+     *  @todo    Never used, Ajaxcollection is always called to perform the save per collection.
      */
     public function saveFormAction()
     {
@@ -75,11 +75,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
         $post = json_decode($post['data'], true);
 
         if (isset($post['database']['name'])) {
-        	$this->_saveDatabaseData($post['database']);
+            $this->_saveDatabaseData($post['database']);
         }
 
         if (isset($post['collections'])) {
-        	$this->_saveCollections($post['collections']);
+            $this->_saveCollections($post['collections']);
         }
 
         $this->_setResponse();
@@ -88,7 +88,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  This method will save database related informations.
      *  
-     *  @param	assoc	$data
+     *  @param    assoc    $data
      */
     protected function _saveDatabaseData($data)
     {
@@ -112,7 +112,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  This method will save database fields
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveDatabaseFields($data)
     {
@@ -122,7 +122,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  This method will save all collections from data
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveCollections($data)
     {
@@ -131,30 +131,30 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
         $config->clearLinkedCollections();
  
         if (isset($data['cartproducts'])) {
-        	$this->_saveQuoteProductsCollection($data['cartproducts']);
+            $this->_saveQuoteProductsCollection($data['cartproducts']);
         }
 
         if (isset($data['orders'])) {
-        	$this->_saveOrdersCollection($data['orders']);
+            $this->_saveOrdersCollection($data['orders']);
         }
   
         if (isset($data['orderproducts'])) {
-        	$this->_saveOrderItemsCollection($data['orderproducts']);
+            $this->_saveOrderItemsCollection($data['orderproducts']);
         }
 
         if (isset($data['addresses'])) {
-        	$this->_saveAddressesCollection($data['addresses']);
+            $this->_saveAddressesCollection($data['addresses']);
         }
 
         if (isset($data['viewedproduct'])) {
-        	$this->_saveViewedProductsCollection($data['viewedproduct']);
+            $this->_saveViewedProductsCollection($data['viewedproduct']);
         }
     }
 
     /**
      *  Save cart products info
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveQuoteProductsCollection($data)
     {
@@ -169,7 +169,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  Save order collection info
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveOrdersCollection($data)
     {
@@ -184,7 +184,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /** 
      *  Save order items collection info
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveOrderItemsCollection($data)
     {
@@ -199,7 +199,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  Save addresses collection info
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveAddressesCollection($data)
     {
@@ -214,7 +214,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     /**
      *  Save viewed products collection info
      *  
-     *  @param  assoc	$data
+     *  @param  assoc    $data
      */
     protected function _saveViewedProductsCollection($data)
     {
@@ -237,14 +237,18 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
     }
 
     /**
-     *  @param  bool	$error
+     *  @param  bool    $error
      */
     protected function _setResponse($error = false)
     {
         $this->_prepareAjaxResponse();
 
-        $this->getResponse()->setBody(json_encode(Array(
-            'error' => $error ? 1 : 0
-        )));
+        $this->getResponse()->setBody(
+            json_encode(
+                Array(
+                'error' => $error ? 1 : 0
+                )
+            )
+        );
     }
 }

@@ -53,13 +53,13 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
     /**
      *  Set client key
      *  
-     *  @param	string	$clientKey
+     *  @param    string    $clientKey
      *  @return Copernica_MarketingSoftware_Model_Sync_Profile
      */
     public function setClientKey($clientKey)
     {
         if (parent::getData('client_key') != $clientKey) {
-        	parent::setData('access_token', '');
+            parent::setData('access_token', '');
         }
 
         parent::setData('client_key', $clientKey);
@@ -80,13 +80,13 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
     /**
      *  Set client secret for this sync profile
      *  
-     *  @param  string	$clientSecret
+     *  @param  string    $clientSecret
      *  @return Copernica_MarketingSoftware_Model_Sync_Profile
      */
     public function setClientSecret($clientSecret)
     {
         if (parent::getData('client_secret') != $clientSecret) {
-        	parent::setData('access_token', '');
+            parent::setData('access_token', '');
         }
 
         parent::setData('client_secret', $clientSecret);
@@ -107,7 +107,7 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
     /**
      *  Set access token for this sync profile
      *  
-     *  @param  string	$accessToken
+     *  @param  string    $accessToken
      *  @return Copernica_MarketingSoftware_Model_Sync_Profile
      */
     public function setAccessToken($accessToken)
@@ -130,7 +130,7 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
     /**
      *  Set name for this sync profile
      *  
-     *  @param  string	$name
+     *  @param  string    $name
      *  @return Copernica_MarketingSoftware_Model_Sync_Profile
      */
     public function setName($name)
@@ -153,19 +153,19 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
     /**
      *  Assign store view to current sync profile
      *  
-     *  @param  StoreView|int	$storeView
+     *  @param  StoreView|int    $storeView
      *  @return Copernica_MarketingSoftware_Model_Sync_Profile
      */
     public function assignStoreView($storeView)
     {
         if (is_object($storeView)) {
-        	$storeView = $storeView->getId();
+            $storeView = $storeView->getId();
         }
 
         $bindings = Mage::helper('marketingsoftware/config')->getSyncProfilesBindings();
 
         if ($this->getId() >= 1) {
-        	$this->save();
+            $this->save();
         }
 
         $bindings[$store] = $this->getId();
@@ -186,7 +186,7 @@ class Copernica_MarketingSoftware_Model_Sync_Profile extends Mage_Core_Model_Abs
 
         foreach ($bindings as $storeId => $profileId) {
             if ($profileId == $this->getId()) {
-            	$bindings[$storeId] = -1;
+                $bindings[$storeId] = -1;
             }
         }
 

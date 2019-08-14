@@ -46,23 +46,29 @@ try
     $table = $installer->getConnection()->newTable($tableName);
 
     // add Id column
-    $table->addColumn('id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+    $table->addColumn(
+        'id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'unsigned'  => true,
         'nullable'  => false,
         'primary'   => true,
         'identity'  => true,
-    ), 'Abandoned cart auto increment Id');
+        ), 'Abandoned cart auto increment Id'
+    );
 
     // add customer Id column
-    $table->addColumn('quote_id', Varien_Db_Ddl_Table::TYPE_INTEGER, 255, array(
+    $table->addColumn(
+        'quote_id', Varien_Db_Ddl_Table::TYPE_INTEGER, 255, array(
         'unsigned'  => true,
         'nullable'  => false
-    ), 'Quote id associated with abandoned cart');
+        ), 'Quote id associated with abandoned cart'
+    );
 
     // add copernica customer Id column
-    $table->addColumn('timestamp', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, 255, array(
+    $table->addColumn(
+        'timestamp', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, 255, array(
         'nullable'  => false
-    ), 'When cart was detected');
+        ), 'When cart was detected'
+    );
 
     // tell connection to create table
     $installer->getConnection()->createTable($table);

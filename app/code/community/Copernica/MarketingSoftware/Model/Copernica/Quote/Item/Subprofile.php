@@ -42,8 +42,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile extends 
     /**
      *  Set the status of this quote item
      *  
-     *  @param	string	$status
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile
+     *  @param    string    $status
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile
      */
     public function setStatus($status)
     {
@@ -65,8 +65,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile extends 
     /**
      *  Try to store a quote item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item	$item
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile;
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item    $item
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile;
      */
     public function setQuoteItem(Copernica_MarketingSoftware_Model_Abstraction_Quote_Item $item)
     {
@@ -142,9 +142,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Quote_Item_Subprofile extends 
             $data['total_price'] = $price->total();
         }
 
-        $data['categories'] = implode("\n", array_map(function($category) {
-            return implode(' > ', $category);
-        }, $product->categories()));
+        $data['categories'] = implode(
+            "\n", array_map(
+                function($category) {
+                return implode(' > ', $category);
+                }, $product->categories()
+            )
+        );
 
         return $data;
     }

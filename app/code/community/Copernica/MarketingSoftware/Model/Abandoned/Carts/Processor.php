@@ -34,7 +34,7 @@ class Copernica_MarketingSoftware_Model_Abandoned_Carts_Processor
     /**
      *  Check if we did already marked 
      *  
-     *  @param	array	$quoteCollection
+     *  @param    array    $quoteCollection
      *  @return boolean
      */
     protected function _filterNotMarked($quoteCollection) 
@@ -42,7 +42,7 @@ class Copernica_MarketingSoftware_Model_Abandoned_Carts_Processor
         $quotesIds = array();
         
         foreach ($quoteCollection as $quote) {
-        	$quotesIds[] = $quote->getId();
+            $quotesIds[] = $quote->getId();
         }
 
         $markedQuotesIds = Mage::getModel('marketingsoftware/abandoned_cart')->getCollection()->addFieldToFilter('quote_id', array('in' => $quotesIds));
@@ -50,14 +50,14 @@ class Copernica_MarketingSoftware_Model_Abandoned_Carts_Processor
         $markedArray = array();
         
         foreach ($markedQuotesIds as $abandonedCart) {
-        	$markedArray[] = $abandonedCart->getQuoteId();
+            $markedArray[] = $abandonedCart->getQuoteId();
         }
 
         $notMarkedQuotes = array();
         
         foreach ($quoteCollection as $quote) {
             if (in_array($quote->getId(), $markedArray)) {
-            	continue;
+                continue;
             }
 
             $notMarkedQuotes[] = $quote;
@@ -78,7 +78,7 @@ class Copernica_MarketingSoftware_Model_Abandoned_Carts_Processor
         $storeIds = $config->getEnabledStores();
 
         if (!is_array($storeIds)) {
-        	$storeIds = array();
+            $storeIds = array();
         }
 
         $timeoutLimit = new DateTime();

@@ -27,14 +27,15 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Subscription extends Coperni
         $profileLinkedFields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
 
         if (!$object->email && !$object->storeId) {
-        	return false;
+            return false;
         }
 
         $store = Mage::getModel('core/store')->load($object->storeId);
         $website = $store->getWebsite();
         $group = $store->getGroup();
 
-        $storeView = implode(' > ', array (
+        $storeView = implode(
+            ' > ', array (
             $website->getName(), 
             $group->getName(), 
             $store->getName())
@@ -49,24 +50,26 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Subscription extends Coperni
         $profileCache = $profileCacheCollection->getFirstItem();
 
         if (!$profileCache->isObjectNew()) { 
-        	$profileCache->delete();
+            $profileCache->delete();
         }
 
         $request = Mage::helper('marketingsoftware/rest_request'); 
 
         $databaseId = Mage::helper('marketingsoftware/config')->getDatabaseId();
 
-        $result = $request->get('/database/'.$databaseId.'/profiles', array('fields' => array(
+        $result = $request->get(
+            '/database/'.$databaseId.'/profiles', array('fields' => array(
             $profileLinkedFields['email'].'=='.$object->email,
             $profileLinkedFields['storeView'].'=='.$storeView
-        )));
+            ))
+        );
 
         if (!isset($result['total']) && $result['total'] == 0) {
-        	return false;
+            return false;
         }
 
         foreach ($result['data'] as $profile) {
-        	$request->delete('/profile/'.$profile['ID']);
+            $request->delete('/profile/'.$profile['ID']);
         }
         
         return true;
@@ -82,7 +85,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Subscription extends Coperni
         $subscriber = Mage::getModel('newsletter/subscriber')->load($this->_getEntityId());
  
         if ($subscriber->isObjectNew()) {
-        	return true;
+            return true;
         }
 
         $subscriptionEntity = Mage::getModel('marketingsoftware/copernica_entity_subscription');

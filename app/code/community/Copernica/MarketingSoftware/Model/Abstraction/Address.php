@@ -32,8 +32,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  The original object
      *  
-     *  @todo	Not used???
-     *  @var	Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
+     *  @todo    Not used???
+     *  @var    Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
      */
     protected $_original;
 
@@ -57,8 +57,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  @param    Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Address
      */
     public function setOriginal($original)
     {
@@ -135,7 +135,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Return the type of this address
      *  
-     *  @return	array
+     *  @return    array
      */
     public function type()
     {
@@ -145,7 +145,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  The customer may return null
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
@@ -170,7 +170,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Return the name belonging to this address
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function name()
     {
@@ -180,7 +180,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Return the e-mail address of this address
      *  
-     *  @return	string
+     *  @return    string
      */
     public function email()
     {
@@ -190,7 +190,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Return the street of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function street()
     {
@@ -200,7 +200,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the city of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function city()
     {
@@ -210,7 +210,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the zipcode of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function zipcode()
     {
@@ -220,7 +220,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the state of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function state()
     {
@@ -230,7 +230,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the country id of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function countryId()
     {
@@ -240,7 +240,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the telephone number of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function telephone()
     {
@@ -250,7 +250,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the fax number of this addresses
      *  
-     *  @return	string
+     *  @return    string
      */
     public function fax()
     {
@@ -260,7 +260,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Get the company of this address
      *  
-     *  @return	string
+     *  @return    string
      */
     public function company()
     {
@@ -270,11 +270,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             $this->type(),
             $this->name(),
@@ -288,14 +289,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
             $this->fax(),
             $this->company(),
             is_object($customer = $this->customer()) ? $customer->id() : null,
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Address
      */
     public function unserialize($string)
     {

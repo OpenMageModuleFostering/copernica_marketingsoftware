@@ -30,7 +30,7 @@
 class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Copernica_MarketingSoftware_Model_Copernica_Abstract
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     protected $_order = false;
 
@@ -47,7 +47,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
     /**
      *  Try to store a quote item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstract	$order
+     *  @param    Copernica_MarketingSoftware_Model_Abstract    $order
      *  @return Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile
      */
     public function setOrder(Copernica_MarketingSoftware_Model_Abstract $order)
@@ -89,15 +89,15 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
         $addresses = $this->_order->addresses();
     
         if (is_array($addresses)) {
-        	foreach ($addresses as $address) {
-            	if (in_array('billing', $address->type()))  {
-            		$billingAddress = $address;
-            	}
-            	
-            	if (in_array('shipping', $address->type())) {
-            		$shippingAddress = $address;
-            	}
-        	}
+            foreach ($addresses as $address) {
+                if (in_array('billing', $address->type())) {
+                    $billingAddress = $address;
+                }
+                
+                if (in_array('shipping', $address->type())) {
+                    $shippingAddress = $address;
+                }
+            }
         }
 
         $price = $this->_order->price();

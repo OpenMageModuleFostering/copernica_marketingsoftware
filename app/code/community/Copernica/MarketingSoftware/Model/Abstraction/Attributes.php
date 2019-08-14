@@ -38,8 +38,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Catalog_Model_Product	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  @param    Mage_Catalog_Model_Product    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function setOriginal(Mage_Catalog_Model_Product $original)
     {
@@ -53,7 +53,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
         
         foreach ($attributes as $attribute) {
             if (
-				$attribute->getIsUserDefined() &&
+                $attribute->getIsUserDefined() &&
                 in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
                 ($label = $attribute->getAttributeCode()) &&
                 ($value = $attribute->getFrontend()->getValue($original))
@@ -70,7 +70,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      *  The name of this product
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function name()
     {
@@ -80,8 +80,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      *  Return an assoc array with attributes.
      *
-     *  @param	Bool	$useAttribcode
-     *  @return	array
+     *  @param    Bool    $useAttribcode
+     *  @return    array
      */
     public function attributes($useAttribCode = false)
     {
@@ -91,14 +91,14 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      *  Return a string representation
      *  
-     *  @return	string
+     *  @return    string
      */
     public function __toString()
     {
         $options = "";
         
         foreach ($this->attributes() as $key => $value) {
-        	$options .= "$key: $value\n";
+            $options .= "$key: $value\n";
         }
         
         return $options;
@@ -107,21 +107,23 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->name(),
             $this->attributes(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function unserialize($string)
     {

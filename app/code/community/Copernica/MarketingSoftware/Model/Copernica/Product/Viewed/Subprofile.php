@@ -30,7 +30,7 @@
 class Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile extends Copernica_MarketingSoftware_Model_Copernica_Abstract
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed
      */
     protected $_viewedProduct = false;
     
@@ -52,7 +52,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile exte
     /**
      *  Try to store a quote item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed	$product
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed    $product
      */
     public function setViewedProduct(Copernica_MarketingSoftware_Model_Abstraction_Product_Viewed $product)
     {
@@ -96,7 +96,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile exte
         
         if ($product->categories()) {
             foreach ($product->categories() as $category) {
-            	$categories[] = implode(' > ', $category);
+                $categories[] = implode(' > ', $category);
             }
         }
 

@@ -42,7 +42,7 @@ require_once 'app/Mage.php';
 umask(0);
 
 if (!Mage::isInstalled()) {
-	exit;
+    exit;
 }
 
 Mage::app('admin')->setUseSessionInUrl(false);

@@ -39,8 +39,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Quote_Item $original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
+     *  @param    Mage_Sales_Model_Quote_Item $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
      */
     public function setOriginal(Mage_Sales_Model_Quote_Item $original)
     {
@@ -78,7 +78,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  The name of this set of options
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function name()
     {
@@ -88,7 +88,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  Return an assoc array with attributes
      *  
-     *  @return	array
+     *  @return    array
      */
     public function attributes()
     {
@@ -98,7 +98,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  Return a string representation
      *  
-     *  @return	string
+     *  @return    string
      */
     public function __toString()
     {
@@ -108,9 +108,9 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  Return a string representation of an array
      *  
-     *  @param	array	$value
-     *  @param	string	$prefix
-     *  @return	string
+     *  @param    array    $value
+     *  @param    string    $prefix
+     *  @return    string
      */
     protected function _arrayToString($value, $prefix = '')
     {
@@ -119,12 +119,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
         foreach ($value as $key => $value) {
             if (is_array($value)) {
                 if (isset($value[0]) && count($value) == 1) {
-                	$value = $value[0];
+                    $value = $value[0];
                 }
 
                 $string .= $prefix.$key.":\n".$this->_arrayToString($value, $prefix.'  ');
             } else {
-            	$string.= $prefix.$key.": $value\n";
+                $string.= $prefix.$key.": $value\n";
             }
         }
         
@@ -134,21 +134,23 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options implement
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->name(),
             $this->attributes(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
      */
     public function unserialize($string)
     {

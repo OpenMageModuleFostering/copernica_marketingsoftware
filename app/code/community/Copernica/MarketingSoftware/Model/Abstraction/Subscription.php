@@ -48,8 +48,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Newsletter_Model_Subscriber	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  @param    Mage_Newsletter_Model_Subscriber    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function setOriginal(Mage_Newsletter_Model_Subscriber $original)
     {
@@ -89,7 +89,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  Return the identifier for this object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -99,7 +99,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  Return the e-mail address with which the user is subscribed
      *  
-     *  @return	string
+     *  @return    string
      */
     public function email()
     {
@@ -110,7 +110,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
      *  Return the status of this subscription
      *  Note that subscribed might be returned but the record is currently removed
      *  
-     *  @return	string
+     *  @return    string
      */
     public function status()
     {
@@ -120,7 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  The customer may return null
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function customer()
     {
@@ -134,7 +134,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  Return the storeview for this subscription
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeView()
     {
@@ -144,24 +144,26 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             $this->email(),
             $this->status(),
             $this->storeview(),
             is_object($customer = $this->customer()) ? $customer->id() : null,
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function unserialize($string)
     {

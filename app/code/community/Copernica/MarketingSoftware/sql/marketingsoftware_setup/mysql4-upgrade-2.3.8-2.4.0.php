@@ -51,25 +51,28 @@ try
     $textType = defined('Varien_Db_Ddl_Table::TYPE_TEXT') ? Varien_Db_Ddl_Table::TYPE_TEXT : Varien_Db_Ddl_Table::TYPE_VARCHAR;
 
     // We will need a name for our events. 
-    $installer->getConnection()->addColumn($queueTableName, 'name', array(
+    $installer->getConnection()->addColumn(
+        $queueTableName, 'name', array(
         'comment' => 'name of the event',
         'type' => $textType,
         'length' => 255,
         'nullable' => true,
         'default' => null
-    ));
+        )
+    );
 
     // we will need associated entity for our events
-    $installer->getConnection()->addColumn($queueTableName, 'entity_id', array(
+    $installer->getConnection()->addColumn(
+        $queueTableName, 'entity_id', array(
         'comment' => 'entity id associated with event',
         'type' => Varien_Db_Ddl_Table::TYPE_INTEGER,
         'nullable' => true,
         'default' => null
-    ));
+        )
+    );
 
     // iterate over all unique customer that we found on old queue
-    foreach ($result as $row)
-    {
+    foreach ($result as $row) {
         // create new events to sync all unique custoemr that we found on old queue
         Mage::getModel('marketingsoftware/queue_item')
             ->setObject(null)

@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Rest_Customer extends Copernica_Marketin
     /**
      *  Customer that will be used to send data
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
      */
     protected $_customerEntity;
 
@@ -42,7 +42,7 @@ class Copernica_MarketingSoftware_Model_Rest_Customer extends Copernica_Marketin
      *  @return bool
      */
     public function setProfile()
-    {    	
+    {        
         $profileId = $this->_customerEntity->getProfileId();
         
         $profileData = $this->_getProfileData();
@@ -61,10 +61,11 @@ class Copernica_MarketingSoftware_Model_Rest_Customer extends Copernica_Marketin
     /**
      *  Set REST customer entity
      *
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$customer
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $customer
      */
-    public function setCustomerEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customerEntity) {
-    	$this->_customerEntity = $customerEntity;    	        
+    public function setCustomerEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customerEntity) 
+    {
+        $this->_customerEntity = $customerEntity;                
     }
 
     /**

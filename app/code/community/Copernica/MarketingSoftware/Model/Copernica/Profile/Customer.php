@@ -30,15 +30,15 @@
 class Copernica_MarketingSoftware_Model_Copernica_Profile_Customer extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     protected $_customer = false;
 
     /**
      *  Set the customer object to this object
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Customer	$customer
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Profile_Customer
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Customer    $customer
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Profile_Customer
      */
     public function setCustomer(Copernica_MarketingSoftware_Model_Abstraction_Customer $customer)
     {

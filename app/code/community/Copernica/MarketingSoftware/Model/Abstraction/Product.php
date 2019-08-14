@@ -32,8 +32,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  The original object
      *  
-     *  @todo	Not used???
-     *  @var	Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item
+     *  @todo    Not used???
+     *  @var    Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item
      */
     protected $_original;
 
@@ -57,18 +57,18 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function setOriginal($original)
     {
         if ($original instanceof Mage_Catalog_Model_Product) {
-        	$this->_createFromProductModel($original);
+            $this->_createFromProductModel($original);
         } else {
             $product = Mage::getModel('catalog/product')->load($original->getProductId());
 
             if ($product->getID()) {
-            	$this->_createFromProductModel($product);
+                $this->_createFromProductModel($product);
             } else {
                 $this->_id = $original->getProductId();
                 $this->_sku = $original->getSKU();
@@ -85,7 +85,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Create product from model.
      *  
-     *  @param	Mage_Catalog_Model_Product	$model
+     *  @param    Mage_Catalog_Model_Product    $model
      */
     protected function _createFromProductModel(Mage_Catalog_Model_Product $model) 
     {
@@ -125,8 +125,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Loads a product model
      *  
-     *  @param	integer	$productId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    integer    $productId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function loadProduct($productId)
     {
@@ -144,7 +144,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the identifier for this object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -155,7 +155,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
      *  Return the sku (stock keeping unit), which is an unique identifier
      *  for a magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function sku()
     {
@@ -165,7 +165,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the name of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function name()
     {
@@ -175,7 +175,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the description of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function description()
     {
@@ -185,7 +185,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the price of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function price()
     {
@@ -195,7 +195,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the creation date of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function created()
     {
@@ -205,7 +205,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the modification date of this magento product
      *  
-     *  @return	string
+     *  @return    string
      */
     public function modified()
     {
@@ -215,8 +215,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the product url of this magento product
      *  
-     *  @param	integer	$storeId
-     *  @return	string
+     *  @param    integer    $storeId
+     *  @return    string
      */
     public function productUrl($storeId = null)
     {
@@ -226,8 +226,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the image url of this magento product
      *  
-     *  @param	integer	$storeId
-     *  @return	string
+     *  @param    integer    $storeId
+     *  @return    string
      */
     public function imageUrl($storeId = null)
     {
@@ -237,7 +237,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the weight of this magento product
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -247,7 +247,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the categories of this product
      *  
-     *  @return	array
+     *  @return    array
      */
     public function categories()
     {
@@ -257,8 +257,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the flattened tree of the given category
      *  
-     *  @param	Mage_Catalog_Model_Category	$category
-     *  @return	array
+     *  @param    Mage_Catalog_Model_Category    $category
+     *  @return    array
      */
     protected function _getFullCategoryName(Mage_Catalog_Model_Category $category)
     {
@@ -278,7 +278,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Return the attributes for this product
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function attributes()
     {
@@ -293,8 +293,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Serialize the object
      *  
-     *  @todo	This method, is it even used? 
-     *  @return	string
+     *  @todo    This method, is it even used? 
+     *  @return    string
      */
     public function serialize()
     {
@@ -304,9 +304,9 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     /**
      *  Unserialize the object
      *  
-     *  @todo	This method, is it even used? And $isNew???
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @todo    This method, is it even used? And $isNew???
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function unserialize($string)
     {

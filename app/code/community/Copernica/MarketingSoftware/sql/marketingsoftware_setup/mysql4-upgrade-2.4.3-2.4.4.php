@@ -49,37 +49,49 @@ try
     $table = $installer->getConnection()->newTable($tableName);
 
     // add Id column
-    $table->addColumn('id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+    $table->addColumn(
+        'id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'unsigned'  => true,
         'nullable'  => false,
         'primary'   => true,
         'identity'  => true,
-    ), 'Profile Cache Id');
+        ), 'Profile Cache Id'
+    );
 
     // add customer Id column
-    $table->addColumn('customer_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+    $table->addColumn(
+        'customer_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'unsigned'  => true
-    ), 'Customer Id');
+        ), 'Customer Id'
+    );
 
     // add copernica customer Id column
-    $table->addColumn('copernica_id', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'copernica_id', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => true
-    ), 'Copernica customer Id');
+        ), 'Copernica customer Id'
+    );
 
     // add profile id column
-    $table->addColumn('profile_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
+    $table->addColumn(
+        'profile_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'nullable'  => true
-    ), 'Profile Id');
+        ), 'Profile Id'
+    );
 
     // add email column
-    $table->addColumn('email', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'email', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => true
-    ), 'Email address');
+        ), 'Email address'
+    );
 
     // add store view column
-    $table->addColumn('store_view', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
+    $table->addColumn(
+        'store_view', Varien_Db_Ddl_Table::TYPE_VARCHAR, 255, array(
         'nullable'  => true
-    ), 'Store view');
+        ), 'Store view'
+    );
 
     // tell connection to create table
     $installer->getConnection()->createTable($table);

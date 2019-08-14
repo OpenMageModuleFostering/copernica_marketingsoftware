@@ -38,7 +38,7 @@ class Copernica_MarketingSoftware_Model_Config extends Mage_Core_Model_Abstract
     /**
      * Constructor
      * 
-     * @see	Varien_Object::_construct()
+     * @see    Varien_Object::_construct()
      */
     protected function _construct()
     {
@@ -48,7 +48,7 @@ class Copernica_MarketingSoftware_Model_Config extends Mage_Core_Model_Abstract
     /**
      *  Load configuration row by it's key.
      *  
-     *  @param  string	$key
+     *  @param  string    $key
      *  @return Copernica_MarketingSoftware_Model_Config
      */
     public function loadByKey($key)

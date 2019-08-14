@@ -32,15 +32,15 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
     /**
      *  To where data will be saved? Posible values are 'copernica' and 'magento'
      *  
-     *  @var	String
+     *  @var    String
      */
     protected $_direction = 'copernica';
 
     /**
      *  Set the direction for this synchronisation
      *  
-     *  @param	string	$direction
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
+     *  @param    string    $direction
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
      */
     public function setDirection($direction)
     {
@@ -80,7 +80,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
     /**
      *  Check if offset exists in array
      *  
-     *  @param	mixed	$offset
+     *  @param    mixed    $offset
      *  @return boolean
      */
     public function offsetExists($offset)
@@ -93,7 +93,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
     /**
      *  Get offset in array
      *  
-     *  @param	mixed	$offset
+     *  @param    mixed    $offset
      *  @return mixed
      */
     public function offsetGet($offset)
@@ -113,18 +113,18 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
         $data = $this->_data();
 
         if ($this->_direction == 'magento') {
-        	return $data;
+            return $data;
         }
 
         $returndata = array();
 
         foreach ($this->requiredFields() as $field) {
-        	$returndata[$field] = $data[$field];
+            $returndata[$field] = $data[$field];
         }
 
         foreach ($this->linkedFields() as $magentoField => $copernicaField) {
             if (empty($copernicaField) || !isset($data[$magentoField])) {
-            	continue;
+                continue;
             }
 
             $returndata[$copernicaField] = $data[$magentoField];
@@ -137,8 +137,8 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
      *  Set entry in offset of array
      *  
      *  @deprecated
-     *  @param	mixed	$offset
-     *  @param  mixed	$value
+     *  @param    mixed    $offset
+     *  @param  mixed    $value
      */
     public function offsetSet($offset, $value)
     {
@@ -149,7 +149,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
      *  Remove entry by offset in array
      *  
      *  @deprecated
-     *  @param	mixed	$offset
+     *  @param    mixed    $offset
      */
     public function offsetUnset($offset)
     {

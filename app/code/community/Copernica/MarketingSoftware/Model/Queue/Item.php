@@ -60,7 +60,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
         $object = json_decode($data);
 
         if (!is_null($object)) {
-        	return $object;
+            return $object;
         }
 
         return unserialize($this->getData('object'));
@@ -69,7 +69,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
     /**
      *  Set the data to the model
      *  
-     *  @param	object  $object
+     *  @param    object  $object
      *  @return Copernica_MarketingSoftware_Model_Queue_Item
      */
     public function setObject($object = null)
@@ -90,7 +90,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
     /**
      *  Set the customer that is interested in queue item
      *  
-     *  @param  int	$customerId
+     *  @param  int    $customerId
      *  @return Copernica_MarketingSoftware_Model_Queue_Item
      */
     public function setCustomerId($customerId)
@@ -113,7 +113,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
     /**
      *  Set name of the event
      *  
-     *  @param  string	$name
+     *  @param  string    $name
      *  @return Copernica_MarketingSoftware_Model_Queue_Item
      */
     public function setName($name)
@@ -136,7 +136,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
     /**
      *  Set associated entity Id
      *  
-     *  @param  int	$id
+     *  @param  int    $id
      *  @return Copernica_MarketingSoftware_Model_Queue_Item
      */
     public function setEntityId($id)
@@ -167,7 +167,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
         $modelName = 'marketingsoftware/queue_event_'. $this->getName();
 
         if (!class_exists(Mage::getConfig()->getModelClassName($modelName))) {
-        	return null;
+            return null;
         }
 
         $event = Mage::getModel($modelName);
@@ -191,14 +191,14 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
         $this->setQueueTime(date("Y-m-d H:i:s"));
 
         if ($this->getAction() == 'remove') {
-        	$this->_clearNoRemoveSiblings();
+            $this->_clearNoRemoveSiblings();
         }
 
         if ($this->getAction() == 'add' || $this->getAction() == 'modify') {
             if ($this->_shouldSave()) {
-            	parent::save();
+                parent::save();
             } else {
-            	return $this;
+                return $this;
             }
         }
 
@@ -217,7 +217,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
             ->addFilter('entity_id', $this->getEntityId());
 
         foreach ($collection as $event) {
-        	$event->delete();
+            $event->delete();
         }
 
         $collection = $this->getCollection()
@@ -227,7 +227,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
             ->addFilter('entity_id', $this->getEntityId());
 
         foreach ($collection as $event) {
-        	$event->delete();
+            $event->delete();
         }
     }
 

@@ -81,7 +81,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_MarketingSoftware_Sync extends
     /** 
      *  Get url that will point to state action in controller
      *  
-     *  @todo	Two returns????
+     *  @todo    Two returns????
      *  @return string
      */
     public function getStateUrl()
@@ -110,7 +110,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_MarketingSoftware_Sync extends
         $parts = array();
         
         foreach ($query as $key => $value) {
-        	$parts[] = implode('=', array($key, urlencode($value)));
+            $parts[] = implode('=', array($key, urlencode($value)));
         }
 
         return $authUrl.'?'.implode('&', $parts);

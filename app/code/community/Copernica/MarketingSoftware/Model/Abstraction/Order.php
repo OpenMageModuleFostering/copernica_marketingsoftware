@@ -34,7 +34,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      * payment name from a quote shipping address. Since this is an order
      * a quote is no longer available.
      * 
-     * @var	string
+     * @var    string
      */
     const PAYMENT_METHOD_KLARNA = 'klarna_partpayment';
 
@@ -53,7 +53,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      * The storeview object
      * 
-     * @var	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     * @var    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     protected $_storeview;
     
@@ -69,8 +69,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Order	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @param    Mage_Sales_Model_Order    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function setOriginal(Mage_Sales_Model_Order $original)
     {
@@ -83,8 +83,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  This method will set the state of this order from original magento order
      *  
-     *  @param	Mage_Sales_Model_Order	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @param    Mage_Sales_Model_Order    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function importFromOriginal(Mage_Sales_Model_Order $original)
     {
@@ -133,7 +133,9 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
                 } else {
                     $this->_paymentDescription = $payment->getMethodInstance()->getTitle();
                 }
-            } catch (Mage_Core_Exception $exception) { }        
+            } catch (Mage_Core_Exception $exception) {
+                Mage::logException($exception);
+            }        
         }
         
         return $this;
@@ -142,8 +144,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  Loads an order model
      *  
-     *  @param	integer	$orderId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @param    integer    $orderId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function loadOrder($orderId)
     {
@@ -159,7 +161,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The id of this order object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -169,7 +171,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The increment (longer) id of this order object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function incrementId()
     {
@@ -179,7 +181,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The quote id of this order object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quoteId()
     {
@@ -189,7 +191,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The state of this order
      *  
-     *  @return	string
+     *  @return    string
      */
     public function state()
     {
@@ -199,7 +201,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The status of this order
      *  
-     *  @return	string
+     *  @return    string
      */
     public function status()
     {
@@ -209,7 +211,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The number of items present in this order
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -219,7 +221,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The number of items present in this order
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function currency()
     {
@@ -230,7 +232,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -240,7 +242,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -250,7 +252,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  To what storeview does this order belong
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
@@ -260,7 +262,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  Get the items from the order
      *  
-     *  @return	array
+     *  @return    array
      */
     public function items()
     {
@@ -270,7 +272,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The timestamp at which this order was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -280,7 +282,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The customer may return null
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
@@ -294,7 +296,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The addresses of the order
      *  
-     *  @return	array of Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  @return    array of Copernica_MarketingSoftware_Model_Abstraction_Address
      */
     public function addresses()
     {
@@ -304,7 +306,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The shipping method of the order
      *  
-     *  @return	string
+     *  @return    string
      */
     public function shippingDescription()
     {
@@ -314,7 +316,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The payment method of the order
      *  
-     *  @return	string
+     *  @return    string
      */
     public function paymentDescription()
     {
@@ -324,7 +326,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  The IP from which this order was constructed
      *  
-     *  @return	string
+     *  @return    string
      */
     public function customerIP()
     {
@@ -334,7 +336,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {       
@@ -344,8 +346,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function unserialize($string)
     {

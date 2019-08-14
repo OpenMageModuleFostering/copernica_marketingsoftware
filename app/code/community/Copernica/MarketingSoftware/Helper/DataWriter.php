@@ -71,7 +71,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
     public function __destruct()
     {
         if (!is_null($this->_fileHandle)) {
-        	fclose($this->_fileHandle);
+            fclose($this->_fileHandle);
         }
     }
 
@@ -86,7 +86,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
 
         while (false !== ($entry = readdir($directoryHandle))) {
             if (strpos($entry, '.') === 0) {
-            	continue;
+                continue;
             }
 
             $fileNameParts = explode('.', $entry);
@@ -108,7 +108,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
         $dir = Mage::getBaseDir('var');
 
         if (!is_dir($dir.'/copernica_data')) {
-            mkdir ($dir.'/copernica_data');
+            mkdir($dir.'/copernica_data');
         }
 
         $this->_workingDir = $dir.'/copernica_data';
@@ -124,7 +124,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
         $mbInBytes = 104857600;
 
         if (!is_file($this->_getFilePath())) {
-        	$this->_createDataFile($this->_getFilePath());
+            $this->_createDataFile($this->_getFilePath());
         }
 
         if (filesize($this->_getFilePath()) > $mbInBytes) {
@@ -139,14 +139,11 @@ class Copernica_MarketingSoftware_Helper_Datawriter
     /**
      *  Create new data file at given path.
      *  
-     *  @param	string	$path
+     *  @param    string    $path
      */
     protected function _createDataFile($path)
     {
-        if (is_file($path)) {
-            // we have a file. Most likely we should handle such situation. 
-            // we will see what we can do with it
-        } else {
+        if (!is_file($path)) {
             touch($path);
         }
     }
@@ -155,8 +152,8 @@ class Copernica_MarketingSoftware_Helper_Datawriter
      *  Get file path to data file. Supplying null value as a parameter will 
      *  output current data file.
      *  
-     *  @param	int	$inc
-     *  @return	string
+     *  @param    int    $inc
+     *  @return    string
      */
     protected function _getFilePath($inc = null) 
     {
@@ -168,7 +165,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
 
             $fileName = implode('.', $fileNameParts);
         } else {
-        	$fileName = $this->_fileName;
+            $fileName = $this->_fileName;
         }
  
         return $this->_workingDir.'/'.$fileName;
@@ -177,7 +174,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
     /**
      *  Write 
      *  
-     *  @param	assoc	$data
+     *  @param    assoc    $data
      */
     protected function _write($data)
     {
@@ -197,7 +194,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
 
         while (false !== ($entry = readdir($directoryHandle))) {
             if (strpos($entry, '.') === 0) {
-            	continue;
+                continue;
             }
 
             unlink($this->_workingDir.'/'.$entry);
@@ -211,7 +208,7 @@ class Copernica_MarketingSoftware_Helper_Datawriter
     /**
      *  Store customer profile.
      *  
-     *  @param	assoc	$profile
+     *  @param    assoc    $profile
      */
     public function storeProfile($profile)
     {

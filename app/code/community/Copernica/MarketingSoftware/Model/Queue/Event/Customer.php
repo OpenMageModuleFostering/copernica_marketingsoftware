@@ -35,7 +35,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
     /**
      *  Handle customer add action. It's basicaly the same as modify action.
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function actionAdd()
     {
@@ -47,7 +47,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
      *  when customer is modified. So on administrative edition or when customer
      *  himself is modifying his data.
      *
-     *  @return	boolean
+     *  @return    boolean
      */
     public function actionModify()
     {
@@ -68,7 +68,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
      *  This action is expensive both with time and resources. It should be called
      *  only when there is a need for that.
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function actionFull()
     {
@@ -79,13 +79,13 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
         $restCustomer->setProfile();
      
          foreach ($customerEntity->getOrders() as $orderEntity) {
-         	$restOrder = $orderEntity->getRestOrder();
-         	$restOrder->syncWithCustomer($customerEntity);
+             $restOrder = $orderEntity->getRestOrder();
+             $restOrder->syncWithCustomer($customerEntity);
          }
         
-         foreach($customerEntity->getWishlistItems() as $wishlistItemEntity) {
-         	$restWishlistItem = $wishlistItemEntity->getRestWishlistItem();
-         	$restWishlistItem->syncWithCustomer($customerEntity);
+         foreach ($customerEntity->getWishlistItems() as $wishlistItemEntity) {
+             $restWishlistItem = $wishlistItemEntity->getRestWishlistItem();
+             $restWishlistItem->syncWithCustomer($customerEntity);
          }
 
         //$request->commit();
@@ -110,7 +110,8 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
             
             $group = $store->getGroup();
 
-            $storeView = implode(' > ', array (
+            $storeView = implode(
+                ' > ', array (
                 $website->getName(), 
                 $group->getName(), 
                 $store->getName())
@@ -125,12 +126,12 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
             $profileCache = $profileCacheCollection->getFirstItem();
 
             if (!$profileCache->isObjectNew()) {
-            	$profileCache->delete();   
+                $profileCache->delete();   
             }
         }
 
         if (!property_exists($object, 'profileId')) {
-        	return false;
+            return false;
         }
 
         Mage::helper('marketingsoftware/rest_request')->delete('/profile/'.$object->profileId);

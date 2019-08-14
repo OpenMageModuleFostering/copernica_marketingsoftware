@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /**
      *  Will create proper database in Copernica platform
      *  
-     *  @param	string	$databaseName
+     *  @param    string    $databaseName
      */
     public function createDatabase($databaseName)
     {
@@ -41,10 +41,12 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
 
         $this->_restRequest()->post('databases', $data);
 
-        $this->createDatabaseField($databaseName, 'customer_id', array(
+        $this->createDatabaseField(
+            $databaseName, 'customer_id', array(
             'type' => 'text',
             'length' => 64
-        ));
+            )
+        );
     }    
 
     /**
@@ -52,22 +54,22 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
      *  For more info about what can be supplied in $options argument go: 
      *  @see https://www.copernica.com/en/support/rest/database-fields
      * 
-     *  @param	string	$databaseName
-     *  @param	string	$fieldName
-     *  @param	array	$options
+     *  @param    string    $databaseName
+     *  @param    string    $fieldName
+     *  @param    array    $options
      */
     public function createDatabaseField($databaseName, $fieldName, $options = array())
     {
-        $options = array_merge( array ('name' => $fieldName), array('displayed' => true), $options);
+        $options = array_merge(array ('name' => $fieldName), array('displayed' => true), $options);
 
-        $this->_restRequest()->post( 'database/'.urlencode($databaseName).'/fields', $options );
+        $this->_restRequest()->post('database/'.urlencode($databaseName).'/fields', $options);
     }
 
     /**
      *  Helper method to create date fields.
      *  
-     *  @param	string	$databaseName
-     *  @param	string	$fieldName
+     *  @param    string    $databaseName
+     *  @param    string    $fieldName
      */
     public function createDatabaseDateField($databaseName, $fieldName)
     {
@@ -79,8 +81,8 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /**
      *  Helper method to create datetime fields.
      *  
-     *  @param	string	$databaseName
-     *  @param	string	$fieldName
+     *  @param    string    $databaseName
+     *  @param    string    $fieldName
      */
     public function createDatabaseDatetimeField($databaseName, $fieldName)
     {
@@ -92,8 +94,8 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /**
      *  Helper method to create email fields.
      *  
-     *  @param	string	$databaseName
-     *  @param	string	$fieldName
+     *  @param    string    $databaseName
+     *  @param    string    $fieldName
      */
     public function createDatabaseEmailField($databaseName, $fieldName)
     {
@@ -106,8 +108,8 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /**
      *  Helper method to create newsletter fields.
      *  
-     *  @param	string	$databaseName
-     *  @param	string	$fieldName
+     *  @param    string    $databaseName
+     *  @param    string    $fieldName
      */
     public function createDatabaseNewsletterField($databaseName, $fieldName)
     {
@@ -136,14 +138,14 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /** 
      *  Create collection inside given database.
      *  
-     *  @param  string	$databaseName
-     *  @param  string	$collectionName
+     *  @param  string    $databaseName
+     *  @param  string    $collectionName
      *  @param  string  $collectionType
-     *  @throws	Copernica_MarketingSoftware_Exception
+     *  @throws    Copernica_MarketingSoftware_Exception
      */
     public function createCollection($databaseName, $collectionName, $collectionType)
     {
-        $this->_restRequest()->post( 'database/'.urlencode($databaseName).'/collections', array ( 'name' => $collectionName ) );
+        $this->_restRequest()->post('database/'.urlencode($databaseName).'/collections', array ( 'name' => $collectionName ));
         
         $requiredFields = $this->_requiredCollectionFields($collectionType);
 
@@ -155,7 +157,7 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     /**
      *  This method created collection field.
      *  
-     *  @param	string	$databaseName
+     *  @param    string    $databaseName
      *  @param  string  $collectionName
      *  @param  string  $collectionType
      *  @param  string  $copernicaName
@@ -170,9 +172,13 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
 
         $collectionId = $this->_getCollectionIdFromDatabase($databaseName, $collectionName);
 
-        $this->_restRequest()->post( 'collection/'.$collectionId.'/fields', array_merge($fieldDefinition, array(
-            'name' => $copernicaName
-        )));
+        $this->_restRequest()->post(
+            'collection/'.$collectionId.'/fields', array_merge(
+                $fieldDefinition, array(
+                 'name' => $copernicaName
+                )
+            )
+        );
     }
 
     /**
@@ -189,24 +195,24 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
 
         if (isset($output['error'])) {
             if (strpos($output['error']['message'], 'No database') !== false) {
-            	throw Mage::exception('Copernica_MarketingSoftware', 'No database', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
+                throw Mage::exception('Copernica_MarketingSoftware', 'No database', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
             } else {
-            	throw Mage::exception('Copernica_MarketingSoftware', $output['message'], Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+                throw Mage::exception('Copernica_MarketingSoftware', $output['message'], Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
             }
         } else if (!is_array($output['data'])) {
-            throw Mage::exception('Copernica_MarketingSoftware', 'Unknown error' ,Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Unknown error', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
         }
 
         $collectionId = false;
 
         foreach ($output['data'] as $collection) {
             if ($collection['name'] == $collectionName) {
-            	$collectionId = $collection['ID'];
+                $collectionId = $collection['ID'];
             }
         }
 
         if ($collectionId === false) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
         }
 
         return $collectionId;
@@ -222,22 +228,22 @@ class Copernica_MarketingSoftware_Helper_Api_Builder extends Copernica_Marketing
     {
         switch ($collectionType) {
             case 'cartproducts':    
-            	return Mage::helper('marketingsoftware')->requiredQuoteItemFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredQuoteItemFields();
+                
             case 'orders' :         
-            	return Mage::helper('marketingsoftware')->requiredOrderFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredOrderFields();
+                
             case 'orderproducts':   
-            	return Mage::helper('marketingsoftware')->requiredOrderItemFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredOrderItemFields();
+                
             case 'addresses':       
-            	return Mage::helper('marketingsoftware')->requiredAddressFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredAddressFields();
+                
             case 'viewedproducts':   
-            	return Mage::helper('marketingsoftware')->requiredViewedProductFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredViewedProductFields();
+                
             case 'wishlistproducts':
-            	return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
+                return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
         }
     }
 }

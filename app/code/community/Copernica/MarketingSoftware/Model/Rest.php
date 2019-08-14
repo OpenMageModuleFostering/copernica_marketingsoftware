@@ -30,12 +30,13 @@
  *  API.
  */
 abstract class Copernica_MarketingSoftware_Model_Rest
-{	
+{
+    
     /**
      *  Get request data that will can be passed to REST request
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity	$entity
-     *  @param	array	$syncedFields
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity    $entity
+     *  @param    array    $syncedFields
      *  @return array
      */
     protected function _getRequestData(Copernica_MarketingSoftware_Model_Copernica_Entity $entity, $syncedFields)
@@ -44,7 +45,7 @@ abstract class Copernica_MarketingSoftware_Model_Rest
 
         foreach ($syncedFields as $fieldType => $copernicaField) {
             if (empty($copernicaField)) {
-            	continue;
+                continue;
             }
 
             $getMethod = 'get'.ucfirst($fieldType);
@@ -59,13 +60,12 @@ abstract class Copernica_MarketingSoftware_Model_Rest
      *  Create profile. Parameter can be supplied as customer entity or array data.
      *  Array data should correspond to supported customer fields.
      *  
-     *  @param  array|Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$data
+     *  @param  array|Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $data
      *  @return int|false
      */
     protected function _createProfile($data)
-    {     	
-        if ($data instanceof Copernica_MarketingSoftware_Model_Copernica_Entity_Customer)
-        {
+    {         
+        if ($data instanceof Copernica_MarketingSoftware_Model_Copernica_Entity_Customer) {
             $id = $data->getCustomerId();
             $email = $data->getEmail();
             $storeView = (string) $data->getStoreView();
@@ -75,27 +75,29 @@ abstract class Copernica_MarketingSoftware_Model_Rest
             $restCustomer->setProfile();
         } else {
             if (!is_array($data) && !isset($data['storeviewId'])) {
-            	return;
+                return;
             }
 
             $profileData = array();
 
             if (isset($data['id'])) {
-            	$profileData['customer_id'] = $data['id'].'|'.$data['storeViewId'];
+                $profileData['customer_id'] = $data['id'].'|'.$data['storeViewId'];
             } else if (isset($data['email'])) {
-            	$profileData['customer_id'] = $data['email'].'|'.$data['storeViewId'];
+                $profileData['customer_id'] = $data['email'].'|'.$data['storeViewId'];
             } else {
-            	return false;
+                return false;
             }
 
             if (!isset($data['storeView'])) {
                 $store = Mage::getModel('core/store')->load($data['storeViewId']);
 
-                $data['storeView'] = implode(' > ', array( 
+                $data['storeView'] = implode(
+                    ' > ', array( 
                     $store->getWebsite()->getName(),
                     $store->getGroup()->getName(),
                     $store->getName(),
-                ));
+                    )
+                );
             }
 
             $id = $data['id'];
@@ -106,7 +108,7 @@ abstract class Copernica_MarketingSoftware_Model_Rest
 
             foreach ($customerLinking as $magentoField => $copernicaField) {
                 if (empty($copernicaField) || is_null($data[$magentoField])) {
-                	continue;
+                    continue;
                 }
 
                 $profileData[$copernicaField] = $data[$magentoField];
@@ -117,10 +119,12 @@ abstract class Copernica_MarketingSoftware_Model_Rest
             Mage::helper('marketingsoftware/rest_request')->post('/database/'.$databaseId.'/profiles', $profileData);
         }
 
-        return Mage::helper('marketingsoftware/api')->getProfileId(array(
+        return Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $id,
             'storeView' => $storeView,
             'email' => $email,
-        ));
+            )
+        );
     }
 }

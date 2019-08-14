@@ -1,49 +1,54 @@
 <?php
 
 class Copernica_MarketingSoftware_Model_Rest_Quote_Item extends Copernica_MarketingSoftware_Model_Rest_Order_Item
-{	
-	/**
-	 *  Customer that will be used to send data
-	 *
-	 *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item
-	 */
-	protected $_quoteItemEntity;
-	
+{
+    
+    /**
+     *  Customer that will be used to send data
+     *
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item
+     */
+    protected $_quoteItemEntity;
+    
     /**
      *  Sync item with quote
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$customer
-     *  @param	int	$quoteId
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $customer
+     *  @param    int    $quoteId
      *  @return boolean
      */
     public function syncWithQuote(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customer, $quoteId)
     {
-    	$customer->setStore($this->_quoteItemEntity->getStoreView());
-    	
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        $customer->setStore($this->_quoteItemEntity->getStoreView());
+        
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $customer->getCustomerId(),
             'storeView' => (string) $customer->getStoreView(),
             'email' => $customer->getEmail(),
-        ));        
+            )
+        );        
         
         if (!$profileId) {
-        	$profileId = $this->_createProfile($customer);
-        	
-        	if(!$profileId) {
-        		return false;
-        	}
+            $profileId = $this->_createProfile($customer);
+            
+            if (!$profileId) {
+                return false;
+            }
         }
                 
         $quoteItemCollectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         if ($quoteItemCollectionId) { 
-        	Mage::helper('marketingsoftware/rest_request')->put('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, $this->getQuoteItemSubprofileData($quoteId), array(
-	            'fields' => array(
-	                'item_id=='.$this->_quoteItemEntity->getId(),
-	                'quote_id=='.$quoteId
-	            ),
-	            'create' => 'true'
-	        ));
+            Mage::helper('marketingsoftware/rest_request')->put(
+                '/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, $this->getQuoteItemSubprofileData($quoteId), array(
+                'fields' => array(
+                    'item_id=='.$this->_quoteItemEntity->getId(),
+                    'quote_id=='.$quoteId
+                ),
+                'create' => 'true'
+                )
+            );
         }
 
         return true;
@@ -52,7 +57,7 @@ class Copernica_MarketingSoftware_Model_Rest_Quote_Item extends Copernica_Market
     /**
      *  Prepare subprofile date
      *  
-     *  @param  int	$quoteId
+     *  @param  int    $quoteId
      *  @return array
      */
     public function getQuoteItemSubprofileData($quoteId)
@@ -71,10 +76,10 @@ class Copernica_MarketingSoftware_Model_Rest_Quote_Item extends Copernica_Market
     /**
      *  Set REST quote item entity
      *
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item	$quoteItemEntity
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item    $quoteItemEntity
      */
     public function setQuoteItemEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Quote_Item $quoteItemEntity) 
     {
-    	$this->_quoteItemEntity = $quoteItemEntity;
+        $this->_quoteItemEntity = $quoteItemEntity;
     }
 }

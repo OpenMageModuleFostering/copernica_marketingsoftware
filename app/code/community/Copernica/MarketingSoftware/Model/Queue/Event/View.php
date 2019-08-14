@@ -36,15 +36,15 @@ class Copernica_MarketingSoftware_Model_Queue_Event_View extends Copernica_Marke
      */
     public function actionAdd()
     {
-    	$object = $this->_getObject();    	    	
-    	
-    	if (!$object->customerId || !is_numeric($object->customerId) || !$object->productId || !is_numeric($object->productId) || !$object->viewedAt || !is_numeric($object->viewedAt)) {
-    		return false;
-    	}    	
+        $object = $this->_getObject();                
+        
+        if (!$object->customerId || !is_numeric($object->customerId) || !$object->productId || !is_numeric($object->productId) || !$object->viewedAt || !is_numeric($object->viewedAt)) {
+            return false;
+        }        
 
-    	$customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
-    	$customerEntity->setCustomer($object->customerId);
-    	
+        $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+        $customerEntity->setCustomer($object->customerId);
+        
         $productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
         $productEntity->setProduct($object->productId, $object->storeId);
         $productEntity->setTimestamp(date('Y-m-d G:i:s', $object->viewedAt));

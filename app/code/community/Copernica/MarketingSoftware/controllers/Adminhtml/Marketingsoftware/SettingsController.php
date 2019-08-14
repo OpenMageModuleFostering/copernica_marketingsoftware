@@ -30,16 +30,16 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController extends Copernica_MarketingSoftware_Controller_Action
 {
-	/**
-	 * Check if cache management is allowed
-	 *
-	 * @return bool
-	 */
-	protected function _isAllowed()
-	{
-		return Mage::getSingleton('admin/session')->isAllowed('copernica/settings');
-	}	
-	
+    /**
+     * Check if cache management is allowed
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('copernica/settings');
+    }    
+    
     /**
      *  indexAction() takes care of displaying the form which
      *  contains the details used for the SOAP connection
@@ -74,12 +74,12 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
      */
     public function stateAction() 
     {
-    	$session = Mage::getSingleton('adminhtml/session');
-    	
+        $session = Mage::getSingleton('adminhtml/session');
+        
         $state = $this->getRequest()->getParam('state');
 
         if ($state != $session->getState()) {
-        	return $this->_redirect('*/*', array('response' => 'invalid-state'));
+            return $this->_redirect('*/*', array('response' => 'invalid-state'));
         }
 
         $code = $this->getRequest()->getParam('code');
@@ -90,7 +90,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
             Mage::helper('marketingsoftware/config')->getClientKey(),
             Mage::helper('marketingsoftware/config')->getClientSecret(),            
             Mage::helper('adminhtml')->getUrl('*/*/state'),
-        	$code
+            $code
         );
 
         if ($accessToken === false) {
@@ -141,21 +141,21 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
 
         if (isset($post['chk-store-disable'])) {
             $config->setEnabledStores(null);
-	        	        
+                        
             Mage::getSingleton('core/session')->addSuccess('Stores settings have been saved');
-	        session_write_close(); // To make sure the success message is passed
-	        
+            session_write_close(); // To make sure the success message is passed
+            
             return $this->_redirect('*/*');
         }
-	        
-		$enabledStores = array();
-	
-		if(isset($post['store'])) {
-	        foreach($post['store'] as $store) {
-	            $enabledStores[] = $store;
-	        }
-		}
-		
+            
+        $enabledStores = array();
+    
+        if (isset($post['store'])) {
+            foreach ($post['store'] as $store) {
+                $enabledStores[] = $store;
+            }
+        }
+        
         $config->setEnabledStores($enabledStores);        
         
         Mage::getSingleton('core/session')->addSuccess('Stores settings have been saved');
@@ -194,11 +194,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
         $clientSecret = $config->getClientSecret();
 
         if ($clientKey == $post['cp_client_key'] && $clientSecret == $post['cp_client_secret']) {
-        	return $this->_redirect('*/*');
+            return $this->_redirect('*/*');
         }
 
         if (!isset($post['cp_client_key'])) {
-        	return $this->_redirect('*/*');
+            return $this->_redirect('*/*');
         }
 
         $config->setClientKey($post['cp_client_key']);

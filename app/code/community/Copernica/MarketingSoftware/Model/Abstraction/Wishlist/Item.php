@@ -44,8 +44,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Wishlist_Model_Item	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
+     *  @param    Mage_Wishlist_Model_Item    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
      */
     public function setOriginal(Mage_Wishlist_Model_Item $original)
     {
@@ -69,7 +69,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  The id of this wishlist item object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -79,7 +79,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  Get the wishlist to which this item belongs
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist
      */
     public function wishlist()
     {
@@ -89,7 +89,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  The amount of this wishlist item
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -100,7 +100,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -110,7 +110,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -120,7 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  The timestamp at which this wishlist item was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -130,7 +130,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  Get the options of this wishlist item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item_Options
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item_Options
      */
     public function options()
     {
@@ -140,7 +140,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  Get the product which belongs to this item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function product()
     {
@@ -150,30 +150,31 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
     /**
      *  Loads a wishlist model
      *
-     *  @param	integer	$wishlistId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
+     *  @param    integer    $wishlistId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
      */
     public function loadWishlistItem($wishlistItemId)
     {
-    	$wishlistItem = Mage::getModel('wishlist/item')->load($wishlistItemId);
-    	
-    	if ($wishlistItem->getId()) {
-    		$this->setOriginal($wishlistItem);
-    	} else {
-    		$this->id = $wishlistItemId;
-    	}
-    	
-    	return $this;
+        $wishlistItem = Mage::getModel('wishlist/item')->load($wishlistItemId);
+        
+        if ($wishlistItem->getId()) {
+            $this->setOriginal($wishlistItem);
+        } else {
+            $this->id = $wishlistItemId;
+        }
+        
+        return $this;
     }
     
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             is_object($wishlist = $this->wishlist()) ? $wishlist->id() : null,
             $this->quantity(),
@@ -182,14 +183,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item implements Ser
             $this->timestamp(),
             $this->options(),
             $this->product(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist_Item
      */
     public function unserialize($string)
     {

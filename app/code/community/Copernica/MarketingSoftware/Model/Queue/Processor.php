@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  Number of processed tasks by this processor
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_processedTasks = 0;
 
@@ -44,21 +44,21 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  How many items we want to process in one run?
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_itemsLimit = 10000000;
 
     /**
      *  For what is our timelimit for queue processing? in seconds.
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_timeLimit = 3075840000;
 
     /**
      *  Currently locked customer
      *  
-     *  @var	int
+     *  @var    int
      */
     protected $_currentCustomer = null;
 
@@ -72,11 +72,11 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
         $config = Mage::helper('marketingsoftware/config');
 
         if ($itemsLimit = $config->getItemsPerRun()) {
-        	$this->_itemsLimit = $itemsLimit;
+            $this->_itemsLimit = $itemsLimit;
         }
 
         if ($timeLimit = $config->getTimePerRun()) {
-        	$this->_timeLimit = $timeLimit;
+            $this->_timeLimit = $timeLimit;
         }
         
         $config = Mage::helper('marketingsoftware/config');
@@ -108,21 +108,21 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  Process queue with lock
      *  
-     *  @param	string	$lock
+     *  @param    string    $lock
      */
     public function processWithLocking($lock)
     {
         if (is_numeric($lock)) {
-        	$this->processQueue($this->_currentCustomer);
+            $this->processQueue($this->_currentCustomer);
         } elseif (is_null($lock)) {
-        	$this->processQueue(null);
+            $this->processQueue(null);
         }
     }
 
     /**
      *  Process queue
      *  
-     *  @param	string	$customerId
+     *  @param    string    $customerId
      */
     public function processQueue($customerId = -1) 
     {   
@@ -134,16 +134,16 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
             ->addDefaultOrder()->setPageSize($this->_itemsLimit < 150 ? 150 : $this->_itemsLimit);
 
         if (is_null($customerId)) {
-        	$queue->addFieldToFilter('customer', array('null' => true));
+            $queue->addFieldToFilter('customer', array('null' => true));
         } elseif ($customerId > -1) {  
-        	$queue->addFilter('customer', $customerId);
+            $queue->addFilter('customer', $customerId);
         }
 
         $this->_prepareProcessor();
 
         foreach ($queue as $item) {   
             if ($this->_isLimitsReached()) {
-            	break;
+                break;
             }
 
             $this->_processItem($item);
@@ -173,15 +173,15 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  Process queue item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Queue_Item	$item
+     *  @param    Copernica_MarketingSoftware_Model_Queue_Item    $item
      */
     protected function _processItem(Copernica_MarketingSoftware_Model_Queue_Item $item)
     {
         try {
             if ($item->process()) {
-            	$item->delete();
+                $item->delete();
             } else { 
-            	$this->_transferItemToErrorQueue($item);
+                $this->_transferItemToErrorQueue($item);
             }
 
             $this->_processedTasks++;
@@ -199,7 +199,7 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  Transfer queue item to error queue.
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Queue_Item	$item
+     *  @param    Copernica_MarketingSoftware_Model_Queue_Item    $item
      */
     protected function _transferItemToErrorQueue(Copernica_MarketingSoftware_Model_Queue_Item $item)
     {
@@ -212,7 +212,7 @@ class Copernica_MarketingSoftware_Model_Queue_Processor
     /**
      *  Fetch data about current run.
      *  
-     *  @param	string	$type
+     *  @param    string    $type
      */
     public function fetchReport($type)
     {

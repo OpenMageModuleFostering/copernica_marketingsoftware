@@ -30,7 +30,8 @@ $installer->startSetup();
 
 try {
     // create profile cache table
-    $installer->run("
+    $installer->run(
+        "
         DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/profile_cache')}`;
         CREATE TABLE `{$installer->getTable('marketingsoftware/profile_cache')}` (
             `id` int(10) unsigned auto_increment,
@@ -38,7 +39,8 @@ try {
             `profile_id` int(10) unsigned NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB default CHARSET=utf8;
-    ");
+    "
+    );
 
     // finalize setup
     $installer->endSetup();

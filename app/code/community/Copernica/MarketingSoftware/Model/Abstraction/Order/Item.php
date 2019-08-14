@@ -44,8 +44,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Order_Item	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  @param    Mage_Sales_Model_Order_Item    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
@@ -69,7 +69,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  The id of this order item object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -79,7 +79,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  Get the order to which this item belongs
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function order()
     {
@@ -89,7 +89,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  The amount of this order item
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -100,7 +100,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -110,7 +110,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -120,7 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  The timestamp at which this order was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -130,7 +130,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  Get the options of this order item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
      */
     public function options()
     {
@@ -140,7 +140,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  Get the product which belongs to this item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function product()
     {
@@ -150,11 +150,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->_id(),
             is_object($order = $this->order()) ? $order->id() : null,
             $this->_quantity(),
@@ -163,14 +164,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
             $this->_timestamp(),
             $this->_options(),
             $this->_product(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
     public function unserialize($string)
     {

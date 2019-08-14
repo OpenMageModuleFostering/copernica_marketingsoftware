@@ -30,14 +30,14 @@
 class Copernica_MarketingSoftware_Model_Copernica_Profile_Order extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     protected $_order = false;
 
     /**
      *  Set the order object to this object  
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Order	$order
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Order    $order
      *  @return Copernica_MarketingSoftware_Model_Copernica_Profile_Order
      */
     public function setOrder(Copernica_MarketingSoftware_Model_Abstraction_Order $order)
@@ -57,7 +57,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Order extends Copernic
     
         foreach ($addresses as $address) {
             if (in_array('billing', $addr->type())) {
-            	return $address->email();  
+                return $address->email();  
             }
         } 
 
@@ -84,20 +84,20 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Order extends Copernic
         $addresses = $this->_order->addresses();
         
         if (count($addresses) == 1) {
-        	$address = $addresses[0];
+            $address = $addresses[0];
         } else {
-        	foreach ($addresses as $addr) {
-        		if (in_array('billing', $addr->type())) {
-        			$address = $addr;
-        		}
-        	}
+            foreach ($addresses as $addr) {
+                if (in_array('billing', $addr->type())) {
+                    $address = $addr;
+                }
+            }
         }
 
         if (Mage::getModel('newsletter/subscriber')->loadByEmail($address->email())->getId()) {
             $subscription = Mage::getModel('marketingsoftware/abstraction_subscription')
                 ->setOriginal(Mage::getModel('newsletter/subscriber')->loadByEmail($address->email()));
         } else {
-        	$subscription = false;
+            $subscription = false;
         }
 
         $name = $address->name();
@@ -105,9 +105,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Order extends Copernic
         $customerId = null;
 
         if ($customer = $this->_order->customer()) {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_order->storeview());
+            $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_order->storeview());
         } else {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), (string)$this->_order->storeview());
+            $customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), (string)$this->_order->storeview());
         }
 
         return array(

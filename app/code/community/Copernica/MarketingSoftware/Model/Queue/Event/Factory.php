@@ -76,7 +76,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Factory
                 $classname = "marketingsoftware/queue_event_product_viewed".$action;
                 break;
                 
-			case "Copernica_MarketingSoftware_Model_Abstraction_Wishlist":
+            case "Copernica_MarketingSoftware_Model_Abstraction_Wishlist":
                 $classname = "marketingsoftware/queue_event_wishlist".$action;
                 break;                
         }

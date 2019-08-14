@@ -32,13 +32,13 @@
  *  than one profile for one customer. It's cause one customer can be in more 
  *  than one store view. Same applies to email addresses cause of same reasons.
  */
-class Copernica_MarketingSoftware_Helper_Profile 
+class Copernica_MarketingSoftware_Helper_Profile
 {
     /**
      *  Get copernica Id based on something and store view.
      *  
-     *  @param	mixed	$something
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @param    mixed    $something
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
      */
     public function getCopernicaId($something, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)
     {
@@ -56,8 +56,8 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Get copernica Id by customer instance
      *  
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer	$customer
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer    $customer
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
      *  @return string
      */
     public function getCustomerCopernicaId(Copernica_MarketingSoftware_Model_Abstraction_Customer $customer, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
@@ -71,7 +71,7 @@ class Copernica_MarketingSoftware_Helper_Profile
             ->setPageSize(1);
 
         if ($profileCache->count()) {
-        	return $profileCache->getFirstItem()->getCopernicaId();
+            return $profileCache->getFirstItem()->getCopernicaId();
         }
 
         $profileCache = Mage::getModel('marketingsoftware/profile_cache')
@@ -112,7 +112,7 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  This method will upgrade profile cache data.
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Profile_Cache	$profileCache
+     *  @param    Copernica_MarketingSoftware_Model_Profile_Cache    $profileCache
      */
     protected function _upgradeSubscriberCopernicaId(Copernica_MarketingSoftware_Model_Profile_Cache $profileCache) 
     {
@@ -127,8 +127,8 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Generate Copernica Id from our customer instance and store view
      *  
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer	$customer
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer    $customer
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
      *  @return string
      */
     public function generateCustomerCopernicaId(Copernica_MarketingSoftware_Model_Abstraction_Customer $customer, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
@@ -139,8 +139,8 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Generate copernica Id from an email address and store View.
      *  
-     *  @param  string	$email
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @param  string    $email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
      *  @return string
      */
     public function getEmailCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
@@ -152,7 +152,7 @@ class Copernica_MarketingSoftware_Helper_Profile
             ->setPageSize(1);
 
         if ($profileCache->count()) {
-        	return $profileCache->getFirstItem()->getCopernicaId();
+            return $profileCache->getFirstItem()->getCopernicaId();
         }
 
         $profileCache = $profileCache->getFirstItem();
@@ -175,9 +175,9 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Generate Copernica Id from our email and store view
      *  
-     *  @param  string	$email
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
-     *  @return	string
+     *  @param  string    $email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
+     *  @return    string
      */
     public function generateEmailCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)
     {
@@ -188,8 +188,8 @@ class Copernica_MarketingSoftware_Helper_Profile
      *  Basically it's a helper method that will convert old customer Id in 
      *  Copernica platform into normal Magento customer Id.
      *  
-     *  @param	string	$oldCopernicaId
-     *  @param	string	$newCustomerId
+     *  @param    string    $oldCopernicaId
+     *  @param    string    $newCustomerId
      */
     protected function _convertCustomerId($oldCopernicaId, $newCustomerId)
     {
@@ -197,7 +197,8 @@ class Copernica_MarketingSoftware_Helper_Profile
 
         $databaseId = Mage::helper('marketingsoftware/api')->getDatabaseId();
 
-        $request->put('database/'.$databaseId.'/profiles',
+        $request->put(
+            'database/'.$databaseId.'/profiles',
             array( 'customer_id' => $newCustomerId),
             array( 'fields[]' => 'customer_id=='.$oldCopernicaId )
         );
@@ -206,8 +207,8 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Generates a unique customer ID based on the e-mail address and the storeview.
      *
-     *  @param  string	$email
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @param  string    $email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview    $storeview
      *  @return string
      */
     protected function _generateOldCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)

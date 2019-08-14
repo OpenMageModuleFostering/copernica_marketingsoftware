@@ -75,7 +75,7 @@ try {
         $customerId = array_key_exists('c', $cliOptions) ? $cliOptions['c'] : 0;
         
         if (array_key_exists('customer', $cliOptions)) {
-        	$customerId = $cliOptions['customer'];
+            $customerId = $cliOptions['customer'];
         }
     }
 
@@ -91,7 +91,7 @@ try {
         $verbose = array_key_exists('v', $cliOptions) ? $cliOptions['v'] : 'TEXT';
         
         if (array_key_exists('verbose', $cliOptions)) {
-        	$verbose = $cliOptions['verbose'] ? $cliOptions['verbose'] : 'TEXT';
+            $verbose = $cliOptions['verbose'] ? $cliOptions['verbose'] : 'TEXT';
         }
     }
 
@@ -101,7 +101,7 @@ try {
         $runtime = array_key_exists('r', $cliOptions) ? $cliOptions['r'] : 45;
         
         if (array_key_exists('runtime', $cliOptions)) {
-        	$runtime = $cliOptions['runtime'];
+            $runtime = $cliOptions['runtime'];
         }
     }
 
@@ -110,7 +110,7 @@ try {
     umask(0);
 
     if (!Mage::isInstalled()) {
-    	exit;
+        exit;
     }
 
     Mage::app('admin')->setUseSessionInUrl(false);
@@ -120,13 +120,13 @@ try {
     $processor = Mage::getModel('marketingsoftware/queue_processor');
 
     if ($lock === false) {
-    	$processor->processQueue($customerId);
+        $processor->processQueue($customerId);
     } else {
         $lock = $processor->aqcuireLock();
 
         if ($lock === false) {
             if ($runtime > 0 ) {
-            	sleep($runtime);
+                sleep($runtime);
             }
             return;
         }
@@ -135,7 +135,7 @@ try {
     }
 
     if ($verbose !== false) {
-    	echo $processor->fetchReport($verbose);
+        echo $processor->fetchReport($verbose);
     }
 } catch (Exception $e) {
     print_r($e);

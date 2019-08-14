@@ -42,15 +42,17 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
      */
     public function upgradeRequest($clientId, $clientSecret, $redirectUri, $code)
     {
-        $output = $this->_restRequest()->get('token', array(
+        $output = $this->_restRequest()->get(
+            'token', array(
             'client_id'     =>  $clientId,
             'client_secret' =>  $clientSecret,            
             'redirect_uri'  =>  $redirectUri,
-        	'code'          =>  $code
-        ));
+            'code'          =>  $code
+            )
+        );
 
         if (isset($output['access_token'])) {
-        	return $output['access_token'];
+            return $output['access_token'];
         }
 
         return false;
@@ -59,7 +61,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Search for profiles that match certain identifier
      *  
-     *  @param  string	$identifier
+     *  @param  string    $identifier
      *  @return array
      */
     public function searchProfiles($identifier)
@@ -77,7 +79,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Update the profiles given a customer.
      *  
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Profile_Customer	$customer
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Profile_Customer    $customer
      */
     public function updateProfiles(Copernica_MarketingSoftware_Model_Copernica_Profile_Customer $customer)
     {
@@ -87,7 +89,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
             Mage::log('Data: '.print_r($data->toArray(), true));
             
             foreach (debug_backtrace() as $tr) {
-            	Mage::log(' '.$tr['file'].''.$tr['line']);
+                Mage::log(' '.$tr['file'].''.$tr['line']);
             }
 
             return;
@@ -115,12 +117,12 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Remove the profile by customer instance
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Profile_Customer	$customer
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Profile_Customer    $customer
      */
     public function removeProfiles(Copernica_MarketingSoftware_Model_Copernica_Profile_Customer $customer)
     {
         if ($customer->getId() === false) {
-        	return false;
+            return false;
         }
 
         $output = $this->_restRequest()->get(
@@ -131,11 +133,11 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
         );
 
         if (!isset($output['data'])) {
-        	return;
+            return;
         }
 
         foreach ($output['data'] as $profile) {
-        	$this->_restRequest()->delete('profile/'.$profile['ID']);
+            $this->_restRequest()->delete('profile/'.$profile['ID']);
         }
     }
 
@@ -143,14 +145,14 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
      *  Update or create quote item sub profile.
      *  
      *  @param  string  $profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile	$data
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile    $data
      */
     public function updateQuoteItemSubProfiles($profileID, Copernica_MarketingSoftware_Model_Copernica_Subprofile $data)
     {
         $collectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $this->_restRequest()->put(
@@ -171,25 +173,25 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
         $collectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $output = $this->_restRequest()->get(
             'profile/'.$profileID.'/subprofiles/'.$collectionId,
             array (
-                'fields[]' => 'quote_id=='.$quote_id
+                'fields[]' => 'quote_id=='.$quoteID
             )
         );
 
         if (!isset($output['total'])) {
-        	return false;
+            return false;
         }
 
         if ($output['total'] == 0) {
-        	return true;
+            return true;
         }
 
-        foreach($output['data'] as $subprofile) {
+        foreach ($output['data'] as $subprofile) {
             $this->_restRequest()->delete('subprofile/'.$subprofile['ID']);
         }
     }
@@ -198,14 +200,14 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
      *  Update order subprofile
      *  
      *  @param  string  $profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile	$data
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile    $data
      */
     public function updateOrderSubProfile($profileID, Copernica_MarketingSoftware_Model_Copernica_Subprofile $data)
     {
         $collectionId = Mage::helper('marketingsoftware/config')->getOrdersCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $this->_restRequest()->put(
@@ -218,15 +220,15 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Update the order item subprofiles in a profile.
      *  
-     *  @param  string  customer identifier	$profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile	$data
+     *  @param  string  customer identifier    $profileID
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile    $data
      */
     public function updateOrderItemSubProfiles($profileID, Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile $data)
     {
         $collectionId = Mage::helper('marketingsoftware/config')->getOrderItemCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $this->_restRequest()->put(
@@ -239,36 +241,36 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Update the wishlist item subprofiles in a profile.
      *
-     *  @param  string  customer identifier	$profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile	$data
+     *  @param  string  customer identifier    $profileID
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile    $data
      */
     public function updateWishlistItemSubProfiles($profileID, Copernica_MarketingSoftware_Model_Copernica_Wishlist_Item_Subprofile $data)
     {
-    	$collectionId = Mage::helper('marketingsoftware/config')->getWishlistItemCollectionId();
+        $collectionId = Mage::helper('marketingsoftware/config')->getWishlistItemCollectionId();
     
-    	if (empty($collectionId)) {
-    		return false;
-    	}
+        if (empty($collectionId)) {
+            return false;
+        }
     
-    	$this->_restRequest()->put(
-    			'profile/'.$profileID.'/subprofiles/'.$collectionId,
-    			$data->toArray(),
-    			array('fields[]' => 'item_id=='.$data->id(), 'create' => 'true')
-    	);
+        $this->_restRequest()->put(
+            'profile/'.$profileID.'/subprofiles/'.$collectionId,
+            $data->toArray(),
+            array('fields[]' => 'item_id=='.$data->id(), 'create' => 'true')
+        );
     }    
 
     /**
      *  Update address subprofile in a profile
      *  
      *  @param  string  $profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile	$data
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile    $data
      */
     public function updateAddressSubProfiles($profileID, Copernica_MarketingSoftware_Model_Copernica_Subprofile $data)
     {
         $collectionId = Mage::helper('marketingsoftware/config')->getAddressesCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $this->_restRequest()->put(
@@ -282,20 +284,20 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
      *  Update product views subprofile in a certain profile.
      *  
      *  @param  string  $profileID
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile	$data
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile    $data
      */
     public function updateViewedProductSubProfiles($profileID, Copernica_MarketingSoftware_Model_Copernica_Product_Viewed_Subprofile $data)
     {
         $collectionId = Mage::helper('marketingsoftware/config')->getViewedProductCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         $this->_restRequest()->put(
             'profile/'.$profileID.'/subprofiles/'.$collectionId, $data->toArray(), array(
-            	'fields[]' => 'id=='.$data->id(), 
-            	'create' => 'true'            		
+                'fields[]' => 'id=='.$data->id(), 
+                'create' => 'true'                    
             )
         );
     }
@@ -312,7 +314,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
         $collectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         if (empty($collectionId)) {
-        	return false;
+            return false;
         }
 
         // Get all subprofiles that we want to remove as old quote items
@@ -327,7 +329,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
         );
 
         if (isset($output['error'])) {
-        	return false;
+            return false;
         }
 
         $request = $this->_restRequest();
@@ -347,7 +349,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Copernica_MarketingSoftware
     /**
      *  Check if database exists
      *  
-     *  @param  string	$databaseName
+     *  @param  string    $databaseName
      *  @return boolean
      */
     public function databaseExists($databaseName)

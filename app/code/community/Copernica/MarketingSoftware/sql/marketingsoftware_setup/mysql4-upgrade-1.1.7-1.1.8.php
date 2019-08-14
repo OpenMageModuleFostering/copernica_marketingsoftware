@@ -33,7 +33,8 @@
 $installer = $this;
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
     ALTER TABLE {$installer->getTable('copernica_marketingsoftware')} 
     ADD login_valid ENUM('yes', 'no') NOT NULL default 'yes',
     ADD linked_fields_valid ENUM('yes', 'no') NOT NULL default 'no',
@@ -44,6 +45,7 @@ $installer->run("
     
     UPDATE {$installer->getTable('copernica_marketingsoftware')} 
     SET progressstatus = 'none', addresscollectionname = '';
-");
+"
+);
 
 $installer->endSetup();

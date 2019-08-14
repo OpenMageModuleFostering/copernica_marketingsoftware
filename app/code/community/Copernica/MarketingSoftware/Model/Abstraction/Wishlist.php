@@ -57,8 +57,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Wishlist_Model_Wishlist	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist
+     *  @param    Mage_Wishlist_Model_Wishlist    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist
      */
     public function setOriginal(Mage_Wishlist_Model_Wishlist $original)
     {
@@ -70,8 +70,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Loads a wishlist model
      *  
-     *  @param	integer	$wishlistId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist
+     *  @param    integer    $wishlistId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist
      */
     public function loadWishlist($wishlistId)
     {
@@ -80,14 +80,14 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
         if (!is_callable($wishlist, 'loadByIdWithoutStore')) {
             $storeIDs = array();
             
-            foreach (Mage::app()->getStores() as $id => $store)  {
-            	$storeIDs[] = $id;
+            foreach (Mage::app()->getStores() as $id => $store) {
+                $storeIDs[] = $id;
             }
         
             $wishlist->setSharedStoreIds($storeIDs);
             $wishlist->load($wishlistId);
         } else {
-        	$wishlist->loadByIdWithoutStore($wishlistId);
+            $wishlist->loadByIdWithoutStore($wishlistId);
         }
         
         if ($wishlist->getId()) {
@@ -102,8 +102,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Import this abstract from a real magento one
      *  
-     *  @param	Mage_Wishlist_Model_Wishlist	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist
+     *  @param    Mage_Wishlist_Model_Wishlist    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist
      */
     protected function _importFromObject(Mage_Wishlist_Model_Wishlist $original)
     {
@@ -151,14 +151,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
         if ($payment = $original->getPayment()) {
             try {
                 $this->_paymentDescription = $payment->getMethodInstance()->getTitle();
-            } catch (Mage_Core_Exception $exception) { }
+            } catch (Mage_Core_Exception $exception) {
+                Mage::logException($exception);
+            }
         } 
     }
 
     /**
      *  The wishlist id of this wishlist object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -168,7 +170,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Is this wishlist still active
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function active()
     {
@@ -178,7 +180,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The number of items present in this wishlist
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -188,7 +190,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The payment currency of this wishlist
      *  
-     *  @return	string
+     *  @return    string
      */
     public function currency()
     {
@@ -199,7 +201,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -209,7 +211,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -219,7 +221,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  To what storeview does this wishlist belong
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
@@ -229,7 +231,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Get the items from the wishlist
      *  
-     *  @return	array
+     *  @return    array
      */
     public function items()
     {
@@ -239,7 +241,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The timestamp at which this wishlist was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -249,7 +251,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The customer may return null
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
@@ -263,7 +265,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The addresses of this wishlist
      *  
-     *  @return	array
+     *  @return    array
      */
     public function addresses()
     {
@@ -273,7 +275,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The IP from which this wishlist was constructed
      *  
-     *  @return	string
+     *  @return    string
      */
     public function customerIP()
     {
@@ -283,7 +285,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The shipping method of this wishlist
      *  
-     *  @return	string
+     *  @return    string
      */
     public function shippingDescription()
     {
@@ -293,7 +295,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  The payment method of this wishlist
      *  
-     *  @return	string
+     *  @return    string
      */
     public function paymentDescription()
     {
@@ -303,16 +305,19 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
     /**
      *  Serialize the object
      *  
-     *  @todo	Two returns??
-     *  @return	string
+     *  @todo    Two returns??
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id()
-        ));
+            )
+        );
 
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             $this->quantity(),
             $this->currency(),
@@ -327,15 +332,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Wishlist implements Serializ
             $this->active(),
             $this->shippingDescription(),
             $this->paymentDescription()
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @todo	Two returns??
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Wishlist
+     *  @todo    Two returns??
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Wishlist
      */
     public function unserialize($string)
     {

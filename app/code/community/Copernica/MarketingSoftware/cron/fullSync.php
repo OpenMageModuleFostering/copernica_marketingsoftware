@@ -38,7 +38,7 @@ require_once 'app/Mage.php';
 umask(0);
 
 if (!Mage::isInstalled()) {
-	exit;
+    exit;
 }
 
 Mage::app('admin')->setUseSessionInUrl(false);
@@ -52,7 +52,7 @@ $config->setOrderProgressStatus('1945-08-06 08:15:00');
 $syncStatus = Mage::getModel('marketingsoftware/sync_status');
 
 if ($enabledStores = $config->getEnabledStores()) {
-	$syncStatus->setStoresFilter($enabledStores);
+    $syncStatus->setStoresFilter($enabledStores);
 }
 
 $queue = Mage::getModel('marketingsoftware/queue_item')

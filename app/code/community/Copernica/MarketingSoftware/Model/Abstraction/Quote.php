@@ -57,8 +57,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Quote	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @param    Mage_Sales_Model_Quote    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function setOriginal(Mage_Sales_Model_Quote $original)
     {
@@ -70,8 +70,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Loads a quote model
      *  
-     *  @param	integer	$quoteId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @param    integer    $quoteId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function loadQuote($quoteId)
     {
@@ -80,14 +80,14 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
         if (!is_callable($quote, 'loadByIdWithoutStore')) {
             $storeIDs = array();
             
-            foreach (Mage::app()->getStores() as $id => $store)  {
-            	$storeIDs[] = $id;
+            foreach (Mage::app()->getStores() as $id => $store) {
+                $storeIDs[] = $id;
             }
         
             $quote->setSharedStoreIds($storeIDs);
             $quote->load($quoteId);
         } else {
-        	$quote->loadByIdWithoutStore($quoteId);
+            $quote->loadByIdWithoutStore($quoteId);
         }
         
         if ($quote->getId()) {
@@ -102,8 +102,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Import this abstract from a real magento one
      *  
-     *  @param	Mage_Sales_Model_Quote	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @param    Mage_Sales_Model_Quote    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     protected function _importFromObject(Mage_Sales_Model_Quote $original)
     {
@@ -151,14 +151,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
         if ($payment = $original->getPayment()) {
             try {
                 $this->_paymentDescription = $payment->getMethodInstance()->getTitle();
-            } catch (Mage_Core_Exception $exception) { }
+            } catch (Mage_Core_Exception $exception) {
+                Mage::logException($exception);
+            }
         } 
     }
 
     /**
      *  The quote id of this quote object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -168,7 +170,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Is this quote still active
      *  
-     *  @return	boolean
+     *  @return    boolean
      */
     public function active()
     {
@@ -178,7 +180,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The number of items present in this quote
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -188,7 +190,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The payment currency of this quote
      *  
-     *  @return	string
+     *  @return    string
      */
     public function currency()
     {
@@ -199,7 +201,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -209,7 +211,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -219,7 +221,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  To what storeview does this quote belong
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
@@ -229,7 +231,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Get the items from the quote
      *  
-     *  @return	array
+     *  @return    array
      */
     public function items()
     {
@@ -239,7 +241,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The timestamp at which this quote was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -249,7 +251,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The customer may return null
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
@@ -263,7 +265,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The addresses of this quote
      *  
-     *  @return	array
+     *  @return    array
      */
     public function addresses()
     {
@@ -273,7 +275,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The IP from which this quote was constructed
      *  
-     *  @return	string
+     *  @return    string
      */
     public function customerIP()
     {
@@ -283,7 +285,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The shipping method of this quote
      *  
-     *  @return	string
+     *  @return    string
      */
     public function shippingDescription()
     {
@@ -293,7 +295,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  The payment method of this quote
      *  
-     *  @return	string
+     *  @return    string
      */
     public function paymentDescription()
     {
@@ -303,22 +305,24 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      *  Serialize the object
      *  
-     *  @todo	Two returns??
-     *  @return	string
+     *  @todo    Two returns??
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id()
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @todo	Two returns??
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @todo    Two returns??
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function unserialize($string)
     {

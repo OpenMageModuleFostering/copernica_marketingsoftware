@@ -32,21 +32,21 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     /**
      *  Magento customer
      *  
-     *  @var	Mage_Customer_Model_Customer
+     *  @var    Mage_Customer_Model_Customer
      */
     protected $_customer = null;
 
     /**
      *  Array of customer addresses
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_addresses = null;
 
     /**
      *  Array of customer orders
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_orders = null;
     
@@ -54,14 +54,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     /**
      * Array of customer wishlist items
      * 
-     * @var		array
+     * @var        array
      */
     protected $_wishlistItems = null;
 
     /**
      *  Cache profile Id
      *  
-     *  @var	string
+     *  @var    string
      */
     protected $_profileId = null;
     
@@ -78,12 +78,12 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
      *  @return Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function fetchStoreView()
-    {    	
-    	if ($this->_store) { 
-    		return $this->_store;
-    	} else {
-        	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->_customer->getStore());
-    	}
+    {        
+        if ($this->_store) { 
+            return $this->_store;
+        } else {
+            return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->_customer->getStore());
+        }
     }
 
     /**
@@ -176,7 +176,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
         $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($this->_customer);
 
         if (!$subscriber->getId()) {
-        	return 'unknown';
+            return 'unknown';
         }
 
         switch($subscriber->getStatus()) {
@@ -210,7 +210,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
 
         foreach ($options as $option) {
             if ($option['value'] == $customerGenderIdx) {
-            	return $option['label'];
+                return $option['label'];
             }
         }
 
@@ -235,15 +235,15 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     public function getAddresses()
     {
         if (!is_null($this->_addresses)) {
-        	return $this->_addresses;
+            return $this->_addresses;
         }
 
         $addresses = array();
 
         foreach ($this->_customer->getAddresses() as $address) {
-        	$addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
-        	$addressEntity->setAddress($address);
-        	
+            $addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
+            $addressEntity->setAddress($address);
+            
             $addresses[] = $addressEntity;
         }
 
@@ -258,7 +258,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     public function getOrders()
     {
         if (!is_null($this->_orders)) { 
-        	return $this->_orders;
+            return $this->_orders;
         }
 
         $orders = array();
@@ -266,9 +266,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
         $ordersCollection = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('customer_id', $this->_customer->getId());
 
         foreach ($ordersCollection as $order) {
-        	$orderEntity = Mage::getModel('marketingsoftware/copernica_entity_order');
-        	$orderEntity->setOrder($order);
-        	
+            $orderEntity = Mage::getModel('marketingsoftware/copernica_entity_order');
+            $orderEntity->setOrder($order);
+            
             $orders[] = $orderEntity;
         }
 
@@ -282,24 +282,24 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
      */
     public function getWishlistItems()
     {
-    	if (!is_null($this->_wishlistItems)) {
-    		return $this->_wishlistItems;
-    	}
+        if (!is_null($this->_wishlistItems)) {
+            return $this->_wishlistItems;
+        }
     
-    	$wishlistItems = array();
+        $wishlistItems = array();
     
-    	$wishlist = Mage::getModel('wishlist/wishlist')->loadByCustomer($this->getId());
-    	
-    	$wishlistItemCollection = Mage::getModel('wishlist/item')->getCollection()->addFieldToFilter('wishlist_id', $wishlist->getId());
-    	
-    	foreach ($wishlistItemCollection as $wishlistItem) {
-    		$wishlistItemEntity = Mage::getModel('marketingsoftware/copernica_entity_wishlist_item');
-    		$wishlistItemEntity->setWishlistItem($wishlistItem);
-    		 
-    		$wishlistItems[] = $wishlistItemEntity;
-    	}
+        $wishlist = Mage::getModel('wishlist/wishlist')->loadByCustomer($this->getId());
+        
+        $wishlistItemCollection = Mage::getModel('wishlist/item')->getCollection()->addFieldToFilter('wishlist_id', $wishlist->getId());
+        
+        foreach ($wishlistItemCollection as $wishlistItem) {
+            $wishlistItemEntity = Mage::getModel('marketingsoftware/copernica_entity_wishlist_item');
+            $wishlistItemEntity->setWishlistItem($wishlistItem);
+             
+            $wishlistItems[] = $wishlistItemEntity;
+        }
     
-    	return $this->_wishlistItems = $wishlistItems;
+        return $this->_wishlistItems = $wishlistItems;
     }    
 
     /**
@@ -319,33 +319,35 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
      */
     public function getRestCustomer()
     {
-    	$restCustomer = Mage::getModel('marketingsoftware/rest_customer');
-    	$restCustomer->setCustomerEntity($this);
-    	
-    	return $restCustomer;
+        $restCustomer = Mage::getModel('marketingsoftware/rest_customer');
+        $restCustomer->setCustomerEntity($this);
+        
+        return $restCustomer;
     }
 
     /**
      *  Get profile Id
      *  
-     *  @param	string	$storeviewText
-     *  @param	int	$id
+     *  @param    string    $storeviewText
+     *  @param    int    $id
      *  @return string|false
      */
     public function getProfileId()
     {
         if (!is_null($this->_profileId)) { 
-        	return $this->_profileId;
+            return $this->_profileId;
         }
         
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $this->getCustomerId(),
             'email' => $this->getEmail(),
             'storeView' => strval($this->getStoreView()),
-        ));
+            )
+        );
         
         if ($profileId) { 
-        	return $this->_profileId = $profileId;
+            return $this->_profileId = $profileId;
         }
 
         return false;
@@ -354,31 +356,31 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     /**
      *  Set customer entity
      *
-     *  @param	int	$customerId
+     *  @param    int    $customerId
      */
     public function setCustomer($customerId) 
     {
-    	$customer = Mage::getModel('customer/customer')->load($customerId);
-    	
-    	if (!$customer->isObjectNew()) {
-    		$this->_customer = $customer;
-    	} else {
-    		throw Mage::exception('Copernica_MarketingSoftware', 'Customer does not exists', Copernica_MarketingSoftware_Exception::CUSTOMER_NOT_EXISTS);
-    	}
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+        
+        if (!$customer->isObjectNew()) {
+            $this->_customer = $customer;
+        } else {
+            throw Mage::exception('Copernica_MarketingSoftware', 'Customer does not exists', Copernica_MarketingSoftware_Exception::CUSTOMER_NOT_EXISTS);
+        }
     }
     
     /**
      * Set the storeView
      * 
-     * @param	Copernica_MarketingSoftware_Model_Abstraction_Storeview	$store
+     * @param    Copernica_MarketingSoftware_Model_Abstraction_Storeview    $store
      */
     public function setStore($store) 
     {
-    	if (!$this->_store || $this->_store->id() != $store->id()) {
-	    	unset($this->_data['storeView']);
-    		unset($this->_data['customerId']);
-    		$this->_profileId = null;
-    		$this->_store = $store;
-    	}
+        if (!$this->_store || $this->_store->id() != $store->id()) {
+            unset($this->_data['storeView']);
+            unset($this->_data['customerId']);
+            $this->_profileId = null;
+            $this->_store = $store;
+        }
     }
 }

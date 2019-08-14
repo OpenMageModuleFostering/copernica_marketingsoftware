@@ -30,15 +30,15 @@
 class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernica_MarketingSoftware_Model_Copernica_Profile
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     protected $_quote = false;
 
     /**
      *  Set the quote object to this object
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Quote	$quote
-     *  @return	Copernica_MarketingSoftware_Model_Copernica_Profile_Quote
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Quote    $quote
+     *  @return    Copernica_MarketingSoftware_Model_Copernica_Profile_Quote
      */
     public function setQuote(Copernica_MarketingSoftware_Model_Abstraction_Quote $quote)
     {
@@ -58,7 +58,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernic
     
         foreach ($addresses as $address) {
             if (in_array('billing', $addr->type())) {
-            	return $address->email();  
+                return $address->email();  
             }
         } 
 
@@ -68,7 +68,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernic
     /**
      *  Return store view associated with profile
      *  
-     *  @return	string
+     *  @return    string
      */
     public function storeView()
     {
@@ -88,13 +88,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernic
         
         if (is_array($addresses)) {
             if (count($addresses) == 1) {
-            	$address = $addresses[0];
+                $address = $addresses[0];
             } else {
-            	foreach ($addresses as $addr) {
-            		if (in_array('billing', $addr->type())) {
-            			$address = $addr;
-            		}
-            	}
+                foreach ($addresses as $addr) {
+                    if (in_array('billing', $addr->type())) {
+                        $address = $addr;
+                    }
+                }
             }
         }
         
@@ -102,7 +102,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernic
             $subscription = Mage::getModel('marketingsoftware/abstraction_subscription')
                 ->setOriginal(Mage::getModel('newsletter/subscriber')->loadByEmail($address->email()));
         } else {
-        	$subscription = false;
+            $subscription = false;
         }
 
         $name = is_object($address) ? $address->name() : null;
@@ -110,9 +110,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Profile_Quote extends Copernic
         $customerId = null;
 
         if ($customer = $this->_quote->customer()) {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_quote->storeview());
+            $customerId = Mage::helper('marketingsoftware/profile')->getCustomerCopernicaId($customer, $this->_quote->storeview());
         } else {
-        	$customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), $this->_quote->storeview());
+            $customerId = Mage::helper('marketingsoftware/profile')->getEmailCopernicaId($address->email(), $this->_quote->storeview());
         }
 
         return array(

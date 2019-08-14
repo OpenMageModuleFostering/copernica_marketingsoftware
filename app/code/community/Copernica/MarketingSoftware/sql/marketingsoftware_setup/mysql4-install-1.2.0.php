@@ -28,7 +28,8 @@ $installer = $this;
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/queue_item')}`;
 CREATE TABLE `{$installer->getTable('marketingsoftware/queue_item')}` (
     `id` int(10) unsigned NOT NULL auto_increment,
@@ -39,6 +40,7 @@ CREATE TABLE `{$installer->getTable('marketingsoftware/queue_item')}` (
     `result_time` timestamp NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB default CHARSET=utf8;
-");
+"
+);
 
 $installer->endSetup();

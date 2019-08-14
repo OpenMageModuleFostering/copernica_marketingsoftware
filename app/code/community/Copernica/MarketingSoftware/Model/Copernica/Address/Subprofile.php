@@ -42,7 +42,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
     /**
      *  Try to store a quote item
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Address	$address
+     *  @param    Copernica_MarketingSoftware_Model_Abstraction_Address    $address
      */
     public function setAddress($address)
     {

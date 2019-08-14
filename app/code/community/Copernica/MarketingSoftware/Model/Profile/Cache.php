@@ -58,7 +58,7 @@ class Copernica_MarketingSoftware_Model_Profile_Cache extends Mage_Core_Model_Ab
     /**
      *  Set profile Id
      *  
-     *  @param	int	$profileId
+     *  @param    int    $profileId
      *  @return Copernica_MarketingSoftware_Model_Profile_Cache
      */
     public function setProfileId($profileId)
@@ -71,7 +71,7 @@ class Copernica_MarketingSoftware_Model_Profile_Cache extends Mage_Core_Model_Ab
     /**
      *  Set customer Id
      *  
-     *  @param	string	$customerId
+     *  @param    string    $customerId
      *  @return Copernica_MarketingSoftware_Model_Profile_Cache
      */
     public function setCustomerId($customerId)

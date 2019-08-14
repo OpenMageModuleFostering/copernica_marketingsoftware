@@ -34,25 +34,25 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
      *  Validate database. When something is wrong this method will throw 
      *  custom exception to report that.
      *  
-     *  @param  string	$databaseName
+     *  @param  string    $databaseName
      *  @throws Copernica_MarketingSoftware_Exception
      */
     public function validateDatabase($databaseName)
     {
-        $output = $this->_restRequest()->get( 'database/'.urlencode($databaseName) );
+        $output = $this->_restRequest()->get('database/'.urlencode($databaseName));
 
         if (isset($output['error']) || !isset($output['name'])) {
             if (strpos($output['error']['message'], 'No database') !== false) {
                 throw Mage::exception('Copernica_MarketingSoftware', 'Database does not exists', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
             } else { 
-				throw Mage::exception('Copernica_MarketingSoftware', 'Database could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+                throw Mage::exception('Copernica_MarketingSoftware', 'Database could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
             }
         }
  
         foreach ($output['fields']['data'] as $field) {
-        	if ($field['name'] == 'customer_id') {
-        		return;
-        	}        	
+            if ($field['name'] == 'customer_id') {
+                return;
+            }            
         }
 
         throw Mage::exception('Copernica_MarketingSoftware', 'Database does not have required customer_id field', Copernica_MarketingSoftware_Exception::DATABASE_STRUCT_INVALID);
@@ -61,15 +61,15 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Validate database field.
      *  
-     *  @param  string	$databaseName
-     *  @param  string	$fieldName
-     *  @param	string	$magentoField
+     *  @param  string    $databaseName
+     *  @param  string    $fieldName
+     *  @param    string    $magentoField
      *  @throws Copernica_MarketingSoftware_Exception
      */
     public function validateDatabaseField($databaseName, $fieldName, $magentoField)
     {
         if (trim($fieldName) == '') {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Field not linked', Copernica_MarketingSoftware_Exception::FIELD_NOT_LINKED);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Field not linked', Copernica_MarketingSoftware_Exception::FIELD_NOT_LINKED);
         }
 
         $output = $this->_restRequest()->get('database/'.urlencode($databaseName).'/fields');
@@ -84,11 +84,11 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
 
         foreach ($output['data'] as $field) { 
             if ($field['name'] != $fieldName) {
-            	continue;
+                continue;
             }
 
             if (!$this->_checkDatabaseFieldType($magentoField, $field, $databaseName)) {
-            	throw Mage::exception('Copernica_MarketingSoftware', 'Field is invalid', Copernica_MarketingSoftware_Exception::FIELD_STRUCT_INVALID);
+                throw Mage::exception('Copernica_MarketingSoftware', 'Field is invalid', Copernica_MarketingSoftware_Exception::FIELD_STRUCT_INVALID);
             }
 
             return;
@@ -100,7 +100,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Validate collection.
      *  
-     *  @param  string	$databaseName
+     *  @param  string    $databaseName
      *  @param  string  $collectionName
      *  @param  string  $collectionType
      *  @throws Copenica_MarketingSoftware_Exception
@@ -118,16 +118,16 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
         }
 
         if ($output['total'] == 0) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
         }
 
         foreach ($output['data'] as $collection) {
             if ($collection['name'] != $collectionName) {
-            	continue;
+                continue;
             }
 
             if ($this->_isCollectionFieldsValid($collection['fields'], $collectionType)) {
-            	return;
+                return;
             }
 
             throw Mage::exception('Copernica_MarketingSoftware', 'Collection structure is invalid.', Copernica_MarketingSoftware_Exception::COLLECTION_STRUCT_INVALID);
@@ -139,8 +139,8 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Check collection field structure.
      *  
-     *  @param  assoc	$collectionFieldStruct
-     *  @param  string	$collectionType
+     *  @param  assoc    $collectionFieldStruct
+     *  @param  string    $collectionType
      *  @return bool
      */
     protected function _isCollectionFieldsValid($collectionFieldStruct, $collectionType)
@@ -154,7 +154,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
         }
 
         if (count(array_intersect($collectionFields, $requiredFields)) == count($requiredFields)) {
-        	return true;
+            return true;
         }
 
         return false;
@@ -163,7 +163,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Validate collection field.
      *  
-     *  @param  string	$databaseName
+     *  @param  string    $databaseName
      *  @param  string  $collectionName
      *  @param  string  $collectionType
      *  @param  string  $magentoFieldName
@@ -178,29 +178,29 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
 
         if (isset($output['error'])) {
             if (strpos($output['error']['message'], 'No database') !== false) {
-            	throw Mage::exception('Copernica_MarketingSoftware', 'Database does not exists', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
+                throw Mage::exception('Copernica_MarketingSoftware', 'Database does not exists', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
             } else {
-            	throw Mage::exception('Copernica_MarketingSoftware', 'API error', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+                throw Mage::exception('Copernica_MarketingSoftware', 'API error', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
             }
         }
 
         if ($output['total'] == 0) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exists', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
         }
  
         $collectionId = false;
 
         foreach ($output['data'] as $collection) {
             if ($collection['name'] == $collectionName) {
-            	$collectionId = $collection['ID'];
+                $collectionId = $collection['ID'];
             }
         }
 
         if ($collectionId === false) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exits', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Collection does not exits', Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS);
         }
 
-        $output = $this->_restRequest()->get( 'collection/'.$collectionId.'/fields' );
+        $output = $this->_restRequest()->get('collection/'.$collectionId.'/fields');
 
         if (isset($output['error']) || !isset($output['data'])) {
             throw Mage::exception('Copernica_MarketingSoftware', 'API error', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
@@ -212,7 +212,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
 
         foreach ($output['data'] as $field) {
             if ($field['name'] != $copernicaFieldName) {
-            	continue;
+                continue;
             }
             
             $fieldDefinition = Mage::helper('marketingsoftware/data')->getCollectionFieldDefinition($collectionType, $magentoFieldName);     
@@ -230,7 +230,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Get required fields for a collection of given type.
      *  
-     *  @param  string	$collectionType
+     *  @param  string    $collectionType
      *  @return array
      */
     protected function _requiredCollectionFields($collectionType)
@@ -238,32 +238,32 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
         switch ($collectionType)
         {
             case 'cartproducts':    
-            	return Mage::helper('marketingsoftware')->requiredQuoteItemFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredQuoteItemFields();
+                
             case 'orders' :         
-            	return Mage::helper('marketingsoftware')->requiredOrderFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredOrderFields();
+                
             case 'orderproducts':   
-            	return Mage::helper('marketingsoftware')->requiredOrderItemFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredOrderItemFields();
+                
             case 'addresses':       
-            	return Mage::helper('marketingsoftware')->requiredAddressFields();
-            	
+                return Mage::helper('marketingsoftware')->requiredAddressFields();
+                
             case 'viewedproduct':   
-            	return Mage::helper('marketingsoftware')->requiredViewedProductFields();
+                return Mage::helper('marketingsoftware')->requiredViewedProductFields();
 
             case 'wishlistproducts':
-            	return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
-            		
+                return Mage::helper('marketingsoftware')->requiredWishlistItemFields();
+                    
             default: 
-            	return array();
+                return array();
         }
     }
 
     /**
      *  Check database field if copernica type match magento type.
      *  
-     *  @param  string	$magentoField
+     *  @param  string    $magentoField
      *  @param  assoc   $copernicaStructure
      *  @param  string  $databaseName
      *  @return boolean
@@ -272,19 +272,19 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     {
         switch ($magentoField) {
             case 'email' : 
-            	return $this->_checkEmailField($copernicaStructure);
-            	
+                return $this->_checkEmailField($copernicaStructure);
+                
             case 'newsletter': 
-            	return $this->_checkNewsletterField($copernicaStructure, $databaseName);
-            	
+                return $this->_checkNewsletterField($copernicaStructure, $databaseName);
+                
             case 'birthdate': 
-            	return $this->_checkDateField($copernicaStructure);
-            	
+                return $this->_checkDateField($copernicaStructure);
+                
             case 'registrationDate': 
-            	return $this->_checkDatetimeField($copernicaStructure);
-            	
+                return $this->_checkDatetimeField($copernicaStructure);
+                
             default: 
-            	return $this->_checkDefaultField($copernicaStructure);
+                return $this->_checkDefaultField($copernicaStructure);
         }
     }
 
@@ -298,38 +298,38 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
         $databaseUnsubscribe = $this->_restRequest()->get('database/'.urlencode($databaseName).'/unsubscribe');
 
         if (isset($databaseUnsubscribe['error'])) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Field could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Field could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
         }
 
         if ($databaseUnsubscribe['behavior'] != 'update') {
-        	return false;
+            return false;
         }
 
         $fieldName = $copernicaStructure['name'];
 
         if (!array_key_exists($fieldName, $databaseUnsubscribe['fields'])) {
-        	return false;
+            return false;
         }
 
         if ($databaseUnsubscribe['fields'][$fieldName] != 'unsubscribed_copernica') {
-        	return false;
+            return false;
         }
 
         $databaseCallbacks = $this->_restRequest()->get('database/'.urlencode($databaseName).'/callbacks');
 
         if (isset($databaseCallbacks['error'])) {
-        	throw Mage::exception('Copernica_MarketingSoftware', 'Field could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
+            throw Mage::exception('Copernica_MarketingSoftware', 'Field could not be checked', Copernica_MarketingSoftware_Exception::API_REQUEST_ERROR);
         }
 
         $callbackUrl = Mage::helper('marketingsoftware')->unsubscribeCallbackUrl();
  
         if ($databaseCallbacks['total'] == 0) {
-        	return false;
+            return false;
         }
 
         foreach ($databaseCallbacks['data'] as $callback) {
             if ($callback['url'] == $callbackUrl && $callback['method'] == 'json' && $callback['expression'] == "profile.$fieldName == 'unsubscribed_copernica';") {
-            	return true;
+                return true;
             }
         }
 
@@ -339,7 +339,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Check field if it's a email field.
      *  
-     *  @param  assoc	$copernicaStructure
+     *  @param  assoc    $copernicaStructure
      *  @return boolean
      */
     protected function _checkEmailField($copernicaStructure)
@@ -350,7 +350,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Check field if it's a date field.
      *  
-     *  @param  assoc	$copernicaStructure
+     *  @param  assoc    $copernicaStructure
      *  @return boolean
      */
     protected function _checkDateField($copernicaStructure)
@@ -361,7 +361,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /**
      *  Check field if it's a datetime field
      *  
-     *  @param  assoc	$copernicaStructure
+     *  @param  assoc    $copernicaStructure
      *  @return boolean
      */
     protected function _checkDatetimeField($copernicaStructure)
@@ -372,7 +372,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
     /** 
      *  Check field if it's a default field.
      *  
-     *  @param  assoc	$copernicaStructure
+     *  @param  assoc    $copernicaStructure
      *  @return boolean
      */
     protected function _checkDefaultField($copernicaStructure)

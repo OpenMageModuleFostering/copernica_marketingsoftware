@@ -29,13 +29,13 @@
  */
 class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_MarketingSoftware_Model_Queue_Event_Abstract
 {
-	/**
-	 * Customer entity
-	 * 
-	 * @var Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
-	 */
-	protected $_customerEntity;
-	
+    /**
+     * Customer entity
+     * 
+     * @var Copernica_MarketingSoftware_Model_Copernica_Entity_Customer
+     */
+    protected $_customerEntity;
+    
     /**
      *  This action will be run on order modify event
      *  
@@ -52,7 +52,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_Mark
         
         $customerEntity = $this->_getCustomerEntity();                
         
-        if ($customerEntity) {                           	        	
+        if ($customerEntity) {                                           
             return $restOrder->syncWithCustomer($customerEntity);
         } else {
             $data = array (
@@ -64,23 +64,23 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_Mark
             );
 
             if ($middlename = $vanillaOrder->getCustomerMiddlename()) {
-            	$data['middlename'] = $middlename;
+                $data['middlename'] = $middlename;
             }
             
-            if ($dateOfBirth = $vanillaOrder->getCustomerDob()) {           	
-            	$data['birthdate'] = date('Y-m-d H:i:s', strtotime($dateOfBirth));
+            if ($dateOfBirth = $vanillaOrder->getCustomerDob()) {               
+                $data['birthdate'] = date('Y-m-d H:i:s', strtotime($dateOfBirth));
             }            
             
             if ($gender = $vanillaOrder->getCustomerGender()) {
-            	$options = Mage::getModel('customer/customer')->getAttribute('gender')->getSource()->getAllOptions();            	
-            	
-		        foreach ($options as $option) {
-		            if ($option['value'] == $gender) {
-		                $gender = $option['label'];
-		            }
-		        }
-            	
-            	$data['gender'] = $gender;
+                $options = Mage::getModel('customer/customer')->getAttribute('gender')->getSource()->getAllOptions();                
+                
+                foreach ($options as $option) {
+                    if ($option['value'] == $gender) {
+                        $gender = $option['label'];
+                    }
+                }
+                
+                $data['gender'] = $gender;
             }
 
             $group = $vanillaOrder->getCustomerGroupId();
@@ -104,8 +104,8 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_Mark
         
         $customerEntity = $this->_getCustomerEntity();
         
-        if(!$customerEntity) {
-        	return true;
+        if (!$customerEntity) {
+            return true;
         }
         
         $request = Mage::helper('marketingsoftware/rest_request');
@@ -113,24 +113,26 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_Mark
         $quoteItemCollection = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         if ($quoteItemCollection) {
-        	$response = $request->get('/profile/'.$customerEntity->getProfileId().'/subprofiles/'.$quoteItemCollection, array(
-            	'fields' => array('quote_id=='.$order->getQuoteId())
-        	));
+            $response = $request->get(
+                '/profile/'.$customerEntity->getProfileId().'/subprofiles/'.$quoteItemCollection, array(
+                'fields' => array('quote_id=='.$order->getQuoteId())
+                )
+            );
         }
 
         if (array_key_exists('data', $response) || count($response['data']) == 0) {
-        	return true;
+            return true;
         }
 
         $request->prepare();
 
         if (Mage::helper('marketingsoftware/config')->getRemoveFinishedQuoteItem()) {
             foreach ($response['data'] as $subprofile) {
-            	$request->delete('/subprofile/'.$subprofile['ID']);
+                $request->delete('/subprofile/'.$subprofile['ID']);
             }
         } else {
             foreach ($response['data'] as $subprofile) {
-            	$request->put('/subprofile/'.$subprofile['ID'].'/fields/', array('status' => 'completed'));
+                $request->put('/subprofile/'.$subprofile['ID'].'/fields/', array('status' => 'completed'));
             }
         }
 
@@ -141,19 +143,19 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Order extends Copernica_Mark
     
     protected function _getCustomerEntity()
     {
-    	if ($this->_customerEntity) {
-    		return $this->_customerEntity;
-    	} else {
-	    	$object = $this->_getObject();
-	    	
-	    	if ($object->customerId && is_numeric($object->customerId)) {
-	    		$customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
-	    		$customerEntity->setCustomer($object->customerId);
-	    		
-	    		return $this->_customerEntity = $customerEntity;
-	    	} else {
-	    		return false;
-	    	}    	   
-    	} 	
+        if ($this->_customerEntity) {
+            return $this->_customerEntity;
+        } else {
+            $object = $this->_getObject();
+            
+            if ($object->customerId && is_numeric($object->customerId)) {
+                $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+                $customerEntity->setCustomer($object->customerId);
+                
+                return $this->_customerEntity = $customerEntity;
+            } else {
+                return false;
+            }           
+        }     
     }
 }

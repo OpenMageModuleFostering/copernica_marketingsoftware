@@ -40,7 +40,7 @@ class Copernica_MarketingSoftware_Model_Abandoned_Cart extends Mage_Core_Model_A
     /**
      *  Set quote Id
      *  
-     *  @param	int	$quoteID
+     *  @param    int    $quoteID
      */
     public function setQuoteId($quoteID)
     {

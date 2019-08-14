@@ -32,49 +32,49 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Entity
     /**
      *  Cached data.
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_data = array();
 
     /**
      *  This is a factory method that will produce proper entities.
      *  
-     *  @todo	Verify whether it is actually needed
-     *  @param  string	$itemName
+     *  @todo    Verify whether it is actually needed
+     *  @param  string    $itemName
      *  @return Copernica_MarketingSoftware_Model_Copernica_Entity
      */
     public function create($itemName)
     {
-    	$modelName = 'marketingsoftware/copernica_entity_'. $itemName;
-    	
-    	if (!class_exists(Mage::getConfig()->getModelClassName($modelName))) {
-    		return null;
-    	}    	
-    	
-    	return Mage::getModel($modelName);    	
+        $modelName = 'marketingsoftware/copernica_entity_'. $itemName;
+        
+        if (!class_exists(Mage::getConfig()->getModelClassName($modelName))) {
+            return null;
+        }        
+        
+        return Mage::getModel($modelName);        
     }
 
     /**
-     * 	@todo	param arguments
-     *  @param	string	$methodName
+     *     @todo    param arguments
+     *  @param    string    $methodName
      */
     public function __call($methodName, $arguments)
     {
         if (substr($methodName, 0, 3) != 'get') {
-        	return null;
+            return null;
         }
 
         $property = substr($methodName, 3);
         $property{0} = strtolower($property{0});
 
         if (array_key_exists($property, $this->_data)) {
-        	return $this->_data[$property];
+            return $this->_data[$property];
         }
 
         $fetchMethod = 'fetch'.ucfirst($property);
 
         if (method_exists($this, $fetchMethod) && !is_null($value = $this->$fetchMethod())) {
-        	return $this->_data[$property] = $value;
+            return $this->_data[$property] = $value;
         }
 
         return null;

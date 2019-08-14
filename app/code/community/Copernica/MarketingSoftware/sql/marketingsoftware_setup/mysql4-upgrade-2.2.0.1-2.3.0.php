@@ -28,9 +28,13 @@ $installer = $this;
 $installer->startSetup();
 
 try {
-    $installer->run("
+    $installer->run(
+        "
         ALTER TABLE {$this->getTable('marketingsoftware/queue_item')}
-        ADD COLUMN customer int NULL DEFAULT NULL;");
-} catch(Exception $e) {}
+        ADD COLUMN customer int NULL DEFAULT NULL;"
+    );
+} catch(Exception $e) {
+    Mage::logException($e);
+}
 
 $installer->endSetup();

@@ -33,13 +33,15 @@
 $installer = $this;
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
     ALTER TABLE {$installer->getTable('copernica_marketingsoftware')} 
     ADD extensionversion VARCHAR(250) NOT NULL;
     
     UPDATE {$installer->getTable('copernica_marketingsoftware')}
     SET `extensionversion` = '1.1.6'
     WHERE 1 = 1;
-");
+"
+);
 
 $installer->endSetup();

@@ -60,30 +60,34 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Quote extends Copernica_Mark
      */
     public function actionRemove()
     {
-    	$object = $this->_getObject();
-    	
-    	if (!$object->customerId || !is_numeric($object->customerId) || !$object->storeView) {
-    		return false;
-    	}
-    	
+        $object = $this->_getObject();
+        
+        if (!$object->customerId || !is_numeric($object->customerId) || !$object->storeView) {
+            return false;
+        }
+        
         $quoteItemCollectionId = Mage::helper('marketingsoftware/config')->getQuoteItemCollectionId();
 
         $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
         $customerEntity->setCustomer($object->customerId);
 
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $customerEntity->fetchId(),
             'storeView' => $object->storeView,
             'email' => $customerEntity->fetchEmail()
-        ));
+            )
+        );
 
         $request = Mage::helper('marketingsoftware/rest_request');
 
-        $result = $request->get('/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
+        $result = $request->get(
+            '/profile/'.$profileId.'/subprofiles/'.$quoteItemCollectionId, array(
             'fields' => array(
                 'quote_id=='.$this->_getEntityId()
             )
-        ));
+            )
+        );
 
         $request->prepare();
 

@@ -316,9 +316,9 @@ function init() {
                                 </label>
                                 <br>
                                 <?php
-                                    foreach(Mage::app()->getWebsites() as $website){
+                                    foreach(Mage::app()->getWebsites(true) as $website){
                                         foreach($website->getGroups() as $group){
-                                            foreach($group->getStores() as $store) {
+                                            foreach($group->getStores(true) as $store) {
 
                                                 $enabledStore = is_array($_config->getEnabledStores()) && in_array($store->getId(), $_config->getEnabledStores());
 

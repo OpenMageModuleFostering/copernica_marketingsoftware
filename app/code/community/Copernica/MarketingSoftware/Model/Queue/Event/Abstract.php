@@ -32,14 +32,14 @@ abstract class Copernica_MarketingSoftware_Model_Queue_Event_Abstract
     /**
      *  What queue item was used to construct this item
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Queue_Item
+     *  @var    Copernica_MarketingSoftware_Model_Queue_Item
      */
     protected $_queueItem;
 
     /**
      *  Construct the item given the queueitem
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Queue_Item	$item
+     *  @param    Copernica_MarketingSoftware_Model_Queue_Item    $item
      */
     public function setQueueItem(Copernica_MarketingSoftware_Model_Queue_Item $item)
     {
@@ -49,8 +49,8 @@ abstract class Copernica_MarketingSoftware_Model_Queue_Event_Abstract
     /**
      *  Get the object for this queue item
      *  
-     *  @todo	Not used?
-     *  @return	Abstraction object
+     *  @todo    Not used?
+     *  @return    Abstraction object
      */
     protected function _getObject()
     {
@@ -60,8 +60,8 @@ abstract class Copernica_MarketingSoftware_Model_Queue_Event_Abstract
     /**
      *  Get the entity Id
      *  
-     *  @todo	Not used?
-     *  @return	int
+     *  @todo    Not used?
+     *  @return    int
      */
     protected function _getEntityId()
     {
@@ -71,7 +71,7 @@ abstract class Copernica_MarketingSoftware_Model_Queue_Event_Abstract
     /**
      *  Get the customer Id
      *  
-     *  @todo	Not used?
+     *  @todo    Not used?
      *  @return int
      */
     protected function _getCustomerId()
@@ -89,7 +89,7 @@ abstract class Copernica_MarketingSoftware_Model_Queue_Event_Abstract
         $methodName = 'action'.ucfirst($this->_queueItem->getAction());
 
         if (!method_exists($this, $methodName)) {
-        	return false;
+            return false;
         }
 
         return $this->$methodName();

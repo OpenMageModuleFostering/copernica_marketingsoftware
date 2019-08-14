@@ -29,16 +29,16 @@
  */
 class Copernica_MarketingSoftware_Model_Queue_Event_Wishlist_Item extends Copernica_MarketingSoftware_Model_Queue_Event_Abstract
 {
-	/**
-	 * Add functionality is the same as that of modify
-	 * 
-	 * @return boolean
-	 */
-	public function actionAdd()
-	{
-		return $this->actionModify();		
-	}
-	
+    /**
+     * Add functionality is the same as that of modify
+     * 
+     * @return boolean
+     */
+    public function actionAdd()
+    {
+        return $this->actionModify();        
+    }
+    
     /**
      *  Handle modify action
      *  
@@ -46,12 +46,12 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Wishlist_Item extends Copern
      */
     public function actionModify()
     {
-    	$object = $this->_getObject();    	   
-    	
-    	if (!$object->wishlistItemId || !is_numeric($object->wishlistItemId) || !$object->customerId || !is_numeric($object->customerId)) {
-    		return false;
-    	}    	    	
-    	
+        $object = $this->_getObject();           
+        
+        if (!$object->wishlistItemId || !is_numeric($object->wishlistItemId) || !$object->customerId || !is_numeric($object->customerId)) {
+            return false;
+        }                
+        
         $wishlistItem = Mage::getModel('wishlist/item')->load($object->wishlistItemId);
 
         $customerId = $object->customerId;
@@ -75,30 +75,34 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Wishlist_Item extends Copern
      */
     public function actionRemove()
     {
-    	$object = $this->getObject();
-    	
-    	if (!$object->customerId || !is_numeric($object->customerId)) {
-    		return false;
-    	}
-    	
+        $object = $this->getObject();
+        
+        if (!$object->customerId || !is_numeric($object->customerId)) {
+            return false;
+        }
+        
         $wishlistItemCollectionId = Mage::helper('marketingsoftware/config')->getWishlistItemCollectionId();
 
         $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
         $customerEntity->setCustomer($object->customerId);
 
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $customerEntity->fetchId(),
             'storeView' => $customerEntity->fetchStoreView(),
             'email' => $customerEntity->fetchEmail()
-        ));
+            )
+        );
 
         $request = Mage::helper('marketingsoftware/rest_request');
 
-        $result = $request->get('/profile/'.$profileId.'/subprofiles/'.$wishlistItemCollectionId, array(
+        $result = $request->get(
+            '/profile/'.$profileId.'/subprofiles/'.$wishlistItemCollectionId, array(
             'fields' => array(
                 'item_id=='.$this->_getEntityId()
             )
-        ));
+            )
+        );
 
         $request->prepare();
 

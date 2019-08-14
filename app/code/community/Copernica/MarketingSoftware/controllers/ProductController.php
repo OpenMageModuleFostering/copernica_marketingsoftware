@@ -28,7 +28,8 @@
  * Controls the product actions.
  */
 class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller_Front_Action
-{  
+{
+  
     /**
      *  The DOM document that will be used to return XML content.
      *
@@ -52,12 +53,12 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $product = Mage::getModel('catalog/product')->load($productId);
 
         if ($product->getId() && $product->getStatus() == Mage_Catalog_Model_Product_Status::STATUS_ENABLED) {
-        	$productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
-        	$productEntity->setProduct($product->getId());
+            $productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
+            $productEntity->setProduct($product->getId());
 
-        	$xml = $this->_buildProductXML($productEntity);
+            $xml = $this->_buildProductXML($productEntity);
         } else {
-        	$xml = $this->_buildErrorXml("Product not found with ID: ". $request->getParam('id'));
+            $xml = $this->_buildErrorXml("Product not found with ID: ". $request->getParam('id'));
         }
 
         $this->_prepareResponse($xml);
@@ -66,8 +67,8 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  This is a helper method to append simple nodes to document tree
      *  
-     *  @param  DOMElement	$parent
-     *  @param  string	$name
+     *  @param  DOMElement    $parent
+     *  @param  string    $name
      *  @param  mixed   $value
      */
     protected function _appendSimpleNode(DOMElement $parent, $name, $value)
@@ -83,16 +84,20 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $today = date('Y-m-d H:i:s');
 
         $collection = Mage::getResourceModel('catalog/product_collection');
-        $collection->addAttributeToFilter('news_from_date', array (
+        $collection->addAttributeToFilter(
+            'news_from_date', array (
             'date' => true,
             'to' => $today
-        ));
-        $collection->addAttributeToFilter('news_to_date', array (
+            )
+        );
+        $collection->addAttributeToFilter(
+            'news_to_date', array (
             'or' => array (
                 array ('date' => true, 'from' => $todayDate),
                 array ('is' => new Zend_Db_Expr('null')) 
             ), 'left'
-        ));
+            )
+        );
         $collection->addAttributeToSelect('id');
 
         $xml = $this->_buildCollectionXML($collection);
@@ -102,18 +107,18 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     
     protected function _buildErrorXml($message)
     {
-    	$element = $this->_document->createElement('error');    
-    	$this->_appendSimpleNode($element, 'message', $message);
-    	return $element;
+        $element = $this->_document->createElement('error');    
+        $this->_appendSimpleNode($element, 'message', $message);
+        return $element;
     }
-    	 
+         
 
     /**
      *  Prepare xml tree for one product instance.
      *
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Product	$product
-     *  @param  bool	$noParents
-     *  @param  bool	$noChildren
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Product    $product
+     *  @param  bool    $noParents
+     *  @param  bool    $noChildren
      *  @return DOMElement
      */
     protected function _buildProductXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product, $noParents = false, $noChildren = false)
@@ -147,11 +152,11 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $element->appendChild($this->_buildAttributesXML($product));
 
         if (!$noParents) {
-        	$element->appendChild($this->_buildParentsXML($product));
+            $element->appendChild($this->_buildParentsXML($product));
         }
 
         if (!$noChildren) {
-        	$element->appendChild($this->_buildChildrenXML($product));
+            $element->appendChild($this->_buildChildrenXML($product));
         }
 
         return $element;
@@ -160,7 +165,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Build product categories XML
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product	$product
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product    $product
      *  @return DOMElement
      */
     protected function _buildCategoriesXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product)
@@ -179,7 +184,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Build product attributes XML
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product	$product
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product    $product
      *  @return DOMElement
      */
     protected function _buildAttributesXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product)
@@ -201,25 +206,25 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Build parents xml
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product	$product
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product    $product
      *  @return DOMElement
      */
     protected function _buildParentsXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product)
     {
         $parentIds = array();
 
-        foreach(Mage_Catalog_Model_Product_Type::getTypes() as $type) {
+        foreach (Mage_Catalog_Model_Product_Type::getTypes() as $type) {
             $result = Mage::getModel($type['model'])->getParentIdsByChild($product->getId());
-            $parentIds = array_unique(array_merge( $parentIds, $result));
+            $parentIds = array_unique(array_merge($parentIds, $result));
         }
 
         $parents = $this->_document->createElement('parents');
 
         foreach ($parentIds as $id) {
-        	$product = Mage::getModel('marketingsoftware/copernica_entity_product');
-        	$product->setProduct($id);
-        	
-        	$parents->appendChild($this->_buildProductXML($product, false, true));
+            $product = Mage::getModel('marketingsoftware/copernica_entity_product');
+            $product->setProduct($id);
+            
+            $parents->appendChild($this->_buildProductXML($product, false, true));
         }
 
         return $parents;
@@ -228,7 +233,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Build children xml
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product	$product
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Product    $product
      *  @return DOMElement
      */
     protected function _buildChildrenXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product) 
@@ -241,9 +246,9 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
             $group = $this->_document->createElement('group');
 
             foreach ($groupIds as $id) {
-            	$product = Mage::getModel('marketingsoftware/copernica_entity_product');
-            	$product->setProduct($id);
-            	            	
+                $product = Mage::getModel('marketingsoftware/copernica_entity_product');
+                $product->setProduct($id);
+                                
                 $group->appendChild($this->_buildProductXML($product, true, false));
             }
 
@@ -256,7 +261,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Prepare XML tree for whole collection of products.
      *
-     *  @param  Mage_Catalog_Model_Resource_Product_Collection	$collection
+     *  @param  Mage_Catalog_Model_Resource_Product_Collection    $collection
      *  @return DOMElement
      */
     protected function _buildCollectionXML(Mage_Catalog_Model_Resource_Product_Collection $collection)
@@ -277,7 +282,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     /**
      *  Prepare response based on passed element.
      *
-     *  @param  DOMElement	$element
+     *  @param  DOMElement    $element
      */
     protected function _prepareResponse(DOMElement $element) 
     {
@@ -321,11 +326,11 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $this->_document = new DOMDocument('1.0', 'utf-8');
 
         if ($request->getParam('new')) {
-        	return $this->_showCollection();
+            return $this->_showCollection();
         }
 
         if ($request->getParam('id')) {
-        	return $this->_showProduct();
+            return $this->_showProduct();
         }
 
         $this->norouteAction();

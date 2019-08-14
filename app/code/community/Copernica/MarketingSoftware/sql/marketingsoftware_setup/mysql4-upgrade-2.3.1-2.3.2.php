@@ -30,7 +30,8 @@ $installer->startSetup();
 
 try {
     // create error queue table
-    $installer->run("
+    $installer->run(
+        "
         DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/error_queue')}`;
         CREATE TABLE `{$installer->getTable('marketingsoftware/error_queue')}` (
             `id` int(10) unsigned auto_increment,
@@ -43,7 +44,8 @@ try {
             `customer` int(11),
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB default CHARSET=utf8;
-    ");
+    "
+    );
 
     // finish setup
     $installer->endSetup();

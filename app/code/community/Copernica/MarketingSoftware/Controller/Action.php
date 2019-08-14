@@ -65,21 +65,21 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
      */
     protected function _isAllowed()
     {
-    	return Mage::getSingleton('admin/session')->isAllowed('copernica');
+        return Mage::getSingleton('admin/session')->isAllowed('copernica');
     }    
 
     /**
      *  Check if queue have too many items. This method will output messages on 
      *  admin session to inform him about current state.
      *  
-     *  @param  Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection	$queue
+     *  @param  Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection    $queue
      */
     protected function _checkQueueSize(Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection $queue)
     {
         $queueSize = $queue->getSize();
 
         if ($queueSize < 100) {
-        	return;
+            return;
         }
 
         $this->_addWarning(Mage::helper('marketingsoftware')->__("There is queue of %d local modification waiting to be processed", $queueSize));
@@ -88,18 +88,18 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
     /**
      *  Check if queue have too old items.
      *  
-     *  @param  Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection	$queue
+     *  @param  Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection    $queue
      */
     protected function _checkQueueTime(Copernica_MarketingSoftware_Model_Mysql4_Queue_Item_Collection $queue)
     {
         $oldestItemTimestamp = $queue->getQueueStartTime();
 
         if (is_null($oldestItemTimestamp)) {
-        	return;
+            return;
         }
 
         if (time() - strtotime($oldestItemTimestamp) < 60*60*24) {
-        	return;
+            return;
         }
 
         $printableTime = Mage::helper('core')->formatDate($oldestItemTimestamp, 'short', true);
@@ -115,7 +115,7 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
         $accessToken = Mage::helper('marketingsoftware/config')->getAccessToken();
 
         if ($accessToken) {
-        	return;
+            return;
         }
 
         $this->_addWarning(Mage::helper('marketingsoftware')->__('There is no access token for API communication.'));
@@ -124,7 +124,7 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
     /**
      *  Add warning message to controller.
      *  
-     *  @param  string	$text
+     *  @param  string    $text
      *  @return self
      */
     protected function _addWarning($text) 
@@ -137,8 +137,8 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
     /**
      *  Add error message to controller.
      *  
-     *  @todo	Not used???
-     *  @param  string	$text
+     *  @todo    Not used???
+     *  @param  string    $text
      *  @return self
      */
     protected function _addError($text) 
@@ -171,19 +171,19 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
     /**
      *  Get notifications of given type
      *  
-     *  @param  string	$type
+     *  @param  string    $type
      *  @return array
      */
     protected function _getNotifications($type) 
     {
         if (!array_key_exists($type, $this->_notes)) {
-        	return array();
+            return array();
         }
 
         $output = $this->_notes[$type];
 
-        if(is_array($output)) {
-        	return $output;
+        if (is_array($output)) {
+            return $output;
         }
 
         return array();

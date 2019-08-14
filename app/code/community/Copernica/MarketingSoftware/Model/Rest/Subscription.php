@@ -33,14 +33,14 @@ class Copernica_MarketingSoftware_Model_Rest_Subscription extends Copernica_Mark
      *  Subscription entity that we will use to create proper profile inside
      *  copernica database.
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription
      */
     protected $_subscriptionEntity;
 
     /**
      *  Get data that should be update in copernica database
      *  
-     *  @param	string	$storeView
+     *  @param    string    $storeView
      *  @return array
      */
     protected function _getProfileData($storeview)
@@ -64,12 +64,14 @@ class Copernica_MarketingSoftware_Model_Rest_Subscription extends Copernica_Mark
     public function sync()
     {
         $storeview = (string) $this->_subscriptionEntity->getStoreView();
-    	
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => null,
-        	'storeView' => $storeview,
+            'storeView' => $storeview,
             'email' => $this->_subscriptionEntity->getEmail(),            
-        ));
+            )
+        );
 
         $request = Mage::helper('marketingsoftware/rest_request');
 
@@ -87,10 +89,10 @@ class Copernica_MarketingSoftware_Model_Rest_Subscription extends Copernica_Mark
     /**
      *  Set REST subscription entity
      *
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription	$subscriptionEntity
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription    $subscriptionEntity
      */
-    public function setSubscriptionEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Quote $subscriptionEntity) 
+    public function setSubscriptionEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription $subscriptionEntity) 
     {
-    	$this->_subscriptionEntity = $subscriptionEntity;
+        $this->_subscriptionEntity = $subscriptionEntity;
     }
 }

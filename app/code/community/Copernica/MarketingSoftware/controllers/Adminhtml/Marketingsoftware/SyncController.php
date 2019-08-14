@@ -30,17 +30,17 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController extends Copernica_MarketingSoftware_Controller_Action
 {
-	
-	/**
-	 * Check if cache management is allowed
-	 *
-	 * @return bool
-	 */
-	protected function _isAllowed()
-	{
-		return Mage::getSingleton('admin/session')->isAllowed('copernica/sync');
-	}
-		
+    
+    /**
+     * Check if cache management is allowed
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('copernica/sync');
+    }
+        
     /**
      *  This action is a default one. Will be executed when user arrives on page.
      */
@@ -72,7 +72,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
         $syncProfile = Mage::getModel('marketingsoftware/sync_profile');
 
         if (array_key_exists('id', $post) && $post['id']) {
-        	$syncProfile->load($post['id']);
+            $syncProfile->load($post['id']);
         }
 
         $syncProfile
@@ -96,11 +96,13 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
         foreach (Mage::app()->getWebsites() as $website) {
             foreach ($website->getGroups() as $group) {
                 foreach ($group->getStores()  as $store) {
-                    $stores[$store->getId()] = implode(' > ', array(
+                    $stores[$store->getId()] = implode(
+                        ' > ', array(
                         $website->getName(),
                         $group->getName(),
                         $store->getName()
-                    ));
+                        )
+                    );
                 }
             }
         }
@@ -127,7 +129,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
             
             $this->getResponse()->setBody(json_encode(array_merge($profile->toArray(), array('state' => $state, 'stores' => $stores))));
         } else {
-        	$this->getResponse()->setBody(json_encode('error'));
+            $this->getResponse()->setBody(json_encode('error'));
         }
     }
 
@@ -139,11 +141,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
         $post = $this->getRequest()->getPost();
 
         if (array_key_exists('id', $post)) {
-        	Mage::getModel('marketingsoftware/sync_profile')        
+            Mage::getModel('marketingsoftware/sync_profile')        
                 ->load($post['id'])
                 ->delete();
         } else {
-        	$this->getResponse()->setBody(json_encode('error'));
+            $this->getResponse()->setBody(json_encode('error'));
         }
 
     }
@@ -158,16 +160,16 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
         $params = $this->getRequest()->getParams();
 
         if (!array_key_exists('state', $params)) {
-        	return $this->_redirect('*/*', array('result' => 'invalid-state'));
+            return $this->_redirect('*/*', array('result' => 'invalid-state'));
         }
         
         if (!array_key_exists('code', $params)) {
-        	return $this->_redirect('*/*', array('result' => 'invalid-code'));
+            return $this->_redirect('*/*', array('result' => 'invalid-code'));
         }
 
         foreach (Mage::getModel('marketingsoftware/sync_profile')->getCollection() as $profile) {
-            if ($params['state'] != md5(Mage::getSingleton('adminhtml/session')->getEncryptedSessionId().date('dmY').$profile->getId()))  {
-            	continue;
+            if ($params['state'] != md5(Mage::getSingleton('adminhtml/session')->getEncryptedSessionId().date('dmY').$profile->getId())) {
+                continue;
             }
 
             $accessToken = Mage::helper('marketingsoftware/api')->upgradeRequest(
@@ -178,7 +180,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController ext
             );
 
             if ($accessToken == false) {
-            	return $this->_redirect('*/*', array('result' => 'invalid-token'));
+                return $this->_redirect('*/*', array('result' => 'invalid-token'));
             }
 
             $profile->setAccessToken($accessToken)->save();

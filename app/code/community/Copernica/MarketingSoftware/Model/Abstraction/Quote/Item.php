@@ -44,8 +44,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  Sets the original model
      *  
-     *  @param	Mage_Sales_Model_Quote_Item	$original
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
+     *  @param    Mage_Sales_Model_Quote_Item    $original
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
      */
     public function setOriginal(Mage_Sales_Model_Quote_Item $original)
     {
@@ -72,7 +72,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  The id of this quote item object
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function id()
     {
@@ -82,7 +82,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  Get the quote to which this item belongs
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function quote()
     {
@@ -92,7 +92,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  The amount of this quote item
      *  
-     *  @return	integer
+     *  @return    integer
      */
     public function quantity()
     {
@@ -103,7 +103,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
      *  The price
      *  Note that an object is returned, which may consist of multiple components
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
@@ -113,7 +113,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  The weight
      *  
-     *  @return	float
+     *  @return    float
      */
     public function weight()
     {
@@ -123,7 +123,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  The timestamp at which this quote item was modified
      *  
-     *  @return	string
+     *  @return    string
      */
     public function timestamp()
     {
@@ -133,7 +133,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  Get the options of this quote item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item_Options
      */
     public function options()
     {
@@ -143,7 +143,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  Get the product which belongs to this item
      *  
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function product()
     {
@@ -153,30 +153,31 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
     /**
      *  Loads a product model
      *
-     *  @param	integer	$productId
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  @param    integer    $productId
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function loadQuoteItem($quoteId)
     {
-    	$quoteItem = Mage::getModel('sales/quote_item')->load($quoteId);
-    	
-    	if ($quoteItem->getId()) {
-    		$this->setOriginal($quoteItem);
-    	} else {
-    		$this->id = $quoteId;
-    	}
-    	
-    	return $this;
+        $quoteItem = Mage::getModel('sales/quote_item')->load($quoteId);
+        
+        if ($quoteItem->getId()) {
+            $this->setOriginal($quoteItem);
+        } else {
+            $this->id = $quoteId;
+        }
+        
+        return $this;
     }
     
     /**
      *  Serialize the object
      *  
-     *  @return	string
+     *  @return    string
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize(
+            array(
             $this->id(),
             is_object($quote = $this->quote()) ? $quote->id() : null,
             $this->quantity(),
@@ -185,14 +186,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote_Item implements Serial
             $this->timestamp(),
             $this->options(),
             $this->product(),
-        ));
+            )
+        );
     }
 
     /**
      *  Unserialize the object
      *  
-     *  @param	string	$string
-     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
+     *  @param    string    $string
+     *  @return    Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
      */
     public function unserialize($string)
     {

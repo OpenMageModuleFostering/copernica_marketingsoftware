@@ -32,33 +32,35 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
     /**
      *  Item that we want to use
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item
      */
     protected $_orderItemEntity = null;
 
     /**
      *  Sync item with customer
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$customer
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Order	$order
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $customer
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Entity_Order    $order
      *  @return boolean
      */
     public function syncWithCustomer(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customer, Copernica_MarketingSoftware_Model_Copernica_Entity_Order $order)
     {
-    	$customer->setStore($this->_orderItemEntity->getStoreView());
-    	    	
-        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
+        $customer->setStore($this->_orderItemEntity->getStoreView());
+                
+        $profileId = Mage::helper('marketingsoftware/api')->getProfileId(
+            array(
             'id' => $customer->getCustomerId(),
             'storeView' => (string) $customer->getStoreView(),
             'email' => $customer->getEmail(),
-        ));   
+            )
+        );   
         
-		if (!$profileId) {
-        	$profileId = $this->_createProfile($customer);
-        	
-        	if(!$profileId) {
-        		return false;
-        	}
+        if (!$profileId) {
+            $profileId = $this->_createProfile($customer);
+            
+            if (!$profileId) {
+                return false;
+            }
         }
 
         $this->syncWithProfile($profileId);
@@ -69,8 +71,8 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
     /**
      *  Sync order items with certain profile
      *  
-     *  @param  int	$profileId
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Order	$order
+     *  @param  int    $profileId
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Order    $order
      *  @return bool
      */
     public function syncWithProfile($profileId, Copernica_MarketingSoftware_Model_Copernica_Entity_Order $order)
@@ -78,17 +80,19 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
         $itemCollectionId = Mage::helper('marketingsoftware/config')->getOrderItemCollectionId();
 
         if ($itemCollectionId) {
-            Mage::helper('marketingsoftware/rest_request')->put('/profile/'.$profileId.'/subprofiles/'.$itemCollectionId, $this->_getSubprofileData($order), array(
-            	'fields' => array (
-                	'item_id=='.$this->_orderItemEntity->getId(),
+            Mage::helper('marketingsoftware/rest_request')->put(
+                '/profile/'.$profileId.'/subprofiles/'.$itemCollectionId, $this->_getSubprofileData($order), array(
+                'fields' => array (
+                    'item_id=='.$this->_orderItemEntity->getId(),
                     'order_id=='.$order->getId()
                 ),
                 'create' => 'true'
-			));
+                )
+            );
 
             return true;
         } else {
-        	return false;
+            return false;
         }
 
     }
@@ -96,8 +100,8 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
     /**
      *  Prepare subprofile data
      *  
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Order	$order
-     *  @return	array
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Order    $order
+     *  @return    array
      */
     protected function _getSubprofileData(Copernica_MarketingSoftware_Model_Copernica_Entity_Order $order)
     {
@@ -106,7 +110,7 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
         $data = $this->_getRequestData($this->_orderItemEntity, $syncedFields);
 
         if (!empty($syncedFields['incrementId'])) {
-        	$data['incrementId'] = $order->getIncrementId();
+            $data['incrementId'] = $order->getIncrementId();
         }
 
         $data['item_id'] = $this->_orderItemEntity->getId();
@@ -117,10 +121,10 @@ class Copernica_MarketingSoftware_Model_Rest_Order_Item extends Copernica_Market
     
     /**
      *  Set REST order item entity
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item	$orderItem
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item    $orderItem
      */
     public function setOrderItemEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item $orderItem)
     {
-    	$this->_orderItemEntity = $orderItem;
+        $this->_orderItemEntity = $orderItem;
     }
 }

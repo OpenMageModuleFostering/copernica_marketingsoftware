@@ -30,7 +30,7 @@
 class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends Copernica_MarketingSoftware_Model_Copernica_Abstract
 {
     /**
-     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  @var    Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
     protected $_orderItem = false;
 
@@ -113,7 +113,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
             $data['url'] = $product->productUrl($storeId);
             $data['image'] = $product->imageUrl($storeId);
         } else {
-        	$data['order_id'] = null;
+            $data['order_id'] = null;
         }
 
         $price = $orderItem->price();
@@ -123,9 +123,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
             $data['total_price'] = $price->total();
         }
 
-        $data['categories'] = implode("\n", array_map(function($category) {
-            return implode(' > ', $category);
-        }, $product->categories()));
+        $data['categories'] = implode(
+            "\n", array_map(
+                function($category) {
+                return implode(' > ', $category);
+                }, $product->categories()
+            )
+        );
 
         return $data;
     }

@@ -32,14 +32,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist extends Copern
     /**
      *  Cached wishlist instance
      *  
-     *  @var	Mage_Wishlist_Model_Wishlist
+     *  @var    Mage_Wishlist_Model_Wishlist
      */
     protected $_wishlist;
 
     /**
      *  Cached wishlist items
      *  
-     *  @var	array
+     *  @var    array
      */
     protected $_wishlistItems;
 
@@ -50,25 +50,25 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist extends Copern
      */
     public function fetchId()
     {
-    	return $this->_wishlist->getId();
+        return $this->_wishlist->getId();
     }
-    	
+        
     /**
      *  @return array
      */
     public function getItems()
     {
         if (!is_null($this->_wishlistItems)) {
-        	return $this->_wishlistItems;
+            return $this->_wishlistItems;
         }
 
         $wishlistItems = array();
 
         foreach ($this->_wishlist->getItemCollection() as $wishlistItem) {
-        	$wishlistItemEntity = Mage::getModel('marketingsoftware/copernica_entity_wishlist_item');
-        	$wishlistItemEntity->setWishlistItem($wishlistItem);
-        	        	
-        	$wishlistItems[] = $wishlistItemEntity;
+            $wishlistItemEntity = Mage::getModel('marketingsoftware/copernica_entity_wishlist_item');
+            $wishlistItemEntity->setWishlistItem($wishlistItem);
+                        
+            $wishlistItems[] = $wishlistItemEntity;
         }
 
         return $this->_wishlistItems = $wishlistItems;
@@ -81,19 +81,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist extends Copern
      */ 
     public function getRestWishlist()
     {
-    	$restWishlist = Mage::getModel('marketingsoftware/rest_wishlist');
-    	$restWishlist->setWishlistEntity($this);
-    	 
-    	return $restWishlist;
+        $restWishlist = Mage::getModel('marketingsoftware/rest_wishlist');
+        $restWishlist->setWishlistEntity($this);
+         
+        return $restWishlist;
     }
     
     /**
      *  Set wishlist entity
      *
-     *  @param	Mage_Wishlist_Model_Wishlist	$wishlist
+     *  @param    Mage_Wishlist_Model_Wishlist    $wishlist
      */
     public function setWishlist(Mage_Wishlist_Model_Wishlist $wishlist)
     {
-    	$this->_wishlist = $wishlist;
+        $this->_wishlist = $wishlist;
     }
 }

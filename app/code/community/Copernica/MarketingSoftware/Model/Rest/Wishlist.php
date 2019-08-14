@@ -32,7 +32,7 @@ class Copernica_MarketingSoftware_Model_Rest_Wishlist extends Copernica_Marketin
     /**
      *  Copernica entity
      *  
-     *  @var	Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist
+     *  @var    Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist
      */
     protected $_wishlistEntity;
 
@@ -49,22 +49,23 @@ class Copernica_MarketingSoftware_Model_Rest_Wishlist extends Copernica_Marketin
     /** 
      *  Sync wishlist with customer
      *  
-     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Customer	$customer
+     *  @param Copernica_MarketingSoftware_Model_Copernica_Entity_Customer    $customer
      */
     public function syncWithCustomer(Copernica_MarketingSoftware_Model_Copernica_Entity_Customer $customer)
     {
         foreach ($this->_wishlistEntity->getItems() as $wishlistItemEntity) {
-        	$restWishlistItem = $wishlistItemEntity->getRestWishlistItem();
-        	$restWishlistItem->syncWithWishlist($customer, $this->_wishlistEntity->getId());
+            $restWishlistItem = $wishlistItemEntity->getRestWishlistItem();
+            $restWishlistItem->syncWithWishlist($customer, $this->_wishlistEntity->getId());
         }
     }
     
     /**
      *  Set REST wishlist entity
      *
-     *  @param	Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist	$wishlistEntity
+     *  @param    Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist    $wishlistEntity
      */
-    public function setWishlistEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist $wishlistEntity) {
-    	$this->_wishlistEntity = $wishlistEntity;
+    public function setWishlistEntity(Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist $wishlistEntity) 
+    {
+        $this->_wishlistEntity = $wishlistEntity;
     }
 }

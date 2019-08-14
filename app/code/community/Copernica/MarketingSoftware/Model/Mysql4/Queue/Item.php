@@ -52,7 +52,7 @@ class Copernica_MarketingSoftware_Model_Mysql4_Queue_Item extends Mage_Core_Mode
                 $lockResult = $adapter->query("select get_lock('COPERNICA_".$row['customer']."', 1) as 'lock'")->fetchAll();
                 
                 if ($lockResult[0]['lock'] == 1) {
-                	return $row['customer'];
+                    return $row['customer'];
                 }
             }
         }
