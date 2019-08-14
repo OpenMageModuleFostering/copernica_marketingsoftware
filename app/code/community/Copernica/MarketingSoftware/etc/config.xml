@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Copernica_MarketingSoftware>
-            <version>3.1.3</version>
+            <version>3.2.0</version>
         </Copernica_MarketingSoftware>
     </modules>
     <global>

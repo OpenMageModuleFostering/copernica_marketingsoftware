@@ -20,7 +20,7 @@
  *
  * @category     Copernica
  * @package      Copernica_MarketingSoftware
- * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @copyright    Copyright (c) 2011-2015 Copernica & Cream. (http://docs.cream.nl/)
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -46,7 +46,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_View extends Copernica_Marke
     	$customerEntity->setCustomer($object->customerId);
     	
         $productEntity = Mage::getModel('marketingsoftware/copernica_entity_product');
-        $productEntity->setProduct($object->productId);
+        $productEntity->setProduct($object->productId, $object->storeId);
         $productEntity->setTimestamp(date('Y-m-d G:i:s', $object->viewedAt));
 
         $restProduct = $productEntity->getRestProduct();

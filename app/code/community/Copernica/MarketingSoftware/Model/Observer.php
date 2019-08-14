@@ -20,7 +20,7 @@
  *
  * @category     Copernica
  * @package      Copernica_MarketingSoftware
- * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @copyright    Copyright (c) 2011-2015 Copernica & Cream. (http://docs.cream.nl/)
  * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -417,7 +417,7 @@ class Copernica_MarketingSoftware_Model_Observer
         }
         
         $queue = Mage::getModel('marketingsoftware/queue_item')
-            ->setObject(array('customerId' => $customerId, 'productId' => $product->getId(), 'viewedAt' => (string) time()))
+            ->setObject(array('storeId' => Mage::app()->getStore()->getId(), 'customerId' => $customerId, 'productId' => $product->getId(), 'viewedAt' => (string) time()))
             ->setCustomer($customerId)
             ->setAction('add')
             ->setName('view')
