@@ -26,7 +26,6 @@
 
 /** 
  *  Link Block
- *  
  */
 class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends Mage_Core_Block_Template
 {
@@ -41,132 +40,12 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
     }
 
     /**
-     * Returns the post URL.
-     * 
-     * @return string
-     */
-    public function getPostUrl()
-    {
-        return $this->getUrl('*/*/saveProfilesAndCollections', array('_secure' => true));
-    }
-
-    /**
-     *  Get supported collection fields 
-     *  @param  string
-     *  @return array
-     */
-    public function getSupportedCollectionFields($collectionType)
-    {
-        switch ($collectionType)
-        {
-            case 'cartproducts': 
-                return Mage::helper('marketingsoftware')->supportedCartItemFields();
-            case 'orders': 
-                return Mage::helper('marketingsoftware')->supportedOrderFields();
-            case 'orderproducts': 
-                return Mage::helper('marketingsoftware')->supportedOrderItemFields();
-            case 'addresses': 
-                return Mage::helper('marketingsoftware')->supportedAddressFields();
-            case 'viewedproduct': 
-                return Mage::helper('marketingsoftware')->supportedViewedProductFields();
-            // if we have non supported collection type, just return empty array
-            default:
-                return array();
-        }
-    }
-
-    /**
-     *  Below. New Ajax Links
-     */
-
-    /** 
-     *  Get the url to account settings
-     *  @return string
-     */
-    public function getAccountSettingsUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_settings/index', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that will be used to save whole form.
-     *  @return string
-     */
-    public function getSaveFormUrl()
-    {
-        return $this->getUrl('*/*/saveForm', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that will answer AJAX requests about copernica's database repairs.
-     *  @return string
-     */
-    public function getAjaxDatabaseValidateUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxdatabase/validate', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that will answer AJAX request about copernica's database creations.
-     *  @return string
-     */
-    public function getAjaxDatabaseCreateUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxdatabase/create', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that can be used to fetch database field 
-     *  @return string
-     */
-    public function getAjaxDatabaseFetchUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxdatabase/fetchField', array('_secure' => true));
-    }
-
-    /**
-     *  Rerturn Ajax url that can be used to validate database field
-     *  @return string
-     */
-    public function getAjaxDatabaseFieldValidateUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxdatabasefield/validate', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that can be used to create database field
-     *  @return string
-     */
-    public function getAjaxDatabaseFieldCreateUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxdatabasefield/create', array('_secure' => true));
-    }
-
-    /**
      *  Return Ajax url that can be used to validate collection
      *  @return  string
      */
     public function getAjaxCollectionValidateUrl()
     {
         return $this->getUrl('*/marketingsoftware_ajaxcollection/validate', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that can be used to create collection
-     *  @return string
-     */
-    public function getAjaxCollectionCreaetUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxcollection/create', array('_secure' => true));
-    }
-
-    /**
-     *  Return Ajax url that can be used to fetch infromation about collection
-     *  @return string
-     */
-    public function getAjaxCollectionInfoUrl()
-    {
-        return $this->getUrl('*/marketingsoftware_ajaxcollection/info', array('_secure' => true));
     }
 
     /**
@@ -177,22 +56,22 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
     {
         return $this->getUrl('*/marketingsoftware_ajaxcollection/fetch', array('_secure' => true));
     }
-
+    
     /**
-     *  Return Ajax url that can be used to validate collection fields
+     *  Return Ajax url that can be used to store collection.
      *  @return string
      */
-    public function getAjaxCollectionFieldValidateUrl()
+    public function getAjaxCollectionStoreUrl()
     {
-        return $this->getUrl('*/marketingsoftware_ajaxcollectionfield/validate', array('_secure' => true));
+        return $this->getUrl('*/marketingsoftware_ajaxcollection/store', array('_secure' => true));
     }
 
     /**
-     *  Return Ajax url that can be used to create collection fields 
+     *  Return Ajax url that can be used to create default structure.
      *  @return string
      */
-    public function getAjaxCollectionFieldCreateUrl()
+    public function getAjaxCollectionDefaultUrl()
     {
-        return $this->getUrl('*/marketingsoftware_ajaxcollectionfield/create', array('_secure' => true));
+        return $this->getUrl('*/marketingsoftware_ajaxcollection/default', array('_secure' => true));   
     }
 }

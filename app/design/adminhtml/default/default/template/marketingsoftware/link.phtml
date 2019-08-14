@@ -1,215 +1,98 @@
 <?php
 /**
- *  View for Link controller
- *  Copernica Marketing Software v 1.2.0
- *  March 2011
- *  http://www.copernica.com/
+ *  link.phtml
+ *  Copernica Marketing Software
  */
-$_helper = Mage::helper('marketingsoftware');
-$_config = Mage::helper('marketingsoftware/config');
-
-// collection names with title
-$collections = array(
-    array('name' => 'cartproducts', 'title' => 'Cart items collection'),
-    array('name' => 'orders', 'title' => 'Orders collection'),
-    array('name' => 'orderproducts', 'title' => 'Order products collection'),
-    array('name' => 'addresses', 'title' => 'Address collection'),
-    array('name' => 'viewedproduct', 'title' => 'Viewed product collection'),
-);
-
-// get current controller
-$currentController = $this->getAction();
-
 ?>
 
 <div class="content-header">
     <h3 class="icon-head head-system-account">Copernica Marketing Software : Link Fields</h3>
     <p class="content-buttons">
+        <button type="button" id="validate">Validate</button>
         <button type="button" id="save">Save</button>
     </p>
 </div>
 
-<!-- Start of status box -->
-<?php if (count($currentController->getErrors()) or count($currentController->getWarnings())) { ?>
-    <div class="entry-edit">    
-        <div class="entry-edit-head collapsable">
-            <h4>Current status</h4>
-        </div>
-        <div class="fieldset collapsable">
-            <ul>
-                <?php foreach ($currentController->getErrors() as $error) { ?>
-                    <li><?php echo $error ?></li>
-                <?php } ?>
-                <?php foreach ($currentController->getWarnings() as $warning) { ?>
-                    <li><?php echo $warning ?></li>
-                <?php } ?>
-            </ul>
-        </div>
+<div id="linking-view" class="columns">
+    <div class="side-col">
+        <h3>
+            Copernica structure
+        </h3>
+        <ul id="collection_list" class="tabs">
+            <li data-target="main">
+                <a class="tab-item-link">
+                    <span>
+                        Database
+                    </span>
+                </a>
+            </li>
+            <li data-target="cartproducts">
+                <a class="tab-item-link">
+                    <span>
+                        Cart items collection
+                    </span>
+                </a>
+            </li>
+            <li data-target="orders">
+                <a class="tab-item-link">
+                    <span>
+                        Orders collection
+                    </span>
+                </a>
+            </li>
+            <li data-target="orderproducts">
+                <a class="tab-item-link">
+                    <span>
+                        Order products collection
+                    </span>
+                </a>
+            </li>
+            <li data-target="addresses">
+                <a class="tab-item-link">
+                    <span>
+                        Address collection
+                    </span>
+                </a>
+            </li>
+            <li data-target="viewedproducts">
+                <a class="tab-item-link">
+                    <span>
+                        Viewed products collection
+                    </span>
+                </a>
+            </li>
+            <li data-target="default">
+                <a class="tab-item-link">
+                    <span>
+                        Default structure
+                    </span>
+                </a>
+            </li>
+        </ul>
     </div>
-<?php } ?>
-<!-- End of status box -->
 
-<div class="entry-edit">
-
-    <!-- fields linking form. -->
-    <form action="<?php echo $this->getPostUrl(); ?>" method="post" name="cp_profile_collection" id="cp_profile_collection">
-        <?php echo $this->getBlockHtml('formkey'); ?>
-
-        <!-- database checker section. -->        
-        <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend">Database</h4>
-            <a href="#" onclick ="document.getElementById('database_help').style.display='block'; return false;" id="page-help-link" style="float: right; line-height:18px;">More information</a>
-        </div>
-        <div class="fieldset">
-            <div class="hor-scroll">
-                <table cellspacing="0" class="form-list">
-                    <tbody>
-                        <tr>
-                            <td class="value">Name</td>
-                            <td class="value">Status</td>
-                        </tr>
-                        <tr>
-                            <td class="value">
-                                <input type="text" class="input-text" value="<?php echo(htmlspecialchars($_config->getDatabaseName())); ?>" name="db_input" id="db_input"/>
-                            </td>
-                            <td class="value">
-                                <span style="display:none;" id="db_check_result"></span>
-                                <b style="display:none;" id="db_check_repair"></b>
-                            </td>                          
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <!-- end of database checker section. -->
-
-        <!-- first section: customer profiles. -->
-        <div class="entry-edit-head">
-            <h4 class="icon-head head-edit-form fieldset-legend" id="customers_profiles_label" name="customers_profiles_label">Customers Profiles</h4>
-            <a href="#" onclick ="document.getElementById('profiles_help').style.display='block'; return false;" id="page-help-link" style="float: right; line-height:18px;">More information</a>            
-        </div>
-        
-        <div class="fieldset">
-            <div class="hor-scroll">
-                <table cellspacing="0" class="form-list">
-                    <tbody id ="customer_fields">
-                        <tr>
-                            <td class="value">Magento field</td>
-                            <td class="value">Copernica field</td>
-                            <td class="value">Status</td>
-                        </tr>
-                        <?php foreach ($_helper->supportedCustomerFields() as $field => $label) { ?>
-                            <tr class="customer_field">
-                                <td class="value magento-field">
-                                    <input type="text" disabled="disabled" class="input-text disabled magento-field-label" value="<?php echo $label;?>">
-                                    <input type="hidden" disabled="disabled" class="magento-field-system" value="<?php echo $field; ?>">
-                                </td>
-                                <td class="value copernica-field"></td>
-                                <td class="value field-status"></td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-<!-- end of first section. -->
-
-        <?php foreach($collections as $collection) { ?>
-            <div class="collection">
-                <input type="hidden" name="collection" value="<?php echo $collection['name']; ?>">
-                <div class="entry-edit-head">
-                    <h4 class="icon-head head-edit-form fieldset-legend">
-                        <?php echo $collection['title']; ?>
-                    </h4>
-                </div>
-                <div class="fieldset collection-container collection-<?php echo $collection['name']; ?>">
-                    <div class="hor-scroll">
-                        <table cellspacing="0" class="form-list">
-                            <tbody>
-                                <tr>
-                                    <td class="value">
-                                        Collection name
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="value field-name">
-                                        <input type="text" class="input-text" title="<?php echo $collection['title']; ?>">
-                                    </td>
-                                    <td class="value field-status">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="fieldset collection-fields collection-<?php echo $collection['name']; ?>">
-                    <div class="hor-scroll">
-                        <table cellspacing="0" class="form-list">
-                            <tbody>
-                                <tr>
-                                    <td class="value">
-                                        Magento field
-                                    </td>
-                                    <td class="value">
-                                        Copernica field
-                                    </td>
-                                    <td class="value">  
-                                        Status
-                                    </td>
-                                </tr>
-                                <?php foreach ($this->getSupportedCollectionFields($collection['name']) as $name => $label) { ?>
-                                    <tr class="field">
-                                        <td class="value field-magento">
-                                            <input type="text" class="input-text disabled" value="<?php echo $label; ?>" disabled="disabled">
-                                            <input type="hidden" value="<?php echo $name; ?>">
-                                        </td>
-                                        <td class="value field-copernica">
-                                        </td>
-                                        <td class="value field-status">
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
-    </form>
+    <div id="collection_view" class="main-col">
+    
+    </div>
 </div>
 
-<script type="text/javascript">
-    // we want to be nice and use js namespacing trick
+<script>
+    // create Copernica namespace
     var Copernica = Copernica || {};
 
     // We want to pass relevant ajax urls to js file. To do that we will create
     // a namespace object that will hold urls. This way we can still keep generating 
     // urls in controller and actual usage will be in js file.
     Copernica.ajaxUrls = {
-        save: '<?php echo $this->getSaveFormUrl(); ?>',
-        database: {
-            validate: '<?php echo $this->getAjaxDatabaseValidateUrl(); ?>',
-            create: '<?php echo $this->getAjaxDatabaseCreateUrl(); ?>',
-            fetch: '<?php echo $this->getAjaxDatabaseFetchUrl(); ?>'
-        },
-        databaseField: {
-            validate: '<?php echo $this->getAjaxDatabaseFieldValidateUrl(); ?>',
-            create: '<?php echo $this->getAjaxDatabaseFieldCreateUrl(); ?>'
-        },
         collection: {
-            validate: '<?php echo $this->getAjaxCollectionValidateUrl(); ?>',
-            create: '<?php echo $this->getAjaxCollectionCreaetUrl(); ?>',
-            info: '<?php echo $this->getAjaxCollectionInfoUrl(); ?>',
-            fetch: '<?php echo $this->getAjaxCollectionFetchUrl(); ?>'
-        },
-        collectionField: {
-            validate: '<?php echo $this->getAjaxCollectionFieldValidateUrl(); ?>',
-            create: '<?php echo $this->getAjaxCollectionFieldCreateUrl(); ?>'
+            fetch: '<?php echo $this->getAjaxCollectionFetchUrl(); ?>',
+            store: '<?php echo $this->getAjaxCollectionStoreUrl(); ?>',
+            default: '<?php echo $this->getAjaxCollectionDefaultUrl(); ?>',
+            validate: '<?php echo $this->getAjaxCollectionValidateUrl(); ?>'
         }
     };
 
-    Copernica.pageUrls = {
-        accountSettings: '<?php echo $this->getAccountSettingsUrl(); ?>'
-    }
-    
+    // create view instance
+    var view = new Copernica.MainView($('linking-view'));
+
 </script>

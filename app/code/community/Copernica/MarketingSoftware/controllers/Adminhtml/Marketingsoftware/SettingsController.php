@@ -97,7 +97,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
         if ($accessToken === false) 
         {
             // store error message as json inside session
-            Mage::getSingleton('core/session')->setErrorMessage(json_encode($output['error']));
+            Mage::getSingleton('core/session')->setErrorMessage(json_encode($output['error']['message']));
 
             // well, we have an error and we have to tell the user that we have an 
             // error
@@ -195,11 +195,20 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SettingsController
         // get all post values from the request
         $post = $this->getRequest()->getPost();
 
-        // check if we have a client key
-        if (!isset($post['cp_client_key'])) return $this->_redirect('*/*');
-
         // get config to local scope
         $config = Mage::helper('marketingsoftware/config');
+
+        // get current client key
+        $clientKey = $config->getClientKey();
+
+        // get current client secret
+        $clientSecret = $config->getClientSecret();
+
+        // if client key and secret does not change there is no point in doing anything
+        if ($clientKey == $post['cp_client_key'] && $clientSecret == $post['cp_client_secret']) return $this->_redirect('*/*');
+
+        // check if we have a client key
+        if (!isset($post['cp_client_key'])) return $this->_redirect('*/*');
 
         // set client key inside config file
         $config->setClientKey($post['cp_client_key']);

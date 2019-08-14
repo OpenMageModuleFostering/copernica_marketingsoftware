@@ -221,7 +221,7 @@ class Copernica_MarketingSoftware_Model_Observer
             )))
             ->setCustomer($customerId)
             ->setAction('remove')
-            ->serName('quote')
+            ->setName('quote')
             ->setEntityId($quote->getId())
             ->save();
     }

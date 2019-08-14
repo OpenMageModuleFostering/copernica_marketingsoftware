@@ -39,12 +39,10 @@ class Copernica_MarketingSoftware_Helper_ApiValidator extends Copernica_Marketin
     public function validateDatabase($databaseName)
     {
         // make a request to API to get database structure
-        $output = $this->request()->get(
-            'database/'.urlencode($databaseName)
-        );
+        $output = $this->request()->get( 'database/'.urlencode($databaseName) );
 
         // check if api say that we have a problem
-        if (isset($output['error']) || !isset($output['data']))
+        if (isset($output['error']) || !isset($output['name']))
         {
             // check if Api tells that database does not exists or something else is wrong
             if (strpos($output['error']['message'], 'No database') !== false)

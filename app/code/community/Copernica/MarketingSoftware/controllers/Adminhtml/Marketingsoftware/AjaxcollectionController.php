@@ -38,43 +38,79 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         // get POST variables
         $post = $this->getRequest()->getPost();
 
+        // get config helper
+        $config = Mage::helper('marketingsoftware/config');
+        $validator = Mage::helper('marketingsoftware/ApiValidator');
+
+        // list of problems
+        $problems = array();
+
         try 
         {
-            // if we don't have a database name we want to tell user that he should provide us with one
-            if (!isset($post['databaseName'])) throw Mage::exception('Copernica_MarketingSoftware', 'No valid database', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
-
-            // if we don't have collection name we want to tell user that his input was wrong
-            if (!isset($post['collectionName']) || !isset($post['collectionType'])) throw Mage::exception('Copernica_MarketingSoftware', 'Invalid input', Copernica_MarketingSoftware_Exception::INVALID_INPUT);
-
-            // try to valdiate collection
-            $this->validateCollection($post['databaseName'], $post['collectionName'], $post['collectionType']);
-
-            // if we are here then everything is just dandy
-            $this->setResponse('Collection is valid');
-        }
-        /**
-         *  All important to us errors will be reported as custom exceptions.
-         *  We can handle them here.
-         */
-        catch (Copernica_MarketingSoftware_Exception $copernicaException)
-        {
-            // determine if we have a fix for problem
-            switch ($copernicaException->getCode())
+            if ($post['type'] == 'main') 
             {
-                case Copernica_MarketingSoftware_Exception::COLLECTION_NOT_EXISTS:
-                    $fix = 'create';
-                    break;
-                case Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS:
-                    $fix = 'create database';
-                    break;
-                default: 
-                    $fix = '';
-                    break;
-            }
+                try
+                {
+                    // validate database
+                    $validator->validateDatabase($post['name']);    
+                }
+                catch (Copernica_MarketingSoftware_Exception $exception)
+                {
+                    array_push($problems, $exception->getMessage());
+                }
 
-            // set response for user
-            $this->setResponse($copernicaException->getMessage(), true, $fix);
+                // iterate over all fields
+                foreach ($post['fields'] as $field)
+                {
+                    // get field magento and copernica name
+                    list($magento, $copernica) = explode(',', $field);
+
+                    try
+                    {
+                        // validate database field
+                        $validator->validateDatabaseField($post['name'], $copernica, $magento);    
+                    }
+                    catch (Copernica_MarketingSoftware_Exception $exception)
+                    {
+                        array_push($problems, $magento.','.$exception->getMessage());
+                    }
+                }
+            }
+            else 
+            {
+                // get database name
+                $databaseName = $config->getDatabaseName();
+
+                try
+                {
+                    // validates collection
+                    $validator->validateCollection($databaseName, $post['name'], $post['type']);    
+                }
+                catch (Copernica_MarketingSoftware_Exception $exception)
+                {
+                    array_push($problems, $exception->getMessage());
+                }
+                
+
+                // iterate over all fields
+                foreach ($post['fields'] as $field)
+                {
+                    // get field magento and copernica name
+                    list($magento, $copernica) = explode(',', $field);
+
+                    try
+                    {
+                        // validate collection field
+                        $validator->validateCollectionField($databaseName, $post['name'], $post['type'], $copernica, $magento);
+                    }
+                    catch (Copernica_MarketingSoftware_Exception $exception)
+                    {
+                        array_push($problems, $magento.','.$exception->getMessage());
+                    }
+                }
+            }
         }
+
         /**
          *  General exceptions should not happen but, just in case we want to 
          *  handle them here.
@@ -85,110 +121,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
             Mage::logException($exception);
 
             // we have an critical error
-            $this->setResponse('Critical error. Check error logs form more info.', true);
-        }
-    }
-
-    /** 
-     *  Action that can be used to create collections
-     */
-    public function createAction()
-    {
-        // get POST variables
-        $post = $this->getRequest()->getPost();
-
-        try
-        {
-            // if we don't have a database name we want to tell user that he should provide us with one
-            if (!isset($post['databaseName'])) throw Mage::exception('Copernica_MarketingSoftware', 'No valid database', Copernica_MarketingSoftware_Exception::DATABASE_NOT_EXISTS);
-
-            // if we don't have collection name we want to tell user that his input was wrong
-            if (!isset($post['collectionName']) || !isset($post['collectionType'])) throw Mage::exception('Copernica_MarketingSoftware', 'Invalid input', Copernica_MarketingSoftware_Exception::INVALID_INPUT);
-
-            // create collection
-            $this->createCollection($post['databaseName'], $post['collectionName'], $post['collectionType']);
-
-            // we are good
-            $this->setResponse('Collection was created');
-        }
-        /**
-         *  All relevant errors will be reported as exception. We can handle 
-         *  them here.
-         */
-        catch (Copernica_MarketingSoftware_Exception $copernicaException)
-        {
-            $this->setResponse($copernicaException->getMessage(), true);
-        }
-        /**
-         *  All general exception can be just logged by magento.
-         */
-        catch (Exception $exception)
-        {
-            // tell mageton to log exception
-            Mage::logException($exception);
-
-            // tell user that we didn't anything due to critical error
-            $this->setResponse('Critical error. Check error logs for more info.', true);
-        }
-    }
-
-    /**
-     *  Action that can be used to get information about collection
-     */
-    public function infoAction()
-    {
-        // get POST variables
-        $post = $this->getRequest()->getPost();
-
-        // get response instance
-        $response = $this->getResponse();
-
-        // Ajax response should be encoded with json
-        $response->setHeader('Content-Type', 'application/json');
-
-        // check if we have collection type? 
-        if (!$post['collectionType'])
-        {
-            // clear response body
-            $response->clearBody();
-
-            // send nice response
-            $response->setBody(json_encode(array(
-                'error' => 1,
-                'message' => 'invalid input'
-            )));
-
-            // we are done here
-            return;
-        }
-
-        // get proper collection name
-        switch ($post['collectionType']) {
-            case 'cartproducts': 
-                $collectionName = Mage::helper('marketingsoftware/config')->getCartItemsCollectionName();
-                break;
-            case 'orders':
-                $collectionName = Mage::helper('marketingsoftware/config')->getOrdersCollectionName();
-                break;
-            case 'orderproducts':
-                $collectionName = Mage::helper('marketingsoftware/config')->getOrderItemsCollectionName();
-                break;
-            case 'addresses':
-                $collectionName = Mage::helper('marketingsoftware/config')->getAddressCollectionName();
-                break;
-            case 'viewedproduct':
-                $collectionName = Mage::helper('marketingsoftware/config')->getViewedProductCollectionName();
-                break;
-            default: 
-                $collectionName = '';
-                break;
+            $this->getResponse()->setBody('Critical error. Check error logs form more info.');
         }
 
         // set the response
-        $response->setBody(json_encode(array(
-            'error' => 0,
-            'collectionName' => $collectionName
-        )));
+        $this->getResponse()->setBody(json_encode($problems));
     }
 
     /**
@@ -199,126 +136,328 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
         // get post variables
         $post = $this->getRequest()->getPost();
 
-        // prepare ajax response
-        $this->prepareAjaxResponse();
-
-        // get response instance into local scope
+        // get response
         $response = $this->getResponse();
 
-        // check if we have all required parameters
-        if (!isset($post['collectionType']) || !isset($post['magentoField'])) {
-            $response->setBody(json_encode(array(
-                'message' => 'Invalid input',
-                'error' => 1
-            )));
+        // check if we have a required name property
+        if (!isset($post['name'])) return $response->setBody(json_encode(array(
+            'message' => 'Invalid input'
+        )));
+
+        // get config and data to local scope
+        $config = Mage::helper('marketingsoftware/config');
+        $data = Mage::helper('marketingsoftware/data');
+
+        // get stored database name
+        $database = $config->getDatabaseName();
+
+        // check if we have a database to communicate
+        if (empty($database) && $post['name'] != 'main') return $response->setBody(json_encode(array(
+            'error' => 'no database'
+        )));
+
+        // placeholder for linked name
+        $linkedName = '';
+
+        // placeholders
+        $linkedFields = array();
+        $supportedFields = array();
+        $linkedFields = array();
+
+        // get the collection name
+        switch ($post['name']) 
+        {
+            case 'main':            
+                $linkedName = $config->getDatabaseName(); 
+                $supportedFields = $data->supportedCustomerFields();
+                $linkedFields = $config->getLinkedCustomerFields();
+                $label = 'Database';
+                break;
+
+            case 'orders':          
+                $linkedName = $config->getOrdersCollectionName(); 
+                $supportedFields = $data->supportedOrderFields();
+                $linkedFields = $config->getLinkedOrderFields();
+                $label = 'Orders collection';
+                break;
+
+            case 'orderproducts':     
+                $linkedName = $config->getOrderItemsCollectionName(); 
+                $supportedFields = $data->supportedOrderItemFields();
+                $linkedFields = $config->getLinkedOrderItemFields();
+                $label = 'Orders items collection';
+                break;
+
+            case 'addresses':       
+                $linkedName = $config->getAddressesCollectionName(); 
+                $supportedFields = $data->supportedAddressFields();
+                $linkedFields = $config->getLinkedAddressFields();
+                $label = 'Addresses collection';
+                break;
+
+            case 'viewedproducts':  
+                $linkedName = $config->getViewedProductCollectionName(); 
+                $supportedFields = $data->supportedViewedProductFields();
+                $linkedFields = $config->getLinkedViewedProductFields();
+                $label = 'Viewed products collection';
+                break;
+
+            case 'cartproducts':          
+                $linkedName = $config->getCartItemsCollectionName(); 
+                $supportedFields = $data->supportedCartItemFields();
+                $linkedFields = $config->getLinkedCartItemFields();
+                $label = 'Cart items collection';
+                break;
         }
 
-        // get collection linked fields
-        $collectionLinkedField = $this->getLinkedFieldByCollectionType($post['collectionType']);
+        // placeholder for fields
+        $fields = array();
 
-        // check if we have any linked field
-        if (empty($collectionLinkedField))
+        // iterate over supported fields and construct overall fields
+        foreach ($supportedFields as $fieldName => $fieldLabel)
         {
-            $response->setBody(json_encode(array(
-                'message' => 'Invalid collection',
-                'error' => 1
-            )));
-
-            // we are done here
-            return;
-        } 
-
-        // check if we have desired field in supported fields
-        if (!array_key_exists($post['magentoField'], $collectionLinkedField)) 
-        {
-            $response->setBody(json_encode(array(
-                'message' => 'Invalid field',
-                'error' => 1
-            )));
-
-            // we are done here
-            return;
+            $fields[] = array (
+                'magento' => $fieldName,
+                'label' => $fieldLabel,
+                'copernica' => $linkedFields[$fieldName]
+            );
         }
 
-        // set proper response body
+        // set response body
         $response->setBody(json_encode(array(
-            'message' => 'Field data fetched',
-            'fieldData' => $collectionLinkedField[$post['magentoField']],
-            'error' => 0
+            'name'          => $post['name'],
+            'linkedName'    => $linkedName,
+            'label'         => $label,
+            'fields'        => $fields,
         )));
     }
 
     /**
-     *  Get all linked field of collection by it's type
-     *  @param  string collection type  
-     *  @return array
+     *  Create field inside given database.
+     *  @param  string  the name of the database that will be used
+     *  @param  string  the name of the field
+     *  @param  string  the magento field
      */
-    private function getLinkedFieldByCollectionType($collectionType)
+    private function createDatabaseField($databaseName, $fieldName, $magentoField)
     {
-        switch ($collectionType) {
-            case 'cartproducts':    return Mage::helper('marketingsoftware/config')->getLinkedCartItemFields();
-            case 'orders':          return Mage::helper('marketingsoftware/config')->getLinkedOrderFields();
-            case 'orderproducts':   return Mage::helper('marketingsoftware/config')->getLinkedOrderItemFields();
-            case 'addresses':       return Mage::helper('marketingsoftware/config')->getLinkedAddressFields();
-            case 'viewedproduct':   return Mage::helper('marketingsoftware/config')->getLinkedViewedProductFields();
-            default:                return array();
+        // get api builder
+        $builder = Mage::helper('marketingsoftware/ApiBuilder');
+
+        // check what kind of field we want to create
+        switch ($magentoField)
+        {
+            case 'email': 
+                $builder->createDatabaseEmailField($databaseName, $fieldName);
+                break;
+            case 'newsletter' : 
+                $builder->createDatabaseNewsletterField($databaseName, $fieldName);
+                break;
+            case 'birthdate' : 
+                $builder->createDatabaseDateField($databaseName, $fieldName);
+                break;
+            case 'storeView': 
+                $builder->createDatabaseField($databaseName, $fieldName, array( 'length' => 100 ));
+                break;
+            case 'registrationDate' : 
+                $builder->createDatabaseDatetimeField($databaseName, $fieldName);
+                break;
+            default: 
+                $builder->createDatabaseField($databaseName, $fieldName);
+                break;
         }
     }
 
     /**
-     *  Validate collection.
-     *  @param  string  database name
-     *  @param  string  collection name
-     *  @param  string  collection type
+     *  This ajax call can be used to store information about certain collection
      */
-    private function validateCollection($databaseName, $collectionName, $collectionType)
+    public function storeAction()
     {
-        // tell helper to validata collection
-        Mage::helper('marketingsoftware/ApiValidator')->validateCollection($databaseName, $collectionName, $collectionType);
+        // get post data
+        $post = $this->getRequest()->getPost();
+
+        // get builder and config
+        $builder = Mage::helper('marketingsoftware/ApiBuilder');
+        $config = Mage::helper('marketingsoftware/Config');
+
+        // what collection we are doing?
+        switch ($post['type']) 
+        {
+            // are we making 'main' (database) collection?
+            case 'main':
+                // create database
+                $builder->createDatabase($post['name']);
+
+                // save database name
+                $config->setDatabaseName($post['name']);
+
+                // fields that we are linking
+                $fields = array();
+
+                // iterate over fields and create proper fields
+                foreach ($post['fields'] as $field)
+                {
+                    // get magneto and copernica name
+                    list($magento, $copernica) = explode(',', $field);
+
+                    // insert next field
+                    $fields[$magento] = $copernica;
+
+                    // create database field
+                    $this->createDatabaseField($post['name'], $copernica, $magento);
+                }
+
+                // store linked fields
+                $config->setLinkedCustomerFields($fields);
+
+                break;
+
+            // are we dealing with normal collection
+            default:
+                // create collection
+                $databaseName = Mage::helper('marketingsoftware/config')->getDatabaseName();
+                $builder->createCollection($databaseName, $post['name'], $post['type']);
+
+                // placeholder for fields
+                $fields = array();
+
+                // iterate over fields and create proper ones
+                foreach ($post['fields'] as $field) 
+                {
+                    // get magento and copernica name
+                    list($magento, $copernica) = explode(',', $field);
+
+                    // assign field linking
+                    $fields[$magento] = $copernica;
+
+                    // create field
+                    $builder->createCollectionField($databaseName, $post['name'], $post['type'], $copernica, $magento);
+                }
+
+                switch ($post['type'])
+                {
+                    case 'orders':
+                        $config->setOrdersCollectionName($post['name']);
+                        $config->setLinkedOrderFields($fields);
+                        break;
+                    case 'orderproducts':
+                        $config->setOrderItemsCollectionName($post['name']);
+                        $config->setLinkedOrderItemFields($fields);
+                        break;
+                    case 'addresses':
+                        $config->setAddressesCollectionName($post['name']);
+                        $config->setLinkedAddressFields($fields);
+                        break;
+                    case 'viewedproducts':
+                        $config->setViewedProductCollectionName($post['name']);
+                        $config->setLinkedViewedProductFields($fields);
+                        break;
+                    case 'cartproducts':
+                        $config->setCartItemsCollectionName($post['name']);
+                        $config->setLinkedCartItemFields($fields);
+                        break;
+                }
+
+                break;
+        }
     }
 
     /**
-     *  Create collection
-     *  @param  string  database name
-     *  @param  string  collection name
-     *  @param  string  collection type
+     *  Make default structure.
      */
-    private function createCollection($databaseName, $collectionName, $collectionType)
+    public function defaultAction()
     {
-        // tell helper to create collection
-        Mage::helper('marketingsoftware/ApiBuilder')->createCollection($databaseName, $collectionName, $collectionType);
-    }
+        // assign database name
+        $databaseName = 'Magento';
 
-    /**
-     *  Prepare response object to fix Ajax communication.
-     */
-    private function prepareAjaxResponse()
-    {
-        // get response instance
-        $response = $this->getResponse();
+        // get builder
+        $builder = Mage::helper('marketingsoftware/ApiBuilder');
+        $config = Mage::helper('marketingsoftware/config');
+        $data = Mage::helper('marketingsoftware/data');
 
-        // clear current response body
-        $response->clearBody();
+        // create database
+        $builder->createDatabase($databaseName);
+        $config->setDatabaseName($databaseName);
 
-        // all Ajax responses should be encoded with JSON
-        $response->setHeader('Content-Type', 'application/json');
-    }
+        /*
+         *  Create database fields
+         */
+        $supportedFields = $data->supportedCustomerFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label)
+        {
+            $this->createDatabaseField($databaseName, $name, $name);
+            $linkedFields[$name] = $name;  
+        } 
+        $config->setLinkedCustomerFields($linkedFields);
 
-    /**
-     *  @param string   Message for user
-     *  @param bool     It's an error?
-     *  @param string   Do we have an fix for error?
-     */
-    private function setResponse($message, $error = false, $fix = '')
-    {
-        // prepare response
-        $this->prepareAjaxResponse();
+        /*
+         *  Create cart items collection
+         */
+        $builder->createCollection($databaseName, 'Cart_Items' ,'cartproducts');
+        $config->setCartItemsCollectionName('Cart_Items');
+        $supportedFields = $data->supportedCartItemFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label)
+        {
+            $builder->createCollectionField($databaseName, 'Cart_Items', 'cartproducts', $name, $name); 
+            $linkedFields[$name] = $name;  
+        } 
+        $config->setLinkedCartItemFields($linkedFields);
 
-        // assign response
-        $this->getResponse()->setBody(json_encode(array(
-            'message' => $message,
-            'error' => $error ? 1 : 0,
-            'fix' => ucfirst($fix)
-        )));
+        /*
+         *  Orders collection
+         */
+        $builder->createCollection($databaseName, 'Orders' ,'orders');
+        $config->setOrdersCollectionName('Orders');
+        $supportedFields = $data->supportedOrderFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label)
+        {
+            $builder->createCollectionField($databaseName, 'Orders', 'orders', $name, $name); 
+            $linkedFields[$name] = $name;  
+        } 
+        $config->setLinkedOrderFields($linkedFields);
+
+        /*
+         *  Orders items collection
+         */
+        $builder->createCollection($databaseName, 'Orders_Items' ,'orderproducts');
+        $config->setOrderItemsCollectionName('Orders_Items');
+        $supportedFields = $data->supportedOrderItemFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label)
+        {
+            $builder->createCollectionField($databaseName, 'Orders_Items', 'orderproducts', $name, $name); 
+            $linkedFields[$name] = $name;  
+        } 
+        $config->setLinkedOrderItemFields($linkedFields);
+
+        /*
+         *  Addresses collection
+         */
+        $builder->createCollection($databaseName, 'Addresses' ,'addresses');
+        $config->setAddressesCollectionName('Addresses');
+        $supportedFields = $data->supportedAddressFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label) 
+        {
+            $builder->createCollectionField($databaseName, 'Addresses', 'addresses', $name, $name); 
+            $linkedFields[$name] = $name;
+        }
+        $config->setLinkedAddressFields($linkedFields);
+
+        /*
+         *  Viewed products collection
+         */
+        $builder->createCollection($databaseName, 'Viewed_Products' ,'viewedproducts');
+        $config->setViewedProductCollectionName('Viewed_Products');
+        $supportedFields = $data->supportedViewedProductFields();
+        $linkedFields = array();
+        foreach ($supportedFields as $name => $label)
+        {
+            $builder->createCollectionField($databaseName, 'Viewed_Products', 'viewedproducts', $name, $name);   
+            $linkedFields[$name] = $name;
+        } 
+        $config->setLinkedViewedProductFields($linkedFields);
     }
 }

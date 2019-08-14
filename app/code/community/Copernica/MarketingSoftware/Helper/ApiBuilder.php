@@ -191,12 +191,9 @@ class Copernica_MarketingSoftware_Helper_ApiBuilder extends Copernica_MarketingS
         $collectionId = $this->getCollectionIdFromDatabase($databaseName, $collectionName);
 
         // create the field
-        $this->request()->post(
-            'collection/'.$collectionId.'/fields',
-            array_merge($fieldDefinition, array(
-                'name' => $copernicaName
-            ))
-        );
+        $this->request()->post( 'collection/'.$collectionId.'/fields', array_merge($fieldDefinition, array(
+            'name' => $copernicaName
+        )));
     }
 
     /**

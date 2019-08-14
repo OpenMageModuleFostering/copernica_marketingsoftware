@@ -38,6 +38,21 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
     protected $multi;
 
     /**
+     *  Cipher lists for different crypto libs
+     *  @var    array
+     */
+    static protected $cipherList = array( 
+        'openssl'   => "ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:+HIGH",
+        'nss'       => "ecdhe_rsa_aes_256_sha:rc4",
+    );
+
+    /**
+     *  The currently used crypto lib.
+     *  @var    string
+     */
+    static protected $cryptoLib = null;
+
+    /**
      *  We use normal PHP constructor cause Helpers are not childs of
      *  Varien_Object class, so no _construct is called.
      */
@@ -123,6 +138,35 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
     }
 
     /**
+     *  Prepare a proper version of curl instance
+     *  @return resource
+     */
+    protected function prepareCurl()
+    {
+        // prepare curl instance
+        $curl = curl_init();
+
+        // well, should we make some detective work?
+        if (is_null(self::$cryptoLib))
+        {
+            // get curl version
+            $version = curl_version();
+
+            // are we using nss?
+            if (strpos($version['ssl_version'], 'NSS') !== false) self::$cryptoLib = 'nss';
+
+            // ssl engines should work with open ssl cipher names
+            else self::$cryptoLib = 'openssl';
+        }
+
+        // set curl option
+        curl_setopt($curl, CURLOPT_SSL_CIPHER_LIST, self::$cipherList[self::$cryptoLib]);
+
+        // return prepared curl instance
+        return $curl;
+    }
+
+    /**
      *  Make a GET requst
      *  @param  string  Request string
      *  @param  assoc   (Optional) Data to be passed with request
@@ -131,7 +175,7 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
     public function get($request, $data = null)
     {
         // reset curl options
-        $curl = curl_init();
+        $curl = $this->prepareCurl();
 
         // if we have access token then we want to append it to request
         if ($this->accessToken) $request.=$this->buildQueryString(array_merge(array(
@@ -175,7 +219,7 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
         else $request.='?access_token='.$this->accessToken;
 
         // create curl
-        $curl = curl_init();
+        $curl = $this->prepareCurl();
 
         // set url that we want to receive
         curl_setopt($curl, CURLOPT_URL, $this->hostname.'/'.$request);
@@ -225,7 +269,7 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
         else $request.='?access_token='.$this->accessToken;
 
         // reset curl options
-        $curl = curl_init();
+        $curl = $this->prepareCurl();
 
         // set url that we want to receive
         curl_setopt($curl, CURLOPT_URL, $this->hostname.'/'.$request);
@@ -269,7 +313,7 @@ class Copernica_MarketingSoftware_Helper_RESTRequest
     public function delete($request, $data = null)
     {
         // reset curl options
-        $curl = curl_init();
+        $curl = $this->prepareCurl();
 
         // append access token to our request
         $request.='?access_token='.$this->accessToken;
