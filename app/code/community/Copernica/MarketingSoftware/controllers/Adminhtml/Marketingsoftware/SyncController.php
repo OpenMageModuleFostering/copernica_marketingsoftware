@@ -30,6 +30,17 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_SyncController extends Copernica_MarketingSoftware_Controller_Action
 {
+	
+	/**
+	 * Check if cache management is allowed
+	 *
+	 * @return bool
+	 */
+	protected function _isAllowed()
+	{
+		return Mage::getSingleton('admin/session')->isAllowed('copernica/sync');
+	}
+		
     /**
      *  This action is a default one. Will be executed when user arrives on page.
      */

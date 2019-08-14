@@ -67,13 +67,14 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
             'quantity'      =>  'Quantity',
             'price'         =>  'Price',
         	'totalPrice'    =>  'Total price',
-            'timestamp'     =>  'Modified',
-            'storeView'     =>  'Store view',             
+            'storeView'     =>  'Store view',
             'url'           =>  'Details URL',
             'image'         =>  'Image URL',
             'categories'    =>  'Categories',
             'options'       =>  'Product options',
             'attributes'    =>  'Product Attributes',
+        	'createdAt' 	=>	'Created',
+        	'updatedAt' 	=>	'Modified'        		
         );
     }
     
@@ -87,7 +88,6 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return array(
             'incrementId' 			=>	'Increment id',
-            'timestamp' 			=>	'Timestamp',
             'quantity' 				=>	'Quantity',
             //'subtotal' => 'Subtotal',
             'shipping' 				=>	'Shipping costs',
@@ -102,6 +102,8 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
             'shippingAddressId' 	=>	'Shipping Address id',
             'billingAddressId' 		=>	'Billing Address id',
             'couponCode' 			=>	'Coupon code',
+        	'createdAt' 			=>	'Created',
+        	'updatedAt' 			=>	'Modified'		
         );
     }
 
@@ -123,7 +125,7 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
             'quantity' 		=>	'Quantity',
             'price' 		=>	'Price',
         	'totalPrice' 	=>	'Total price',
-        	'timestamp' 	=>	'Modified',
+        	'status'		=> 	'Order item status',
             'storeView' 	=>	'Store view',             
             'url' 			=>	'Details URL',
             'image' 		=>	'Image URL',
@@ -131,6 +133,9 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
             'options' 		=>	'Product options',
             'attributes' 	=>	'Product Attributes',
             'salesRules' 	=>	'Sales rules',
+        	'createdAt' 	=>	'Created',
+        	'updatedAt' 	=>	'Modified',
+        		
         );
     }
     
@@ -174,13 +179,13 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
             'attributeSet'  =>  'Attribute set',
             'weight'        =>  'Weight',
             'price'         =>  'Price',
-        	'timestamp'     =>  'Timestamp',
         	'storeView'     =>  'Store view',
             'url'           =>  'Details URL',
             'image'         =>  'Image URL',
             'categories'    =>  'Categories',
             'options'       =>  'Product options',
-            'attributes'    =>  'Product Attributes',            
+            'attributes'    =>  'Product Attributes',          
+        	'createdAt' 	=>	'Created'  
         );
     }
     
@@ -201,14 +206,14 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     		'quantity'      =>  'Quantity',
     		'price'         =>  'Price',
     		'totalPrice'    =>  'Total price',
-    		'timestamp'		=>  'Timestamp',
     		'description'	=>	'Description',
     		'storeView'		=>	'Store view',
     		'url'           =>  'Details URL',
     		'image'         =>  'Image URL',
     		'categories'    =>  'Categories',
     		'options'       =>  'Product options',
-    		'attributes'    =>  'Product Attributes',    			
+    		'attributes'    =>  'Product Attributes',
+    		'createdAt' 	=>	'Created'
     	);
     }
 
@@ -299,9 +304,12 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $definitions = array(
             'cartproducts' => array (
-                'timestamp' => array (
-                    'type' => 'datetime'
-                ),
+            	'createdAt' => array (
+            		'type' => 'datetime'
+            	),
+            	'updatedAt' => array (
+            		'type' => 'datetime'
+            	),	
                 'url' => array (
                     'type' => 'text',
                     'length' => 255
@@ -332,10 +340,13 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
 				),
             ),
             'orderproducts' => array (
-                'timestamp' => array (
+                'createdAt' => array (
                     'type' => 'datetime'
                 ),
-                'url' => array (
+            	'updatedAt' => array (
+            		'type' => 'datetime'
+            	),
+            	'url' => array (
                     'type' => 'text',
                     'length' => 255
                 ),
@@ -370,7 +381,7 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ),
             ),
             'viewedproducts' => array (
-                'timestamp' => array (
+                'createdAt' => array (
                     'type' => 'datetime'
                 ),
                 'url' => array (
@@ -403,9 +414,12 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ) 
             ),
             'orders' => array (
-                'timestamp' => array (
+                'createdAt' => array (
                     'type' => 'datetime'
                 ),
+            	'updatedAt' => array (
+            		'type' => 'datetime'
+            	),
                 'storeView' => array (
                     'type' => 'text',
                     'length' => 250
@@ -437,9 +451,9 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 )
             ),
         	'wishlistproducts' => array (
-        		'timestamp' => array (
-        			'type' => 'datetime'
-        		),
+                'createdAt' => array (
+                    'type' => 'datetime'
+                ),
         		'description' => array (
                     'type' => 'big',
                     'textlines' => 4,

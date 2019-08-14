@@ -129,8 +129,8 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $this->_appendSimpleNode($element, 'sku', $product->getSku());
         $this->_appendSimpleNode($element, 'name', $product->getName());
         $this->_appendSimpleNode($element, 'description', $product->getDescription());
-        $this->_appendSimpleNode($element, 'modified', $product->getModified());
-        $this->_appendSimpleNode($element, 'created', $product->getCreated());
+        $this->_appendSimpleNode($element, 'modified', $product->getUpdatedAt());
+        $this->_appendSimpleNode($element, 'created', $product->getCreatedAt());
         $this->_appendSimpleNode($element, 'productUrl', $product->getUrl());
         $this->_appendSimpleNode($element, 'imageUrl', $product->getImage());
         $this->_appendSimpleNode($element, 'thumbnailUrl', $product->getThumbnail());

@@ -57,6 +57,16 @@ class Copernica_MarketingSoftware_Controller_Action extends Mage_Adminhtml_Contr
 
         $this->_checkApiAccess();
     }
+    
+    /**
+     * Check if cache management is allowed
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+    	return Mage::getSingleton('admin/session')->isAllowed('copernica');
+    }    
 
     /**
      *  Check if queue have too many items. This method will output messages on 

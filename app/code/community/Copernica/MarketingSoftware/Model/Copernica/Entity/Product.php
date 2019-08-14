@@ -235,7 +235,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      *  
      *  @return string
      */
-    public function getModified()
+    public function getUpdatedAt()
     {
         return $this->_product->getUpdatedAt();
     }
@@ -245,7 +245,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      *  
      *  @return string
      */
-    public function getCreated()
+    public function getCreatedAt()
     {
         return $this->_product->getCreatedAt();
     }

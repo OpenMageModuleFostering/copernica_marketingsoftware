@@ -36,7 +36,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Startsync extends Copernica_
      *  
      *  @var	int
      */
-    protected $_eventsLimit = 5000;
+    protected $_eventsLimit = 500;
 
     /**
      *  Current event status. It contains informations about last entites that were

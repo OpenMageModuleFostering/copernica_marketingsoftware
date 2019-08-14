@@ -28,7 +28,7 @@
  *  This class will answer any Ajax call that is asking info about Copernica
  *  collection.
  */
-class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionController extends Mage_Adminhtml_Controller_Action
+class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionController extends Copernica_MarketingSoftware_Controller_Action
 {
     /**
      *  Valdiate collection

@@ -165,14 +165,24 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order extends Copernica
     }
 
     /**
-     *  Fetch timestamp
-     *  
+     *  Get last modification date
+     *
      *  @return string
      */
-    public function fetchTimestamp()
+    public function fetchUpdatedAt()
     {
-        return $this->_order->getUpdatedAt();
+    	return $this->_order->getUpdatedAt();
     }
+    
+    /**
+     *  Get product creation date
+     *
+     *  @return string
+     */
+    public function fetchCreatedAt()
+    {
+    	return $this->_order->getCreatedAt();
+    }  
 
     /**
      *  Fetch shipping description

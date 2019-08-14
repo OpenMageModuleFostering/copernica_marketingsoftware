@@ -111,6 +111,36 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
     	
     	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);        
     }
+    
+    /**
+     *  Get last modification date
+     *
+     *  @return string
+     */
+    public function getUpdatedAt()
+    {
+    	return $this->_orderItem->getUpdatedAt();
+    }
+    
+    /**
+     *  Get creation date
+     *
+     *  @return string
+     */
+    public function getCreatedAt()
+    {
+    	return $this->_orderItem->getCreatedAt();
+    }  
+
+    /**
+     * Get order item status. 
+     * 
+     * @return string
+     */
+    public function fetchStatus()
+    {
+    	return $this->_orderItem->getStatus();
+    }
 
     /**
      *  Get store Id

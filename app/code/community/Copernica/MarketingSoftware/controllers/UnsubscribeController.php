@@ -49,17 +49,15 @@ class Copernica_MarketingSoftware_UnsubscribeController extends Mage_Core_Contro
                
                 $subscriber = Mage::getModel('newsletter/subscriber');
 				
-				if ($customer) {
-					$subscriber->loadByCustomer($customer)->getId();
-				} else {
-	                $subscriber->loadByEmail($email)->getId();
+            	if (
+					$subscriber->loadByCustomer($customer)->getId() ||
+					$subscriber->loadByEmail($email)->getId()
+				) {
+					// we have a valid subscriber object now, so unsubscribe the user
+					$subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
+					echo 'ok';
+					return;
 				}
-				
-				$subscriber->setEmail($email);
-                $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
-                
-				echo 'ok';
-                return;
             }
         }
         echo 'not ok';

@@ -101,7 +101,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist_Item extends C
 	 *
 	 *  @return string
 	 */
-	public function fetchTimestamp()
+	public function getCreatedAt()
 	{
 		return $this->_wishlistItem->getAddedAt();
 	}

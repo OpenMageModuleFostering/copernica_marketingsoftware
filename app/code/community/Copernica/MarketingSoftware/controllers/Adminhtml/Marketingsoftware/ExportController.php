@@ -30,6 +30,17 @@
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController extends Copernica_MarketingSoftware_Controller_Action
 {
+	/**
+	 * Check if cache management is allowed
+	 *
+	 * @return bool
+	 */
+	protected function _isAllowed()
+	{
+		return Mage::getSingleton('admin/session')->isAllowed('copernica/export');
+	}
+		
+	
     /**
      * Takes care of displaying the form which 
      * contains the details used for the SOAP connection.
