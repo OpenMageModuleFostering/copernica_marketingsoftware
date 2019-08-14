@@ -178,7 +178,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         $attributes->setAttribute('name', $product->getAttributeSet());
 
         foreach ($product->getAttributesList() as $attribute) {
-            $attrElem = $this->_document->createElement($attribute['code'], $attribute['value']);
+            $attrElem = $this->_document->createElement($attribute['code'], htmlspecialchars(html_entity_decode($attribute['value'])));
             $attrElem->setAttribute('type', $attribute['type']);
             $attrElem->setAttribute('label', $attribute['label']);
 
@@ -196,12 +196,20 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
      */
     protected function _buildParentsXML(Copernica_MarketingSoftware_Model_Copernica_Entity_Product $product)
     {
-        $parentIds = $product->getNative()->getTypeInstance()->getParentIdsByChild($product->getId());
+        $parentIds = array();
+
+        foreach(Mage_Catalog_Model_Product_Type::getTypes() as $type) {
+            $result = Mage::getModel($type['model'])->getParentIdsByChild($product->getId());
+            $parentIds = array_unique(array_merge( $parentIds, $result));
+        }
 
         $parents = $this->_document->createElement('parents');
 
         foreach ($parentIds as $id) {
-        	$parents->appendChild($this->_buildProductXML(new Copernica_MarketingSoftware_Model_Copernica_Entity_Product($id), false, true));
+        	$product = Mage::getModel('marketingsoftware/copernica_entity_product');
+        	$product->setProduct($id);
+        	
+        	$parents->appendChild($this->_buildProductXML($product, false, true));
         }
 
         return $parents;
@@ -222,8 +230,11 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
         foreach ($childrenIds as $groupIds) {
             $group = $this->_document->createElement('group');
 
-            foreach ($groupIds as $id ) {
-                $group->appendChild($this->_buildProductXML(new Copernica_MarketingSoftware_Model_Copernica_Entity_Product($id), true, false));
+            foreach ($groupIds as $id) {
+            	$product = Mage::getModel('marketingsoftware/copernica_entity_product');
+            	$product->setProduct($id);
+            	            	
+                $group->appendChild($this->_buildProductXML($product, true, false));
             }
 
             $children->appendChild($group);
@@ -242,8 +253,12 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     {   
         $element = $this->_buildRootElement();
 
-        foreach ($collection as $product) { 
-            $element->appendChild($this->_buildProductXML(new Copernica_MarketingSoftware_Model_Copernica_Entity_Product($product->getId())));
+        foreach ($collection as $child) {
+
+            $product = Mage::getModel('marketingsoftware/copernica_entity_product');
+            $product->setProduct($child->getId);
+
+            $element->appendChild($this->_buildProductXML(new Copernica_MarketingSoftware_Model_Copernica_Entity_Product($child->getId())));
         }
         
         return $element;

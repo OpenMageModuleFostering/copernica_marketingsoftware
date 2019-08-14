@@ -55,17 +55,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
         $customerEntity->setCustomer($this->_getEntityId());
 
         $restCustomer = $customerEntity->getRestCustomer();
-        $restCustomer->setProfile();
-
-//        $request = Mage::helper('marketingsoftware/rest_request');
-//        $request->prepare();
-
-// 		foreach ($customerEntity->getAddresses() as $addressEntity) {
-// 			$restAddress = $addressEntity->getRestAddress();
-// 			$restAddress->bindToCustomer($customerEntity);
-// 		}
-
-//        $request->commit();       
+        $restCustomer->setProfile();   
 
         return true;
     }
@@ -87,14 +77,6 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
 
         $restCustomer = $customerEntity->getRestCustomer();
         $restCustomer->setProfile();
-
-        //$request = Mage::helper('marketingsoftware/rest_request');
-        //$request->prepare();
-
-//         foreach ($customerEntity->getAddresses() as $addressEntity) {
-//         	$restAddress = $addressEntity->getRestAddress();
-//         	$restAddress->bindToCustomer($customerEntity);
-//         }
      
          foreach ($customerEntity->getOrders() as $orderEntity) {
          	$restOrder = $orderEntity->getRestOrder();

@@ -150,6 +150,6 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Wishlist_Item extends C
     {
     	$this->_wishlistItem = $wishlistItem;
     	
-    	$this->setProduct($wishlistItem->getProductId());
+    	$this->setProduct($wishlistItem->getProductId(), $this->getStoreId());
     }
 }

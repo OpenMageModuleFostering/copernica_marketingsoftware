@@ -122,8 +122,10 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
         if ($this->_orderItem instanceof Mage_Sales_Model_Quote_Item) {
         	if ($this->_orderItem->getQuote()) {
         		return $this->_orderItem->getQuote()->getStoreId();
-        	} else {
+        	} elseif ($this->_orderItem->getQuoteId())  {
         		return Mage::getModel('sales/quote')->loadByIdWithoutStore($this->_orderItem->getQuoteId())->getStoreId();
+        	} else {
+        		throw new Exception(Mage::helper('marketingsoftware')->__("Could not load store id from quote."));
         	}
         } elseif ($this->_orderItem instanceof Mage_Sales_Model_Order_Item) {
         	return $this->_orderItem->getOrder()->getStoreId();
@@ -188,8 +190,11 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Order_Item extends Cope
      */
     public function setOrderItem($orderItem)
     {
-    	$this->_orderItem = $orderItem;
-    	
-    	$this->setProduct($orderItem->getProductId());
+    	if ($orderItem->getId()) {
+    		$this->_orderItem = $orderItem;
+    		$this->setProduct($orderItem->getProductId(), $this->getStoreId());
+    	} else {
+    		throw new Exception(Mage::helper('marketingsoftware')->__('Set an empty quote item or order item object.'));
+    	}
     }
 }

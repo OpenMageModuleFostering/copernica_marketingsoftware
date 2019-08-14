@@ -202,6 +202,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      */
     public function fetchId()
     {
+    	if (!$this->_product) {
+    		throw new Exception('asdf');
+    	}
         return $this->_product->getId();
     }
 
@@ -417,9 +420,14 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
      *  Set product entity
      *
      *  @param	int	$productId
+     *  @param  int $storeId
      */
-    public function setProduct($productId, $storeId)
+    public function setProduct($productId, $storeId = null)
     {
+    	if (!$storeId) {
+    		$storeId = Mage::app()->getStore()->getId();
+    	}
+    	
     	$this->_product = Mage::getModel('catalog/product')->setStoreId($storeId)->load($productId);
     }
     

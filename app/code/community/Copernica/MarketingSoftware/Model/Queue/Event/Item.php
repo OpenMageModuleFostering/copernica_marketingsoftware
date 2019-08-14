@@ -164,13 +164,15 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Item extends Copernica_Marke
         
         $quoteItem = Mage::getModel('sales/quote_item')->load($object->quoteItemId);
         
-        $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
-        $customerEntity->setCustomer($object->customerId);
-        
-        $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
-        $quoteItemEntity->setQuoteItem($quoteItem);       
-
-        $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
-        $restQuoteItem->syncWithQuote($customerEntity, $quoteId);
+        if ($quoteId && $quoteItem->getId()) {
+	        $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+	        $customerEntity->setCustomer($object->customerId);
+	        
+	        $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+	        $quoteItemEntity->setQuoteItem($quoteItem);       
+	
+	        $restQuoteItem = $quoteItemEntity->getRestQuoteItem();
+	        $restQuoteItem->syncWithQuote($customerEntity, $quoteId);
+        }
     }
 }
