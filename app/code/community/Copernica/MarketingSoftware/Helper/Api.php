@@ -1,5 +1,30 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  Copernica_MarketingSoftware_Helper_Api
  *  This file holds the class that is used to communicate with Copernica
  *  Copernica Marketing Software v 1.2.0
@@ -8,7 +33,7 @@
  */
 
 /** Require some additional file for exceptions */
-require_once(dirname(__FILE__).'/../Model/Error.php');
+require_once dirname(__FILE__).'/../Model/Error.php';
 
 /**
  *  CopernicaAPI class
@@ -26,19 +51,19 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  The Copernica account name that is sent with the constructor
      *  @var string
      */
-    private $account;
+    protected $account;
 
     /**
      *  Store the id of the database
      *  @var integer
      */
-    private $databaseID = false;
+    protected $databaseID = false;
 
     /**
      *  Store the id of the collection
      *  @var integer
      */
-    private $collectionID = array();
+    protected $collectionID = array();
 
     /**
      *  Checks the connection settings and initializes the soap client
@@ -90,7 +115,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
         // check for invalid login
         $objarray = get_object_vars($this->soapclient);
-
+		
         // return API Error
         if (isset($objarray['__soap_fault'])) throw new CopernicaError(COPERNICAERROR_LOGINFAILURE);
 
@@ -124,11 +149,15 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         // Get the database name
         $identifier = ($databaseName === false) ? Mage::helper('marketingsoftware/config')->getDatabaseName() : $databaseName;
 
+        Varien_Profiler::start('Copernica SOAP call: Account_Database');        
+        
         // Get the database object
         $request = $this->soapclient->Account_Database(array('identifier' => $identifier));
 
         // Get the response object from the request
         $object = $this->soapclient->result($request);
+        
+        Varien_Profiler::stop('Copernica SOAP call: Account_Database');        
 
         // If it not an object, throw an error
         if (!is_object($object)) throw (new CopernicaError(COPERNICAERROR_NODATABASE));
@@ -150,6 +179,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         // Did we already have this id, return it
         if (isset($this->collectionID[$databaseName.$name])) return $this->collectionID[$databaseName.$name];
 
+        Varien_Profiler::start('Copernica SOAP call: Database_Collection');        
+        
         // Get the soap collection object
         $request = $this->soapclient->Database_Collection(array(
             'id'            =>  $this->getDatabaseId($databaseName ? $databaseName : false),
@@ -159,6 +190,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         // Get the response object from the request
         $object = $this->soapclient->result($request);
 
+        Varien_Profiler::stop('Copernica SOAP call: Database_Collection');        
+        
         // no object is returned
         if (!is_object($object)) throw (new CopernicaError(COPERNICAERROR_NOCOLLECTION));
 
@@ -173,8 +206,10 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      */
     public function searchProfiles($identifier)
     {
+    	Varien_Profiler::start('Copernica SOAP call: Database_SearchProfiles');
+    	    	
         // Search the profiles
-        return $this->soapclient->result(
+        $profiles = $this->soapclient->result(
             $this->soapclient->Database_SearchProfiles(array(
                 'id'            =>  $this->getDatabaseId(),
                 'requirements'  =>  array(
@@ -186,6 +221,10 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
                 )
             ))
         );
+        
+        Varien_Profiler::stop('Copernica SOAP call: Database_SearchProfiles');        
+        
+        return $profiles;
     }
 
     /**
@@ -209,6 +248,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             ));
         }            
     }
+    
     /**
      *  Update the profiles given a customer and return the found profiles
      *  @param  Copernica_MarketingSoftware_Model_Copernica_ProfileCustomer
@@ -230,6 +270,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             // and get lost
             return;
         }
+        
+        Varien_Profiler::start('Copernica SOAP call: Database_updateProfiles');
 
         // Update the profiles and wait for the result because, we want to search for it
         $this->soapclient->result($this->soapclient->Database_updateProfiles(array(
@@ -237,13 +279,15 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             'requirements'  =>  array(
                 $this->soapclient->toObject(array(
                     'fieldname' =>  'customer_id',
-                    'value'     =>  $data->id(),
+                    'value'     =>  $data->originalId(),
                     'operator'  =>  '='
                 ))
             ),
             'create'        =>  true,
             'fields'        =>  $data->toArray()
         )));
+        
+        Varien_Profiler::stop('Copernica SOAP call: Database_updateProfiles');
     }
     
     /**
@@ -297,6 +341,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
     /**
      *  Remove the cart items which have been purchased
+     *  
      *  @param  string  customer identifier
      *  @param integer quote item id
      */
@@ -306,6 +351,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         $collectionName = Mage::helper('marketingsoftware/config')->getCartItemsCollectionName();
         $collectionId = $this->getCollectionId($collectionName);
 
+        Varien_Profiler::start('Copernica SOAP call: Profile_searchSubProfiles');        
+        
         // find the subprofiles
         $subprofiles = $this->soapclient->result($this->soapclient->Profile_searchSubProfiles(array(
             'id'            =>  $profileID,
@@ -323,6 +370,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             ),
             'collection'    =>  $this->soapclient->toObject(array('id' => $collectionId)),
         )));
+        
+        Varien_Profiler::stop('Copernica SOAP call: Profile_searchSubProfiles');        
 
         // Build an array of ids
         $ids = array();
@@ -338,6 +387,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Update the subprofiles given, the profile identifier
      *  the collection name and the data
+     *  
      *  @param  string  customer identifier
      *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile
      */
@@ -366,6 +416,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Update the subprofiles given, the profile identifier
      *  the collection name and the data
+     *  
      *  @param  string  customer identifier
      *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile
      */
@@ -394,6 +445,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Update the subprofiles given, the profile identifier
      *  the collection name and the data
+     *  
      *  @param  string  customer identifier
      *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile
      */
@@ -420,7 +472,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      }
 
     /**
-     *  Does a database with the given name exist?
+     *  Does a database with the given name exist?.
+     *  
      *  @param  string
      *  @return boolean
      */
@@ -439,6 +492,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
     /**
      *  Is the database with the given name valid?
+     *  
      *  @param  string
      *  @return string 'ok', 'notexists', 'notvalid'
      */
@@ -470,6 +524,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
     /**
      *  Repair the database with the given name valid?
+     *  
      *  @param  string
      *  @return string 'ok', 'notexists', 'notvalid'
      */
@@ -503,6 +558,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Is the collection in the given database, with the given type
      *  and name valid?
+     *  
      *  @param  string  $databaseName   name of the database
      *  @param  string  $collectionType 'cartproducts', 'orders', 'orderproducts', 'addresses'
      *  @param  string  $collectionName name of the collection
@@ -561,6 +617,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Repair the collection in the given database, with the given type
      *  and name
+     *  
      *  @param  string  $databaseName   name of the database
      *  @param  string  $collectionType 'cartproducts', 'orders', 'orderproducts', 'addresses'
      *  @param  string  $collectionName name of the collection
@@ -617,6 +674,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
     /**
      *  Validate the field, given the collection name.
      *  When the collection name is empty the check is performed for the database
+     *  
      *  @param  String  fieldname in our Magento plug-in
      *  @param  String  fieldname in the customers Copernica environment
      *  @param  String  name of the database in the customers Copernica environment
@@ -640,12 +698,13 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
     /**
      *  Validate the field from the database
+     *  
      *  @param  String  name of the database in the customers Copernica environment
      *  @param  String  name of the field in our Magento plug-in
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function validateDatabaseField($databaseName, $magentoFieldName, $copernicaFieldName)
+    protected function validateDatabaseField($databaseName, $magentoFieldName, $copernicaFieldName)
     {
         // Get the database id
         $id = $this->getDatabaseId($databaseName);
@@ -733,7 +792,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return object  SOAP object
      */
-    private function collectionFieldData($database, $collectionName, $fieldName)
+    protected function collectionFieldData($database, $collectionName, $fieldName)
     {
         // Get the id of this collection
         $id = $this->getCollectionId($collectionName, $database);
@@ -753,7 +812,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function validateCartProductsField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
+    protected function validateCartProductsField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
     {
         // Get the id of this collection
         $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
@@ -784,7 +843,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function validateOrdersField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
+    protected function validateOrdersField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
     {
         // Get the id of this collection
         $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
@@ -810,7 +869,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function validateOrderProductsField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
+    protected function validateOrderProductsField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
     {
         // Get the id of this collection
         $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
@@ -841,7 +900,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function validateAddressesField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
+    protected function validateAddressesField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
     {
         // Get the id of this collection
         $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
@@ -883,7 +942,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function repairDatabaseField($databaseName, $magentoFieldName, $copernicaFieldName)
+    protected function repairDatabaseField($databaseName, $magentoFieldName, $copernicaFieldName)
     {
         $id = $this->getDatabaseId($databaseName);
 
@@ -913,7 +972,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         // What field is this?
         switch($magentoFieldName)
         {
-            case "email":   $definition['type'] = 'email'; break;
+            case "email":      $definition['type'] = 'email'; break;
+            case "store_view": $definition['length'] = 100; break;
             case "newsletter":
                 // is the unsubscribe behaviour set?
                 $database = $this->soapclient->result($this->soapclient->Database_retrieve(array('id' => $id)));
@@ -993,7 +1053,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  String  fieldname in the customers Copernica environment
      *  @return 'ok', 'notexists', 'notvalid'
      */
-    private function repairCollectionField($database, $collectionName, $collection, $magentoFieldName, $copernicaFieldName)
+    protected function repairCollectionField($database, $collectionName, $collection, $magentoFieldName, $copernicaFieldName)
     {
         // Get the id of this collection
         $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
@@ -1017,7 +1077,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
 
         // enrich the definition, given the collection
         $definition = $this->getFieldDefinition($collection, $magentoFieldName, $definition);
-
+        
         // create the field or update the existing field
         if (!is_object($object) || $object->id == 0)    $this->soapclient->Collection_createField($definition);
         elseif (count($definition) > 1)                 $this->soapclient->CollectionField_update($definition);
@@ -1033,7 +1093,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      *  @param  array   definition
      *  @return array   with enriched definition
      */
-    private function getFieldDefinition($collection, $fieldName, $definition)
+    protected function getFieldDefinition($collection, $fieldName, $definition)
     {
         if ($collection == 'cartproducts' || $collection == 'orderproducts')
         {
@@ -1064,6 +1124,8 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
                 case "fax":         $definition['type'] = 'phone_fax'; break;
             }
         }
+        
+        if ($fieldName == 'store_view') $definition['length'] = 100;
 
         // return the definition
         return $definition;

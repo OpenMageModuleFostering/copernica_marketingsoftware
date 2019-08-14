@@ -1,5 +1,30 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  A wrapper object around a magento Product
  */
 class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializable
@@ -8,25 +33,26 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
      *  The original object
      *  @param      Mage_Catalog_Model_Product
      */
-    private $original;
+    protected $original;
 
     /**
      * Predefine the internal fields
      */
-    private $id;
-    private $sku;
-    private $name;
-    private $description;
-    private $productUrl;
-    private $imagePath;
-    private $weight;
-    private $categories = array();
-    private $isNew;
-    private $price;
-    private $created;
-    private $modified;
-    private $attributes;
-    private $attributeSet;
+    protected $id;
+    protected $sku;
+    protected $name;
+    protected $description;
+    protected $productUrl;
+    protected $imagePath;
+    protected $weight;
+    protected $categories = array();
+    protected $isNew;
+    protected $price;
+    protected $specialPrice;
+    protected $created;
+    protected $modified;
+    protected $attributes;
+    protected $attributeSet;
 
     /**
      *  Sets the original model
@@ -34,7 +60,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
      *  @return     Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function setOriginal($original)
-    {   	
+    {
         if ($original instanceof Mage_Catalog_Model_Product) {
             //this is the original product
             $this->original = $original;
@@ -46,7 +72,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
             if ($product->getId()) {
                 //the product exists
                 $this->original = $product;
-            } else {           	            	
+            } else {
                 // unfortunately we do not have the product any more, but we have the information
                 // so we can fill a lot of fields, so the functions still work
                 $this->id           =   $original->getProductId();
@@ -158,6 +184,21 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
         }
         else return $this->price;
     }
+    
+    /**
+     *  Return the price of this magento product
+     *  @return     string
+     */
+    public function specialPrice()
+    {
+    	// Is this object still present?
+    	if (is_object($this->original))
+    	{
+    		return $this->original->getSpecialPrice();
+    	}
+    	else return $this->specialPrice;
+    }
+    
 
     /**
      *  Return the creation date of this magento product
@@ -203,30 +244,14 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
         else
         {
             // Get the product
+            /* @var $product Mage_Catalog_Model_Product */
             $product = is_object($this->original) ? $this->original : Mage::getModel('catalog/product')->load($this->id);
-
+            
             // Could not load the product, return an empty string
             if (!$product->getId()) return '';
-
-            // Retrieve the requested store, null returns the default store
-            $store = Mage::app()->getStore($storeId);
-
-            // We have a valid product now
-            $href = Mage::getModel('core/url_rewrite')->loadByIdPath('product/' . $product->getId())->getRequestPath();
-            if ($href && is_object($store))
-            {
-                // Get the url from the store
-                $url = $store->getUrl('', array('_direct' => $href));
-
-                // Should we use the SEO rewrites
-                if (Mage::getStoreConfig('web/seo/use_rewrites')) {
-                    return str_replace('index.php/', '', $url);
-                } else {
-                    return $url;
-                }
-            }
-            // or use the default if it doesn't exist
-            else return $product->getProductUrl();
+            
+            // Just return the product URL as is
+            return $product->getProductUrl();
         }
     }
 
@@ -244,7 +269,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
         }
         else $path = $this->imagePath;
 
-        // most likely store `false` is supplied to the function, if the path 
+        // most likely store `false` is supplied to the function, if the path
         // is empty it is also not very usefull to prepend a string to it
         if ($storeId === false || empty($path)) return $path;
 
@@ -297,7 +322,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
      *  @param      Mage_Catalog_Model_Category $category
      *  @return     array
      */
-    private function _getFullCategoryName(Mage_Catalog_Model_Category $category)
+    protected function _getFullCategoryName(Mage_Catalog_Model_Category $category)
     {
         // is there a parent?
         if ($category->getParentId() > 1)
@@ -356,18 +381,18 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
         }
         else return $this->attributes;
     }
-    
+
     public function attributeSet()
-    {   	
+    {
     	// Is this object still present?
     	if (is_object($this->original)) {
     		$attributeSetModel = Mage::getModel("eav/entity_attribute_set");
     		$attributeSetModel->load($this->original->getAttributeSetId());
-    		
+
     		return $attributeSetModel->getAttributeSetName();
-    	} else { 
+    	} else {
     		return $this->attributeSet;
-    	}    	
+    	}
     }
 
     /**
@@ -389,6 +414,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
             $this->categories(),
             $this->isNew(),
             $this->price(),
+        	$this->specialPrice(),
             $this->created(),
             $this->modified(),
             $this->attributes(),
@@ -414,6 +440,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
             $this->categories,
             $this->isNew,
             $this->price,
+        	$this->specialPrice,
             $this->created,
             $this->modified,
             $this->attributes

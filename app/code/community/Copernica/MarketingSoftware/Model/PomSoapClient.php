@@ -1,5 +1,30 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  Copernica Soap Client
  *  @version        1.1
  */
@@ -27,6 +52,8 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
         // create connection
         parent::__construct($url, $params);
 
+        Varien_Profiler::start('Copernica SOAP call: login');        
+        
         // try to login
         // @todo check session time
         $result = $this->login(array(
@@ -34,6 +61,8 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
             'password'  =>  $connectionSettings['password'],
             'account'   =>  $connectionSettings['account'],
         ));
+        
+        Varien_Profiler::stop('Copernica SOAP call: login');        
     }
 
     /**
@@ -79,7 +108,7 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
      *  @param  object with the result
      *  @return mixed
      */
-    private static function decodeResult($result)
+    protected static function decodeResult($result)
     {
         // is this a regular, scalar, result?
         if (isset($result->value)) return $result->value;
@@ -152,7 +181,7 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
      *  @param  associative array
      *  @return array
      */
-    private static function encodeAssoc($array)
+    protected static function encodeAssoc($array)
     {
         // we are going to construct an array of pairs
         $pairs = array();
@@ -180,7 +209,7 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
      *  @param  Normal array
      *  @return array
      */
-    private static function encodeArray($array)
+    protected static function encodeArray($array)
     {
         // the result array
         $result = array();
@@ -203,7 +232,7 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
      *  @param      object
      *  @return     object
      */
-    private static function encodeObject($object)
+    protected static function encodeObject($object)
     {
         // result object
         $result = new stdClass();
@@ -231,7 +260,7 @@ class Copernica_MarketingSoftware_Model_PomSoapClient extends SoapClient
      *  @param      object
      *  @return     object
      */
-    private static function decodeObject($object)
+    protected static function decodeObject($object)
     {
         // result object
         $result = new stdClass();

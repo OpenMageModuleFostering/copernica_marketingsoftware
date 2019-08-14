@@ -25,11 +25,33 @@
  */
 
 /**
- *  A wrapper object around an event
+ * With the config object the configuration options of the marketing
+ * software module are accessible.
+ * 
+ * We do not use the Core_Config model, because everytime a config 
+ * value is saved it will empty the config cache, which might throw
+ * errors on a high traffic website.
+ *
  */
-class Copernica_MarketingSoftware_Model_QueueEvent_SubscriptionAdd extends Copernica_MarketingSoftware_Model_QueueEvent_SubscriptionModify
+class Copernica_MarketingSoftware_Model_Config extends Mage_Core_Model_Abstract
 {
-     /**
-     *  Process this item in the queue the behaviour is the same is for a modification
-     */
+	/**
+	 * Constructor
+	 * 
+	 * @see Varien_Object::_construct()
+	 */
+	protected function _construct()
+	{
+		$this->_init('marketingsoftware/config');
+	}
+
+	public function loadByKey($key)
+	{
+		$this->_beforeLoad($key, 'key_name');
+		$this->_getResource()->load($this, $key, 'key_name');
+		$this->_afterLoad();
+		$this->setOrigData();
+		$this->_hasDataChanges = false;
+		return $this;
+	}
 }

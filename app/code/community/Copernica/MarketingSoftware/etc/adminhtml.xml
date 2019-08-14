@@ -9,15 +9,15 @@
             <children>
                 <settings translate="title" module="marketingsoftware">
                     <title>Account Settings</title>
-                    <action>*/marketingsoftware_settings</action>
+                    <action>adminhtml/marketingsoftware_settings</action>
                 </settings>
                 <links translate="title" module="marketingsoftware">
                     <title>Link Fields</title>
-                    <action>*/marketingsoftware_link</action>
+                    <action>adminhtml/marketingsoftware_link</action>
                 </links>
                 <export translate="title" module="marketingsoftware">
                     <title>Synchronize Data</title>
-                    <action>*/marketingsoftware_export</action>
+                    <action>adminhtml/marketingsoftware_export</action>
                 </export>
             </children>
         </copernica>

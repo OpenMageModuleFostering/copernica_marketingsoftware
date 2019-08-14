@@ -1,13 +1,42 @@
 <?php
+/**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Observer object.  
+ *
+ */
 class Copernica_MarketingSoftware_Model_Observer
 {
     /**
-     *  Method for the following events:
-     *  'checkout_controller_onepage_save_shipping_method'
-     *  'checkout_controller_multishipping_shipping_post'
-     *  This method is fired during checkout process, after the customer has entered billing address
-     *  and saved the shipping method
-     *  @param $observer Varien_Event_Observer
+     * Method for the following events:
+     * 'checkout_controller_onepage_save_shipping_method'
+     * 'checkout_controller_multishipping_shipping_post'
+     * This method is fired during checkout process, after the customer has entered billing address
+     * and saved the shipping method
+     * @param $observer Varien_Event_Observer
      */
     public function checkoutSaveStep(Varien_Event_Observer $observer)
     {
@@ -28,8 +57,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'sales_quote_item_delete_before'.
-     *  An item is removed from a quote
+     * Method for event 'sales_quote_item_delete_before'.
+     * An item is removed from a quote
      */
     public function quoteItemRemoved(Varien_Event_Observer $observer)
     {
@@ -61,8 +90,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'sales_quote_item_save_after'.
-     *  An item is added or modified
+     * Method for event 'sales_quote_item_save_after'.
+     * An item is added or modified
      */
     public function quoteItemModified(Varien_Event_Observer $observer)
     {
@@ -102,8 +131,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'sales_order_save_after'.
-     *  An order is added or modified
+     * Method for event 'sales_order_save_after'.
+     * An order is added or modified
      */
     public function orderModified(Varien_Event_Observer $observer)
     {
@@ -130,8 +159,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'newsletter_subscriber_delete_before'.
-     *  The newsletter subscription is deleted, do something with it,
+     * Method for event 'newsletter_subscriber_delete_before'.
+     * The newsletter subscription is deleted, do something with it,
      */
     public function newsletterSubscriptionRemoved(Varien_Event_Observer $observer)
     {
@@ -153,8 +182,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'newsletter_subscriber_save_after'.
-     *  The newsletter subscription is added or modified
+     * Method for event 'newsletter_subscriber_save_after'.
+     * The newsletter subscription is added or modified
      */
     public function newsletterSubscriptionModified(Varien_Event_Observer $observer)
     {
@@ -183,8 +212,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'customer_delete_before'.
-     *  The customer is deleted, do something with it,
+     * Method for event 'customer_delete_before'.
+     * The customer is deleted, do something with it,
      */
     public function customerRemoved(Varien_Event_Observer $observer)
     {
@@ -206,8 +235,8 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Method for event 'customer_save_after'.
-     *  The customer is added or modified, do something with it,
+     * Method for event 'customer_save_after'.
+     * The customer is added or modified, do something with it,
      */
     public function customerModified(Varien_Event_Observer $observer)
     {
@@ -229,18 +258,21 @@ class Copernica_MarketingSoftware_Model_Observer
     }
 
     /**
-     *  Is the Copernica module enabled?
-     *  @return boolean
+     * Is the Copernica module enabled?
+     *  
+     * @return boolean
      */
-    private function enabled()
+    protected function enabled()
     {
         // get the result from the helper
         return Mage::helper('marketingsoftware')->enabled();
     }
 
     /**
-     *  Process the queue
-     *  Note that this function might run for a longer time
+     * Process the queue. This function will stop running after 180 
+     * seconds. It will then start processing the rest of the queue
+     * the next time the cron event is fired.  
+     * 
      */
     public function processQueue()
     {
@@ -268,21 +300,16 @@ class Copernica_MarketingSoftware_Model_Observer
             return true;
         }
         
-        try
-        {
+        try {
             // Perform some basic checks first
             Mage::getSingleton('marketingsoftware/marketingsoftware')->api()->check(true);
-        }
-        catch (CopernicaError $e)
-        {
+        } catch (CopernicaError $e) {
             // log the message
             Mage::log("Copernica/marketingSoftware: ".(string)$e);
 
             // Do not process any records
             return;
-        }
-        catch(Exception $e)
-        {
+        } catch(Exception $e) {
             Mage::logException($e);
             return;
         }

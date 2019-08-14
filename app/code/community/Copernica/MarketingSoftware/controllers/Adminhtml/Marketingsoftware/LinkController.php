@@ -1,9 +1,32 @@
 <?php
 /**
- *  Link Controller, which takes care of the link fields menu.
- *  Copernica Marketing Software v 1.2.0
- *  March 2011
- *  http://www.copernica.com/
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Link Controller takes care of the link fields menu.
+ *  
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController extends Mage_Adminhtml_Controller_Action
 {
@@ -40,7 +63,8 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
 
     /**
      *  Check and process incoming ajax request
-     *  @return string      The error description, or 'ok' if not error was detected
+     *  The error description, or 'ok' if not error was detected
+     *  @return string      
      */
     public function checkAjaxAction()
     {

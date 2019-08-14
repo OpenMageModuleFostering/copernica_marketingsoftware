@@ -1,9 +1,34 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  Asynchronous SOAP api client.
  *  This is an extension to the normal soap client, because it can run multiple
  *  calls at the same time. It differs from the normal PomSoapClient class because
- *  the PxPomSoapClient::methodToCall() method does not return the result, but
+ *  the PomSoapClient::methodToCall() method does not return the result, but
  *  a handle that can be queried to see if it has already returned data.
  *
  *  Example use:
@@ -18,43 +43,50 @@
  */
 class Copernica_MarketingSoftware_Model_AsyncPomSoapClient extends Copernica_MarketingSoftware_Model_PomSoapClient
 {
+	/**
+	 * The content type header to use for soap requests
+	 * 
+	 * @var string
+	 */
+	const HTTP_HEADER_SOAP = 'application/soap+xml;charset=UTF-8';
+	
     /**
      *  The curl multi handle
      *  @var resource
      */
-    private $curl = false;
+    protected $curl = false;
 
     /**
      *  Set of pending requests ID's
      *  This is an assoc array: request ID maps to a array with handle and request
      *  @var array
      */
-    private $pending = array();
+    protected $pending = array();
 
     /**
      *  Set of requests for which the answer has been received
      *  This is an assoc array: request ID maps to the received answer
      *  @var array
      */
-    private $completed = array();
+    protected $completed = array();
 
     /**
      *  The last assigned request ID
      *  @var integer
      */
-    private $freeID = 0;
+    protected $freeID = 0;
 
     /**
      *  Name of the cookie file
      *  @var string
      */
-    private $cookies = false;
+    protected $cookies = false;
 
     /**
      *  Is the object currently busy parsing an async answer?
      *  @var resource   CURL resource identifier of the request that is internally processed
      */
-    private $internalRequest = false;
+    protected $internalRequest = false;
 
 
     /**
@@ -188,7 +220,7 @@ class Copernica_MarketingSoftware_Model_AsyncPomSoapClient extends Copernica_Mar
      *  @param  resource    CURL resource
      *  @return integer     Request ID
      */
-    private function resource2id($resource)
+    protected function resource2id($resource)
     {
         // loop through all pending requests
         foreach ($this->pending as $request => $data)
@@ -229,6 +261,7 @@ class Copernica_MarketingSoftware_Model_AsyncPomSoapClient extends Copernica_Mar
             CURLOPT_COOKIEFILE      =>  $this->cookies,
             CURLOPT_COOKIEJAR       =>  $this->cookies,
             CURLOPT_POSTFIELDS      =>  $request,
+            CURLOPT_HTTPHEADER      => array('Content-Type: '.self::HTTP_HEADER_SOAP),
         ));
 
         // find the method name

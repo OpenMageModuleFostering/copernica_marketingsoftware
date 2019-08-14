@@ -23,27 +23,20 @@
 * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
 * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 */
-/** 
- *  Upgrader from version 1.1.7 to 1.1.8
- *  Copernica Marketing Software v 1.1.8
- *  October 2010
- *  http://www.copernica.com/
- */
- 
+
 $installer = $this;
 $installer->startSetup();
 
-$installer->run("
-    ALTER TABLE {$installer->getTable('copernica_marketingsoftware')} 
-    ADD login_valid ENUM('yes', 'no') NOT NULL default 'yes',
-    ADD linked_fields_valid ENUM('yes', 'no') NOT NULL default 'no',
-    ADD `addressfields` TEXT NOT NULL,
-    ADD `addresscollectionname` VARCHAR(250) NOT NULL default 'Addresses',
-    MODIFY COLUMN progressstatus VARCHAR(250) NOT NULL default 'none',
-    DROP COLUMN extensionversion;
-    
-    UPDATE {$installer->getTable('copernica_marketingsoftware')} 
-    SET progressstatus = 'none', addresscollectionname = '';
-");
+try {
+	$installer->run("
+		DROP TABLE IF EXISTS {$this->getTable('marketingsoftware/config_data')};
+		CREATE TABLE `{$this->getTable('marketingsoftware/config_data')}` (
+			`config_id` int(11) NOT NULL auto_increment,
+			`key_name` varchar( 128 ) NOT NULL,
+			`value` TEXT NOT NULL,
+			PRIMARY KEY (`config_id`),
+			UNIQUE config_data_key_name (`key_name`)
+		) ENGINE = InnoDB DEFAULT CHARSET = utf8;");
+} catch(Exception $e) {}
 
 $installer->endSetup();

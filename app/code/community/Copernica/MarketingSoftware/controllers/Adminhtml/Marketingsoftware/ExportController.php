@@ -1,15 +1,39 @@
 <?php
+/**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
 /** 
- *  Export Controller, which takes care of the export data menu.
- *  Copernica Marketing Software v 1.2.0
- *  March 2011
- *  http://www.copernica.com/ 
+ *  Export Controller takes care of the export data menu.
+ *   
  */
 class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController extends Mage_Adminhtml_Controller_Action
 {
     /**
-     *  indexAction() takes care of displaying the form which 
-     *  contains the details used for the SOAP connection
+     * Takes care of displaying the form which 
+     * contains the details used for the SOAP connection.
+     *  
      */
     public function indexAction()
     {
@@ -34,8 +58,9 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
     /**
      *  progressAction() takes care of placing a loader 
      *  during the background export action
-     *  @return string  Returns a 'completed' or 'in progress' message, depending
+     *  Returns a 'completed' or 'in progress' message, depending
      *  on the state of the sync tool
+     *  @return string 
      */    
     public function progressAction()
     {   
@@ -72,9 +97,10 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_ExportController e
     }
     
     /**
-     *  getAction() takes care of exporting customers account information 
-     *  from Magento to Copernica
-     *  @return string  Returns the current page reloaded, containing an information message
+     * getAction() takes care of exporting customers account information 
+     * from Magento to Copernica.
+     *  
+     * @return string  Returns the current page reloaded, containing an information message
      */
     public function getAction()
     {        

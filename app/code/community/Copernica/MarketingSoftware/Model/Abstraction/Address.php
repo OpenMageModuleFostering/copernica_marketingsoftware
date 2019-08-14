@@ -1,5 +1,30 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  A wrapper object around an Address
  */
 class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializable
@@ -8,24 +33,24 @@ class Copernica_MarketingSoftware_Model_Abstraction_Address implements Serializa
      *  The original object
      *  @param      Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
      */
-    private $original;
+    protected $original;
 
     /** 
      * Predefine the internal fields
      */ 
-    private $id;
-    private $type;
-    private $name;
-    private $email;
-    private $street;
-    private $city;
-    private $zipcode;
-    private $state;
-    private $countryCode;
-    private $telephone;
-    private $fax;
-    private $company;
-    private $customerId;
+    protected $id;
+    protected $type;
+    protected $name;
+    protected $email;
+    protected $street;
+    protected $city;
+    protected $zipcode;
+    protected $state;
+    protected $countryCode;
+    protected $telephone;
+    protected $fax;
+    protected $company;
+    protected $customerId;
     
     /**
      *  Sets the original model

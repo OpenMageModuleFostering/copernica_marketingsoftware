@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Copernica_MarketingSoftware>
-            <version>2.0.1</version>
+            <version>2.1.0</version>
         </Copernica_MarketingSoftware>
     </modules>
     <global>
@@ -20,6 +20,9 @@
                     <marketingsoftware>
                         <table>copernica_marketingsoftware</table>
                     </marketingsoftware>
+                    <config_data>
+                        <table>copernica_config_data</table>
+                    </config_data>
                 </entities>
             </marketingsoftware_mysql4>
         </models>

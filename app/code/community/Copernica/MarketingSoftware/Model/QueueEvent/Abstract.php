@@ -1,4 +1,29 @@
 <?php
+/**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
 require_once(dirname(__FILE__).'/../Error.php');
 /**
  *  A wrapper object around an event
@@ -9,55 +34,14 @@ abstract class Copernica_MarketingSoftware_Model_QueueEvent_Abstract
      *  What queue item was used to construct this item
      *  @var Copernica_MarketingSoftware_Model_Queue
      */
-    private $queueItem;
-
-    /**
-     *  Get the right object
-     */
-    public static function get($queueItem)
-    {
-        // If we want to start a full synchronisation, we should return a start sync object
-        if ($queueItem->getAction() == 'start_sync') return new Copernica_MarketingSoftware_Model_QueueEvent_StartSync($queueItem);
-
-        // Prepare the action, to append it to the classname
-        $action = ucfirst($queueItem->getAction());
-
-        // What kind of class is given
-        switch (get_class($queueItem->getObject()))
-        {
-            case "Copernica_MarketingSoftware_Model_Abstraction_Quote":
-                $classname = "Copernica_MarketingSoftware_Model_QueueEvent_Quote".$action;
-                break;
-
-            case "Copernica_MarketingSoftware_Model_Abstraction_Quote_Item":
-                $classname = "Copernica_MarketingSoftware_Model_QueueEvent_QuoteItem".$action;
-                break;
-
-            case "Copernica_MarketingSoftware_Model_Abstraction_Customer":
-                $classname = "Copernica_MarketingSoftware_Model_QueueEvent_Customer".$action;
-                break;
-
-            case "Copernica_MarketingSoftware_Model_Abstraction_Order":
-                $classname = "Copernica_MarketingSoftware_Model_QueueEvent_Order".$action;
-                break;
-
-            case "Copernica_MarketingSoftware_Model_Abstraction_Subscription":
-                $classname = "Copernica_MarketingSoftware_Model_QueueEvent_Subscription".$action;
-                break;
-        }
-
-        // No classname, throw an error
-        if (!isset($classname)) throw(new CopernicaError(COPERNICAERROR_UNRECOGNIZEDEVENT));
-
-        // construct the object
-        return new $classname($queueItem);
-    }
+    protected $queueItem;
 
     /**
      *  Construct the item given the queueitem
+     *  
      *  @param Copernica_MarketingSoftware_Model_Queue $queueItem
      */
-    private function __construct($queueItem)
+    public function __construct($queueItem)
     {
         $this->queueItem = $queueItem;
     }

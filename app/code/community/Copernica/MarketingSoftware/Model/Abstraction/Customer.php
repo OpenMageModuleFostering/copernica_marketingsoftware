@@ -1,5 +1,30 @@
 <?php
 /**
+ * Copernica Marketing Software 
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0).
+ * It is available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * If you are unable to obtain a copy of the license through the 
+ * world-wide-web, please send an email to copernica@support.cream.nl 
+ * so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this software 
+ * to newer versions in the future. If you wish to customize this module 
+ * for your needs please refer to http://www.magento.com/ for more 
+ * information.
+ *
+ * @category     Copernica
+ * @package      Copernica_MarketingSoftware
+ * @copyright    Copyright (c) 2011-2012 Copernica & Cream. (http://docs.cream.nl/)
+ * @license      http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
  *  A wrapper object around a magento Customer
  */
 class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializable
@@ -8,19 +33,20 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
      *  The original object
      *  @param      Mage_Customer_Model_Customer
      */
-    private $original;
+    protected $original;
 
     /**
      * Predefine the internal fields
      */
-    private $id;
-    private $name;
-    private $email;
-    private $subscription;
-    private $group;
-    private $addresses;
-    private $gender;
-    private $storeview;
+    protected $id;
+    protected $name;
+    protected $email;
+    protected $oldemail;
+    protected $subscription;
+    protected $group;
+    protected $addresses;
+    protected $gender;
+    protected $storeview;
 
 
     /**
@@ -105,6 +131,26 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
             return $this->original->getEmail();
         }
         else return $this->email;
+    }
+    
+    /**
+     * Method to retrieve the previous email if possible
+     * Falls back on self::email()
+     * 
+     * @return string
+     */
+    public function oldEmail()
+    {
+    	if (is_object($this->original))
+    	{
+    		return $this->original->getOrigData('email');
+    	}
+    	elseif (isset($this->oldemail))
+    	{
+    		return $this->oldemail;
+    	}
+    	
+    	return $this->email();
     }
 
     /**
@@ -242,6 +288,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
             $this->id(),
             $this->name(),
             $this->email(),
+        	$this->oldEmail(),
             $this->subscription(),
             $this->group(),
             $this->addresses(),
@@ -265,6 +312,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
             $this->id,
             $this->name,
             $this->email,
+        	$this->oldemail,
             $this->subscription,
             $this->group,
             $this->addresses,
@@ -272,7 +320,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Customer implements Serializ
         ) = $data;
 
         // do we have a storeview available?
-        if (isset($data[7])) $this->storeview = $data[7];
+        if (isset($data[8])) $this->storeview = $data[8];
 
         return $this;
     }
