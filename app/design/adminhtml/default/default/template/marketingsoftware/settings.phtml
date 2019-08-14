@@ -1,0 +1,223 @@
+<?php
+/**
+ *  View for Settings controller
+ *  Copernica Marketing Software v 1.2.0
+ *  March 2011
+ *  http://www.copernica.com/
+ */
+
+$_helper = Mage::helper('marketingsoftware'); 
+$_config = Mage::helper('marketingsoftware/config');
+?>
+<script type="text/javascript">
+
+// define timeout variable
+var timerID = 0;
+
+// on page loader
+Event.observe(window, 'load', init, false);
+
+/**
+ *  Function that is loaded on window load.
+ *  It contains a default settings checker and multiple event listeners
+ */
+function init() {
+     checksettings('onload');
+     $('cp_host').observe('keyup', checksettings);
+     $('cp_user').observe('keyup', checksettings);
+     $('cp_pass').observe('keyup', checksettings);
+     $('cp_account').observe('keyup', checksettings);
+}
+
+/**
+ *  Function that checks account settings.
+ *  This method will send an ajax call to the server.
+ *  @param string|object    We can have either a string ('onload') for calling the function on page load, or we can have a 'on key press' event object.
+ */
+function checksettings(event) {
+
+    // the data that we want to send to the server
+    var data = {
+        cp_host : document.getElementById('cp_host').value,
+        cp_user : document.getElementById('cp_user').value,
+        cp_pass : document.getElementById('cp_pass').value,
+        cp_account : document.getElementById('cp_account').value
+    };
+
+    // Ajax URL
+    var url = <?php echo(json_encode($this->getCheckSettingsUrl())); ?>;
+
+    // status DIV
+    var div = $('settings_status');
+
+    // reset timer
+    if (timerID) clearTimeout(timerID);
+
+    // proceed with the function
+    timerID = setTimeout(function() {
+        
+        // display a 'checking' status
+        div.innerHTML = 'Checking account information...';
+        
+        // proceed with the AJAX call
+        new Ajax.Request(url, {
+            method: 'post', 
+            parameters: data,
+            onLoading: function() {
+                $('loading-mask', 'loading_mask_loader').invoke('hide');
+            },
+            onComplete: function(answer) {
+                if (answer.responseText == '') 
+                {
+                    // set the return message
+                    answer.responseText = 'Acount information is valid.';
+                    
+                    // enable the save button
+                    document.getElementById('cp_save').disabled = false;
+                    document.getElementById('cp_save').setAttribute("class","");
+                    
+                    // display the 'save your settings 'notice
+                    if (event != 'onload') document.getElementById('cp_save_notice').style.display = 'inline';
+                    
+                    // hide the 'invalid settings' notice
+                    if (event != 'onload') document.getElementById('cp_invalid_notice').style.display = 'none';
+                }
+                else
+                {
+                    // disable the settings button
+                    document.getElementById('cp_save').disabled = true;
+                    document.getElementById('cp_save').setAttribute("class","disabled");
+                    
+                    // display the 'invalid settings' notice
+                    document.getElementById('cp_invalid_notice').style.display = 'inline';
+                    
+                    // hide the 'save your settings' notice
+                    if (event != 'onload') document.getElementById('cp_save_notice').style.display = 'none';
+                }
+                
+                // set a return message for invalid login data situation
+                if (answer.responseText == 'impossible') answer.responseText = 'Invalid login data.';
+                
+                // feed the div with the right content
+                div.innerHTML = answer.responseText;
+                
+            }
+        });
+    }, 1000);
+}
+
+</script>
+
+<div class="content-header">
+    <h3 class="icon-head head-system-account">Copernica Marketing Software : Settings</h3>
+    <p class="form-buttons">
+        <span id="cp_save_notice" style="color: white; font-weight: bold; padding: 2px 4px; background-color: #188F11; border: thin solid #660000; display:none;">Warning: the settings are not yet saved !</span>
+        <span id="cp_invalid_notice" style="color: white; font-weight: bold; padding: 2px 4px; background-color: #CC3300; border: thin solid #660000; display:none;">Warning: the settings are invalid !</span>        
+        <button type="button" onclick="cpForm.submit();" name="cp_save" id="cp_save">Save connection settings</button>
+    </p>
+</div>
+<div class="entry-edit">
+    <form action="<?php echo $this->getPostUrl(); ?>" method="post" name="cp_form" id="cp_form">
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend">Login Information</h4>
+            <a href="#" onclick ="document.getElementById('settings_help').style.display='block';" id="page-help-link" style="float: right; line-height:18px; return false;">More information</a>             
+        </div>
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tbody>
+                        <tr>
+                        <td class="label"><label for="cp_host">Hostname <span class="required">*</span></label></td>
+                        <td class="value"><input type="text" class=" required-entry input-text validate-url" title="Hostname" value="<?php echo $_config->getHostname(); ?>" name="cp_host" id="cp_host"></td>
+                        </tr>
+                        
+                        <tr>
+                        <td class="label"><label for="cp_user">Username <span class="required">*</span></label></td>
+                        <td class="value"><input type="text" class=" required-entry input-text" title="Username" value="<?php echo $_config->getUsername(); ?>" name="cp_user" id="cp_user"></td>
+                        </tr>
+                        
+                        <tr>
+                        <td class="label"><label for="cp_account">Account Name <span class="required">*</span></label></td>
+                        <td class="value"><input type="text" class=" required-entry input-text" title="Account Name" value="<?php echo $_config->getAccount(); ?>" name="cp_account" id="cp_account"></td>
+                        </tr>
+                        
+                        <tr>
+                        <td class="label"><label for="cp_pass">Password <span class="required">*</span></label></td>
+                        <td class="value"><input type="password" class=" required-entry input-text" title="Password" value="<?php echo $_config->getPassword(); ?>" name="cp_pass" id="cp_pass"></td>
+                        </tr>
+                        
+                        <tr>
+                        <td class="label"><label for="settings_status">Status </label></td>
+                        <td class="value"><div id="settings_status">Checking account information...</div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+   
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Important Notice</h4>
+    </div>
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <table cellspacing="0" class="form-list">
+                <tbody>
+                    <tr>
+                    <td>To enable the Magento extension, you need to have a valid license for <a href="https://www.copernica.com/en/magento" target="_blank" title="Copernica Marketing Software">Copernica Marketing Software</a>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="entry-edit-head">
+        <h4 class="icon-head head-edit-form fieldset-legend">Environment Information</h4>
+    </div>
+    <div class="fieldset">
+        <div class="hor-scroll">
+            <table cellspacing="0" class="form-list">
+                <tbody>
+                    <tr>
+                    <td class="label">Copernica extension version: </td>
+                    <td class="value"><strong><?php echo $_helper->getExtensionVersion();?></strong></td>
+                    </tr>
+                    <tr>
+                    <td class="label">Magento webshop version: </td>
+                    <td class="value"><strong><?php echo Mage::getVersion();?></strong></td>
+                    </tr>                    
+                </tbody>
+            </table>
+        </div>
+    </div>    
+</div>
+
+<!-- settings help -->
+<div id="settings_help" style="display: none; position: absolute; top: 30%; left: 30%; width: 580px; height: 300px; padding: 20px; border: 1px solid black; z-index:1002;background-color: #FDFAB1; color: black;">
+    <h3 style="text-align: center;">Account Settings HOW-TO</h3>
+    Set your login details used to access your user account available in Copernica Marketing Software:
+    <br/><br/>
+    - Hostname : The URL (http://publisher.copernica.nl) that you use to connect to your Copernica user account
+    <br/>
+    - Username : Your Copernica username
+    <br/>
+    - Account Name: The Copernica master account that hosts your user account
+    <br/>
+    - Password : The password for your Copernica user account
+    <br/><br/>
+    The "Status" field will display the current account information status. If you change values of any account details fields, this status will be updated.
+    <br/><br/>
+    [+] Be sure to "Save connection settings" after specifying new account details. You can do this by using the button in the top-right corner.
+    <br/><br/>
+    [+] A Copernica Database administration can be found in the "Link Fields" submenu under the "Copernica Marketing Software" menu.
+    <br/>
+    <a href="#" onclick="document.getElementById('settings_help').style.display='none';" style="top:0; right:6px; position: absolute; return false;">Close</a>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    var customForm = new varienForm('cp_form', true);
+    cpForm = new varienForm('cp_form', '');
+//]]>
+</script>
