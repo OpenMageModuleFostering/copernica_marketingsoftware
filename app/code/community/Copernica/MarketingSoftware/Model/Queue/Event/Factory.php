@@ -50,7 +50,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Factory
     
         $action = ucfirst($queueItem->getAction());
         
-        switch (get_class($queueItem->getObject()))
+        switch (get_class($queueItem->_getObject()))
         {
             case "Copernica_MarketingSoftware_Model_Abstraction_Quote":
                 $classname = "marketingsoftware/queue_event_quote".$action;

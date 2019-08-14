@@ -60,9 +60,9 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Quote extends Copernica_Mark
      */
     public function actionRemove()
     {
-    	$object = $this->getObject();
+    	$object = $this->_getObject();
     	
-    	if (!$object->customerId || !is_numeric($object->customerId)) {
+    	if (!$object->customerId || !is_numeric($object->customerId) || !$object->storeView) {
     		return false;
     	}
     	
@@ -73,7 +73,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Quote extends Copernica_Mark
 
         $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
             'id' => $customerEntity->fetchId(),
-            'storeView' => $customerEntity->fetchStoreView(),
+            'storeView' => $object->storeView,
             'email' => $customerEntity->fetchEmail()
         ));
 

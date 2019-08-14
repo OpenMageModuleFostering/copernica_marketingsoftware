@@ -36,7 +36,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_View extends Copernica_Marke
      */
     public function actionAdd()
     {
-    	$object = $this->_queueItem->getObject();    	    	
+    	$object = $this->_getObject();    	    	
     	
     	if (!$object->customerId || !is_numeric($object->customerId) || !$object->productId || !is_numeric($object->productId) || !$object->viewedAt || !is_numeric($object->viewedAt)) {
     		return false;

@@ -203,12 +203,7 @@ class Copernica_MarketingSoftware_Model_Observer
 
         if ($email) {
         	Mage::getModel('marketingsoftware/queue_item')
-            	->setObject(array(
-            		'customerInfo' => array(
-                		'id' => $customerId,
-                		'storeView' => $storeView,
-                		'email' => $email
-            		), 'quoteId' => $quote->getId()))
+        		->setObject(array('storeView' => $storeView, 'quoteId' => $quote->getId(), 'customerId' => $customerId))
             	->setCustomer($customerId)
             	->setName('quote')
             	->setAction('remove')            

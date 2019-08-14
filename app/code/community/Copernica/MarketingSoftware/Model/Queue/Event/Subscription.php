@@ -22,7 +22,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Subscription extends Coperni
      */
     public function actionRemove()
     {
-        $object = $this->getObject();
+        $object = $this->_getObject();
 
         $profileLinkedFields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
 

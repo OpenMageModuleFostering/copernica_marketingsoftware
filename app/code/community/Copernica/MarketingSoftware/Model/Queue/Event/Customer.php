@@ -119,7 +119,7 @@ class Copernica_MarketingSoftware_Model_Queue_Event_Customer extends Copernica_M
      */
     public function actionRemove()
     {
-        $object = $this->getObject();
+        $object = $this->_getObject();
 
         if (property_exists($object, 'email') && property_exists($object, 'storeId')) {
             $store = Mage::getModel('core/store')->load($object->storeId);
