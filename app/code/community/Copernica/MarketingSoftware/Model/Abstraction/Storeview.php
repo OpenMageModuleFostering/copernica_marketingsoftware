@@ -30,12 +30,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Core_Model_Store
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $id;
@@ -46,7 +40,6 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     protected $viewCode;
     protected $viewLabel;
 
-
     /**
      *  Sets the original model
      *  @param      Mage_Core_Model_Store $original
@@ -54,7 +47,16 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function setOriginal(Mage_Core_Model_Store $original)
     {
-        $this->original = $original;
+    	if ($original->getWebsite() instanceof Mage_Core_Model_Website) {
+    		$this->id = $original->getId();
+			$this->websiteCode = $original->getWebsite()->getCode();
+			$this->websiteLabel = $original->getWebsite()->getName();
+			$this->storeCode = $original->getGroup()->getId();
+			$this->storeLabel = $original->getGroup()->getName();
+			$this->viewCode = $original->getCode();
+			$this->viewLabel = $original->getName();			
+    	}
+    	 	
         return $this;
     }
 
@@ -64,12 +66,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function id()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getId();
-        }
-        else return $this->id;
+		return $this->id;
     }
 
     /**
@@ -77,13 +74,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      *  @return     string
      */
     public function websiteCode()
-    {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getWebsite()->getCode();
-        }
-        
+    {       
 		return $this->websiteCode;
     }
 
@@ -93,12 +84,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function websiteLabel()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getWebsite()->getName();
-        }
-        else return $this->websiteLabel;
+		return $this->websiteLabel;
     }
 
     /**
@@ -107,12 +93,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function storeCode()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getGroup()->getId();
-        }
-        else return $this->storeCode;
+		return $this->storeCode;
     }
 
     /**
@@ -121,12 +102,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function storeLabel()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getGroup()->getName();
-        }
-        else return $this->storeLabel;
+		return $this->storeLabel;
     }
 
     /**
@@ -135,12 +111,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function viewCode()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getCode();
-        }
-        else return $this->viewCode;
+		return $this->viewCode;
     }
 
     /**
@@ -149,12 +120,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
      */
     public function viewLabel()
     {
-        // Is this object still present?
-        if ($this->original instanceof Mage_Core_Model_Store && $this->original->getWebsite() instanceof Mage_Core_Model_Website)
-        {
-            return $this->original->getName();
-        }
-        else return $this->viewLabel;
+		return $this->viewLabel;
     }
 
     /**

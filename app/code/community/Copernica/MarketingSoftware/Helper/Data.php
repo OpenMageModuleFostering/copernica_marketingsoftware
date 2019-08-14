@@ -153,6 +153,31 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
         );
     }
 
+	/**
+     *  Helper method returns all supported fields for 
+     *  the viewed product collection
+     *  @return array
+     */
+    public function supportedViewedProductFields()
+    {
+        return array(
+            'product_id'    =>  'product id',
+            'name'          =>  'Product name',
+            'sku'           =>  'SKU',
+        	'attribute_set'	=>	'Attribute set',
+            'weight'        =>  'Weight',
+            'price'         =>  'Price',
+            'store_view'    =>  'Store view', 
+            'total_price'   =>  'Total price',
+            'url'           =>  'Details URL',
+            'image'         =>  'Image URL',
+            'categories'    =>  'Categories',
+            'options'       =>  'Product options',
+            'attributes'    =>  'Product Attributes',
+        	'timestamp'		=>	'Timestamp',
+        );
+    }
+
     /**
      * Get the version of this extension.
      * 

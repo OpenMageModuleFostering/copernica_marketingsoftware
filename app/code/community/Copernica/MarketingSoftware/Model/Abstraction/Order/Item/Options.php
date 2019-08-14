@@ -30,16 +30,10 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Sales_Model_Order_Item
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $name;
-    protected $attributes;
+    protected $attributes = null;
 
 
     /**
@@ -49,7 +43,30 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-        $this->original = $original;
+		$this->name = $original->getName();
+
+		$attributes = array();
+		$data = array();
+		$options = $original->getProductOptions();
+		
+		if (isset($options['attributes_info'])) {
+			//configurable products
+			$attributes = $options['attributes_info'];
+		} elseif (isset($options['bundle_options'])) {
+			//bundle products
+			$attributes = $options['bundle_options'];
+		} elseif (isset($options['options'])) {
+			//generic products
+			$attributes = $options['options'];
+		}
+		
+		if ($attributes) {
+			foreach ($attributes as $attribute) {
+				$data[$attribute['label']] = $attribute['value'];
+			}
+			$this->attributes = $data;
+		}	
+    	
         return $this;
     }
 
@@ -59,12 +76,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function name()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getName();
-        }
-        else return $this->name;
+		return $this->name;
     }
 
     /**
@@ -73,31 +85,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
      */
     public function attributes()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            $options = $this->original->getProductOptions();
-            $attributes = array();
-            if (isset($options['attributes_info'])) {
-                //configurable products
-                $attributes = $options['attributes_info'];
-            } elseif (isset($options['bundle_options'])) {
-                //bundle products
-                $attributes = $options['bundle_options'];
-            } elseif (isset($options['options'])) {
-                //generic products
-                $attributes = $options['options'];
-            }
-            if ($attributes) {
-                foreach ($attributes as $attribute) {
-                    $data[$attribute['label']] = $attribute['value'];
-                }
-                return $data;
-            }
-            return null;
-        }
-        else return $this->attributes;
+		return $this->attributes;
     }
 
     /**

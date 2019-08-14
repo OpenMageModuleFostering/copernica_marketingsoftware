@@ -103,8 +103,8 @@ class Copernica_MarketingSoftware_Model_QueueEvent_StartSync extends Copernica_M
             foreach ($customers as $customer)
             {
                 // Was this record changed or modified after the last synchronisation
-                if ($customer->getCreatedAt() <= $progressDateTime &&
-                    $customer->getUpdatedAt() <= $progressDateTime ) continue;
+                if ($customer->getCreatedAt() < $progressDateTime &&
+                    $customer->getUpdatedAt() < $progressDateTime ) continue;
 
                 // wrap the object
                 $object = Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($customer->getEntityId());
@@ -185,8 +185,11 @@ class Copernica_MarketingSoftware_Model_QueueEvent_StartSync extends Copernica_M
             foreach ($orders as $order)
             {
                 // Was this record changed or modified after the last synchronisation
-                if ($order->getCreatedAt() <= $progressDateTime &&
-                    $order->getUpdatedAt() <= $progressDateTime ) continue;
+                if ($order->getCreatedAt() < $progressDateTime &&
+                    $order->getUpdatedAt() < $progressDateTime ) continue;
+                
+                // Get the maximum progress time
+                $progressDateTime = max($progressDateTime, $order->getUpdatedAt());
                 
                 // Only sync guest orders
                 if ($order->getCustomerId()) continue;                
@@ -198,9 +201,6 @@ class Copernica_MarketingSoftware_Model_QueueEvent_StartSync extends Copernica_M
                 $queue = Mage::getModel('marketingsoftware/queue')
                     ->setObject($object)
                     ->save();
-
-                // Get the maximum progress time
-                $progressDateTime = max($progressDateTime, $order->getUpdatedAt());
 
                 // get rid of the order and the object
                 unset($order);

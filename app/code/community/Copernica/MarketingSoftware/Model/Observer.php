@@ -257,6 +257,38 @@ class Copernica_MarketingSoftware_Model_Observer
         }
     }
 
+	/**
+     * Method for event 'sales_quote_item_save_after'.
+     * An item is added or modified
+     */
+    public function productViewed(Varien_Event_Observer $observer)
+    {
+        // if the plug-in is not enabled, skip this
+        if (!$this->enabled()) return;
+
+        // Do we have a valid item?
+        if ($item = $observer->getEvent()->getProduct())
+        {
+			$customer = Mage::getSingleton('customer/session')->getCustomer();
+			$id = $customer->getId();
+
+            if (!$id) {
+                //this item cannot be linked to a customer, so is not relevant at this moment
+                return;
+            }
+
+            // wrap the object
+            $object = Mage::getModel('marketingsoftware/abstraction_viewedproduct')->setOriginal($item, $id);
+
+            // This quote item should be added to the queue
+            $queue = Mage::getModel('marketingsoftware/queue')
+                ->setObject($object)
+                ->setAction('add')
+                ->save();
+        }
+    }
+
+
     /**
      * Is the Copernica module enabled?
      *  
@@ -286,7 +318,7 @@ class Copernica_MarketingSoftware_Model_Observer
         // Set the the time limit to a high number
         set_time_limit(0);
         $collection = Mage::getResourceModel('marketingsoftware/queue_collection')
-            ->addDefaultOrder()->setPageSize(150);
+            ->addDefaultOrder()->setPageSize(300);
 
         // store the start time
         $time = time();
@@ -322,7 +354,7 @@ class Copernica_MarketingSoftware_Model_Observer
         {
             // Is the timer already expired
             if (time() > ($time + 3 * 60)) break;
-
+            
             try
             {
                 // we still have time, so lets process an item from the queue

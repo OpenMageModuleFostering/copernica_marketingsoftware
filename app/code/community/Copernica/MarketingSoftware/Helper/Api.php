@@ -131,6 +131,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         $this->getCollectionId($config->getOrdersCollectionName());
         $this->getCollectionId($config->getOrderItemsCollectionName());
         $this->getCollectionId($config->getAddressesCollectionName());
+        $this->getCollectionId($config->getViewedProductCollectionName());
 
         // else we have a valid login
         return true;
@@ -471,6 +472,34 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         ));
      }
 
+	 /**
+     *  Update the subprofiles given, the profile identifier
+     *  the collection name and the data
+     *  @param  string  customer identifier
+     *  @param  Copernica_MarketingSoftware_Model_Copernica_Subprofile
+     */
+     public function updateViewedProductSubProfiles($profileID, $data)
+     {
+        // The collection name and id are determined
+        $collectionName = Mage::helper('marketingsoftware/config')->getViewedProductCollectionName();
+        $collectionId = $this->getCollectionId($collectionName);
+        
+        // Update the subprofiles
+        $this->soapclient->Profile_updateSubProfiles(array(
+            'id'            =>  $profileID,
+            'requirements'  =>  array(
+                $this->soapclient->toObject(array(
+                    'fieldname' =>  'id',
+                    'value'     =>  $data->id(),
+                    'operator'  =>  '='
+                ))
+            ),
+            'collection'    =>  $this->soapclient->toObject(array('id' => $collectionId)),
+            'create'        =>  true,
+            'fields'        =>  $data->toArray(),
+        ));
+     }
+
     /**
      *  Does a database with the given name exist?.
      *  
@@ -583,6 +612,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             'orders'        =>  array('order_id', 'quote_id'),
             'orderproducts' =>  array('item_id', 'order_id'),
             'addresses'     =>  array('address_id'),
+        	'viewedproduct' =>  array('product_id'),
         );
 
         // is this a known collection type
@@ -651,6 +681,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             'orders'        =>  array('order_id', 'quote_id'),
             'orderproducts' =>  array('item_id', 'order_id'),
             'addresses'     =>  array('address_id'),
+        	'viewedproduct' =>  array('product_id'),
         );
 
         // is this a known collection type
@@ -690,6 +721,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
             case "orders":          return $this->validateOrdersField($database, $collectionName, $magentoFieldName, $copernicaFieldName);
             case "orderproducts":   return $this->validateOrderProductsField($database, $collectionName, $magentoFieldName, $copernicaFieldName);
             case "addresses":       return $this->validateAddressesField($database, $collectionName, $magentoFieldName, $copernicaFieldName);
+            case "viewedproduct":   return $this->validateViewedProductField($database, $collectionName, $magentoFieldName, $copernicaFieldName);
 
             // no collection given use database
             default:                return $this->validateDatabaseField($database, $magentoFieldName, $copernicaFieldName);
@@ -920,6 +952,37 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
         return 'ok';
     }
 
+	/**
+     *  Validate the field from the cart items collection
+     *  @param  String  name of the database in the customers Copernica environment
+     *  @param  String  name of the collection in the customers Copernica environment
+     *  @param  String  name of the field in our Magento plug-in
+     *  @param  String  fieldname in the customers Copernica environment
+     *  @return 'ok', 'notexists', 'notvalid'
+     */
+    protected function validateViewedProductField($database, $collectionName, $magentoFieldName, $copernicaFieldName)
+    {
+        // Get the id of this collection
+        $object = $this->collectionFieldData($database, $collectionName, $copernicaFieldName);
+
+        // does the field exist
+        if (!is_object($object) || $object->id == 0) return 'notexists';
+
+        // some special cases
+        switch($magentoFieldName)
+        {
+            case 'timestamp':   return (in_array($object->type, array('empty_datetime', 'datetime'))) ? 'ok' : 'notvalid';
+            case 'url':
+            case 'image':       return ($object->length > 100) ? 'ok' : 'notvalid';
+            case 'categories':
+            case 'options':
+            case 'attributes':  return (($object->length > 150 || $object->big) && isset($object->lines) && $object->lines > 1) ? 'ok' : 'notvalid';
+        }
+
+        // default it is okay
+        return 'ok';
+    }
+
     /**
      *  Repair the field, given the collection name.
      *  When the collection name is empty the check is performed for the database
@@ -1095,7 +1158,7 @@ class Copernica_MarketingSoftware_Helper_Api extends Mage_Core_Helper_Abstract
      */
     protected function getFieldDefinition($collection, $fieldName, $definition)
     {
-        if ($collection == 'cartproducts' || $collection == 'orderproducts')
+        if ($collection == 'cartproducts' || $collection == 'orderproducts' || $collection == 'viewedproducts')
         {
             // some special cases, for the cart / order products
             switch($fieldName)

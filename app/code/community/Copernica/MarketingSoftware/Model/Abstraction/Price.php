@@ -38,12 +38,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Sales_Model_Quote|Mage_Sales_Model_Order|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item
-     */
-    protected $original;
-    
-    /**
      * Predefine the internal fields
      */
     protected $total;
@@ -62,7 +56,73 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function setOriginal($original)
     {
-        $this->original = $original;
+		if ($grandTotal = $original->getGrandTotal()) {
+			$this->total = $grandTotal;
+		} elseif ($rowTotalInclTax = $original->getRowTotalInclTax()) {
+        	$this->total = $rowTotalInclTax;
+		} elseif ($baseRowTotal = $original->getBaseRowTotal()) {
+        	$this->total = $baseRowTotal;
+		}
+    	
+        // Used for quotes and orders
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
+        	$costs = 0;
+        
+        	// iterate over all visisble items
+        	foreach ($original->getAllVisibleItems() as $item) {
+        		$costs += $item->getBaseCost();
+        	}
+        
+        	// return the costs
+        	$this->costs = $costs;
+        } elseif ($baseCost = $original->getBaseCost()) {
+        	$this->costs = $baseCost;
+        }
+        
+        // no price for an individual item
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
+        	$this->itemPrice = 0;
+        
+        // Used for quote items and order items
+        elseif ($price = $original->getPrice())
+        	$this->itemPrice = $price;
+        
+        // no price for an individual item
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
+        	$this->originalPrice = 0;
+        
+        // Used for quote items and order items
+        elseif ($originalPrice = $original->getOriginalPrice())
+        	$this->originalPrice = $originalPrice;
+        
+        if ($discountAmount = $original->getDiscountAmount()) 
+        	$this->discount = $discountAmount;
+        
+        if ($taxAmount = $original->getTaxAmount()) 
+        	$this->tax = $taxAmount;
+        
+        // Shipping is only available for quotes and orders, but not for items
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
+        {
+        	// Get the shipping amount
+        	if ($shippingAmount = $original->getShippingAmount())
+        		$this->shipping = $shippingAmount;
+        	else
+        		$this->shipping = 0;
+        }
+        else $this->shipping = 0;
+        
+        if ($currency = $original->getOrderCurrencyCode()) 
+        	$this->currency = $currency;
+        elseif ($currency = $original->getQuoteCurrencyCode())
+        	$this->currency = $currency;
+        elseif (($order = $original->getOrder()) && ($currency = $order->getOrderCurrencyCode()))
+        	$this->currency = $currency;
+        elseif (($quote = $original->getQuote()) && ($currency = $quote->getQuoteCurrencyCode()))
+        	$this->currency = $currency;
+        else
+        	$this->currency = '';
+        
         return $this;
     }
 
@@ -72,19 +132,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function total()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Used for quotes and orders
-            if ($grandTotal = $this->original->getGrandTotal())                 return $grandTotal;
-            
-            // Used for quote items and order items
-            elseif ($rowTotalInclTax = $this->original->getRowTotalInclTax())   return $rowTotalInclTax;
-            
-            // Used for quote items and order items (when no tax is configured)
-            elseif ($baseRowTotal = $this->original->getBaseRowTotal())         return $baseRowTotal;
-        }
-        else return $this->total;
+		return $this->total;
     }
     
     /**
@@ -93,28 +141,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function costs()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Used for quotes and orders
-            if ($this->original instanceOf Mage_Sales_Model_Quote || $this->original instanceOf Mage_Sales_Model_Order)
-            {
-                $costs = 0;
-                
-                // iterate over all visisble items
-                foreach ($this->original->getAllVisibleItems() as $item)
-                {
-                    $costs += $item->getBaseCost();
-                }
-                
-                // return the costs
-                return $costs;
-            }
-        
-            // Used for quote items and order items
-            elseif ($baseCost = $this->original->getBaseCost()) return $baseCost;
-        }
-        else return $this->costs;
+        return $this->costs;
     }
     
     /**
@@ -123,16 +150,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function itemPrice()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // no price for an individual item
-            if ($this->original instanceOf Mage_Sales_Model_Quote || $this->original instanceOf Mage_Sales_Model_Order) return 0;            
-            
-            // Used for quote items and order items
-            elseif ($price = $this->original->getPrice()) return $price;
-        }
-        else return $this->itemPrice;
+		return $this->itemPrice;
     }
     
     /**
@@ -141,16 +159,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function originalPrice()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // no price for an individual item
-            if ($this->original instanceOf Mage_Sales_Model_Quote || $this->original instanceOf Mage_Sales_Model_Order) return 0;            
-            
-            // Used for quote items and order items
-            elseif ($originalPrice = $this->original->getOriginalPrice()) return $originalPrice;
-        }
-        else return $this->originalPrice;
+        return $this->originalPrice;
     }
     
     /**
@@ -159,13 +168,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function discount()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Used for all items
-            if ($discountAmount = $this->original->getDiscountAmount()) return $discountAmount;
-        }
-        else return $this->discount;
+        return $this->discount;
     }
     
     /**
@@ -174,13 +177,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function tax()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Used for all items
-            if ($taxAmount = $this->original->getTaxAmount()) return $taxAmount;
-        }
-        else return $this->tax;
+        return $this->tax;
     }
     
     /**
@@ -189,18 +186,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function shipping()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Shipping is only available for quotes and orders, but not for items
-            if ($this->original instanceOf Mage_Sales_Model_Quote || $this->original instanceOf Mage_Sales_Model_Order)
-            {
-                // Get the shipping amount
-                if ($shippingAmount = $this->original->getShippingAmount()) return $shippingAmount;
-            }
-            else return 0;            
-        }
-        else return $this->shipping;
+        return $this->shipping;
     }
     
     /**
@@ -209,16 +195,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
      */
     public function currency()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($currency = $this->original->getOrderCurrencyCode()) return $currency;
-            elseif ($currency = $this->original->getQuoteCurrencyCode()) return $currency;
-            elseif (($order = $this->original->getOrder()) && ($currency = $order->getOrderCurrencyCode())) return $currency;
-            elseif (($quote = $this->original->getQuote()) && ($currency = $quote->getQuoteCurrencyCode())) return $currency;
-            else return '';            
-        }
-        else return $this->currency;
+        return $this->currency;
     }
 
     /**

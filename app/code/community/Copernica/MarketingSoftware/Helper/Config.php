@@ -623,6 +623,50 @@ class Copernica_MarketingSoftware_Helper_Config extends Mage_Core_Helper_Abstrac
 	}
 
 	/**
+	 *  Get the name of the viewed products collection
+	 *  @return string
+	 */
+	public function getViewedProductCollectionName()
+	{
+		return $this->_getConfig('viewed_product_collection_name');
+	}
+
+	/**
+	 *  Set the name of the viewed products collection
+	 *  @param String
+	 *  @return Copernica_MarketingSoftware_Helper_Config
+	 */
+	public function setViewedProductCollectionName($value)
+	{
+		$this->_setConfig('viewed_product_collection_name', $value);
+		return $this;
+	}
+
+	/**
+	 *  Get the linked customer fields
+	 *  @return array assoc array of fields which have been linked
+	 */
+	public function getLinkedViewedProductFields()
+	{
+		$value = $this->_getConfig('linked_viewed_product_fields');
+
+		// What value is found?
+		if (empty($value))  return array();
+		else                return json_decode($value, true);
+	}
+
+	/**
+	 *  Get the linked customer fields
+	 *  @param array assoc array of fields which have been linked
+	 *  @return Copernica_MarketingSoftware_Helper_Config
+	 */
+	public function setLinkedViewedProductFields($value)
+	{
+		$this->_setConfig('linked_viewed_product_fields', json_encode($value), true);
+		return $this;
+	}
+
+	/**
 	 *  Get the progress status for customers
 	 *  This is the created timestamp of the most recent customer which has
 	 *  been queued for synchronisation

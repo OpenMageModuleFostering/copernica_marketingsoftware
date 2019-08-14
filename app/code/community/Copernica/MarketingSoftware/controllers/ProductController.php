@@ -1,21 +1,21 @@
 <?php
 /**
- * Copernica Marketing Software 
+ * Copernica Marketing Software
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0).
  * It is available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
- * If you are unable to obtain a copy of the license through the 
- * world-wide-web, please send an email to copernica@support.cream.nl 
+ * If you are unable to obtain a copy of the license through the
+ * world-wide-web, please send an email to copernica@support.cream.nl
  * so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade this software 
- * to newer versions in the future. If you wish to customize this module 
- * for your needs please refer to http://www.magento.com/ for more 
+ * Do not edit or add to this file if you wish to upgrade this software
+ * to newer versions in the future. If you wish to customize this module
+ * for your needs please refer to http://www.magento.com/ for more
  * information.
  *
  * @category     Copernica
@@ -25,9 +25,9 @@
  */
 
 /**
- * Controls the product actions. 
- * 
- * 
+ * Controls the product actions.
+ *
+ *
  */
 class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller_Front_Action
 {
@@ -39,14 +39,20 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     {
         //TODO: some security
         $request = $this->getRequest();
-        if($request->getParam('identifier') == "sku"){
+        if ($request->getParam('identifier') == "sku") {
         	$product = $this->_getProductBySku($request->getParam('id'));
         } else {
         	$product = $this->_getProduct($request->getParam('id'));
         }
-        
+
+        // Use attribute codes or labels?
+        $useAttribCode = false;
+        if ($request->getParam('attribkey') == 'code') {
+            $useAttribCode = true;
+        }
+
         if ($product != NULL) {
-            $xml = $this->_buildProductXML(array($product));
+            $xml = $this->_buildProductXML(array($product), $useAttribCode);
             $this->_prepareResponse($xml);
         }
         elseif ($request->getParam('new'))
@@ -69,7 +75,7 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
                             ->addAttributeToSelect('id');
 
             // construct the XML
-            $xml = $this->_buildProductXML($collection);
+            $xml = $this->_buildProductXML($collection, $useAttribCode);
             $this->_prepareResponse($xml);
         } else {
             $this->norouteAction();
@@ -80,23 +86,24 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
      * Constructs an XML object for the given product
      *
      * @param Mage_Catalog_Model_Product $product
+     * @param bool $useAttribCode
      * @return SimpleXMLElement
      */
-    protected function _buildProductXML($collection)
+    protected function _buildProductXML($collection, $useAttribCode = false)
     {
         $xml = new SimpleXMLElement('<products/>');
-        
+
         // iterate over the collection
-        foreach ($collection as $product) 
-        {   
+        foreach ($collection as $product)
+        {
             // Add a product node
             $element = $xml->addChild('product');
 
             // wrap the product
-            $product = Mage::getModel('marketingsoftware/abstraction_product')->loadProduct($product->getId());
-            
+            $_product = Mage::getModel('marketingsoftware/abstraction_product')->loadProduct($product->getId());
+
             // Collection of relevant fields
-            $fields = array(    
+            $fields = array(
                 'id',
                 'sku',
                 'name',
@@ -106,22 +113,22 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
                 'modified',
                 'created',
                 'productUrl',
-                'imageUrl', 
-                'weight', 
-                'isNew', 
-                'categories', 
+                'imageUrl',
+                'weight',
+                'isNew',
+                'categories',
                 'attributes'
             );
-            
+
             // Add the internal product fields to the database
-            foreach ($fields as $name) 
+            foreach ($fields as $name)
             {
                 // Get the value
-                $value = $product->$name();
-                
+                $value = $_product->$name();
+
                 // Get the attributes of the attributes
-                if ($name == 'attributes') $value = $value->attributes();
-                
+                if ($name == 'attributes') $value = $value->attributes($useAttribCode);
+
                 if (is_bool($value))
                 {
                     $element->addChild($name, htmlspecialchars(html_entity_decode($value ? 'yes' : 'no')));
@@ -132,35 +139,87 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
                 	if ($name == 'price' || $name == 'specialPrice') {
                 		$value = Mage::helper('core')->currency($value, true, false);
                 	}
-                	                	
+
                     $element->addChild($name, htmlspecialchars(html_entity_decode((string)$value)));
                     continue;
                 }
-                
+
                 // We have an array here
-                
+
                 // Add an element, to bundle all the elements of the array
                 $node = $element->addChild($name);
-                
+
                 // we have an array here
-                foreach ($value as $key => $attribute) 
+                foreach ($value as $key => $attribute)
                 {
                     // prepare the key
                     if (is_numeric($key)) $key = 'items';
                     else $key = str_replace(' ', '_', $key);
-               
+
                     // special treatment for categories and empty values
                     if ($name == 'categories') $attribute = implode(' > ', $attribute);
                     elseif (trim($attribute) === '') continue;
-                    
 
-                
                     // Add the child
                     $node->addChild($key, htmlspecialchars(html_entity_decode((string)$attribute)));
                 }
             }
+            
+            $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+            
+            if (isset($parentIds[0])) {
+            	$_product = Mage::getModel('marketingsoftware/abstraction_product')->loadProduct($parentIds[0]);
+            	
+            	// Add a product node
+            	$element = $xml->addChild('configurable_product');
+
+            	// Add the internal product fields to the database
+            	foreach ($fields as $name)
+            	{
+            		// Get the value
+            		$value = $_product->$name();
+            	
+            		// Get the attributes of the attributes
+            		if ($name == 'attributes') $value = $value->attributes($useAttribCode);
+            	
+            		if (is_bool($value))
+            		{
+            			$element->addChild($name, htmlspecialchars(html_entity_decode($value ? 'yes' : 'no')));
+            			continue;
+            		}
+            		elseif (!is_array($value))
+            		{
+            			if ($name == 'price' || $name == 'specialPrice') {
+            				$value = Mage::helper('core')->currency($value, true, false);
+            			}
+            	
+            			$element->addChild($name, htmlspecialchars(html_entity_decode((string)$value)));
+            			continue;
+            		}
+            	
+            		// We have an array here
+            	
+            		// Add an element, to bundle all the elements of the array
+            		$node = $element->addChild($name);
+            	
+            		// we have an array here
+            		foreach ($value as $key => $attribute)
+            		{
+            			// prepare the key
+            			if (is_numeric($key)) $key = 'items';
+            			else $key = str_replace(' ', '_', $key);
+            	
+            			// special treatment for categories and empty values
+            			if ($name == 'categories') $attribute = implode(' > ', $attribute);
+            			elseif (trim($attribute) === '') continue;
+            	
+            			// Add the child
+            			$node->addChild($key, htmlspecialchars(html_entity_decode((string)$attribute)));
+            		}
+            	}            	
+            }
         }
-        
+
         return $xml;
     }
 
@@ -194,13 +253,12 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
      */
     protected function _getProduct($productId)
     {
-        $product = Mage::getModel('catalog/product')
-            ->load($productId);
-            
+        $product = Mage::getModel('catalog/product')->load($productId);
+
         // only a product with an id exists
         return $product->getId() ? $product : null;
     }
-    
+
     /**
     * Retrieves a product by SKU
     *
@@ -209,12 +267,9 @@ class Copernica_MarketingSoftware_ProductController extends Mage_Core_Controller
     */
     protected function _getProductBySku($productSku)
     {
-    	$product = Mage::getModel('catalog/product')
-    				->loadByAttribute('sku',$productSku);
-    
+    	$product = Mage::getModel('catalog/product')->loadByAttribute('sku',$productSku);
+
     	// only a product with an id exists
     	return $product->getId() ? $product : null;
     }
-    
-    
 }

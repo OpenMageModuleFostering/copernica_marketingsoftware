@@ -140,6 +140,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
             $orders_array = array();
             $orderproducts_array = array();
             $address_array = array();
+            $viewedproduct_array = array();
 
             // we loop throught the POST data and store each data inside the array it belongs to
             foreach ($post as $fieldname => $fieldvalue)
@@ -169,6 +170,11 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
                     $fieldname = str_replace('input_addresses_', '', $fieldname);
                     $address_array[$fieldname] = $fieldvalue;
                 }
+                elseif (strpos($fieldname, 'input_viewedproduct') !== false)
+                {
+                	$fieldname = str_replace('input_viewedproduct_', '', $fieldname);
+                	$viewedproduct_array[$fieldname] = $fieldvalue;
+                }
             }
 
             // store the database and collection names
@@ -178,11 +184,13 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
                 ->setOrdersCollectionName($post['orders_input'])
                 ->setOrderItemsCollectionName($post['orderproducts_input'])
                 ->setAddressesCollectionName($post['addresses_input'])
+                ->setViewedProductCollectionName($post['viewedproduct_input'])
                 ->setLinkedCustomerFields($customer_array)
                 ->setLinkedCartItemFields($cartproducts_array)
                 ->setLinkedOrderFields($orders_array)
                 ->setLinkedOrderItemFields($orderproducts_array)
-                ->setLinkedAddressFields($address_array);
+                ->setLinkedAddressFields($address_array)
+                ->setLinkedViewedProductFields($viewedproduct_array);
 
             // add a success notice
             Mage::getSingleton('adminhtml/session')->addSuccess('Settings were successfully saved.');

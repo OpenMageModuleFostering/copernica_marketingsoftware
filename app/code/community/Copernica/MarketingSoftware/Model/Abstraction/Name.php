@@ -30,12 +30,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Customer_Model_Customer|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $firstname;
@@ -50,7 +44,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function setOriginal($original)
     {
-        $this->original = $original;
+        $this->firstname = $original->getFirstname();
+        $this->prefix = $original->getPrefix();
+        $this->middlename = $original->getMiddlename();
+        $this->lastname = $original->getLastname();
+        
         return $this;
     }
 
@@ -60,12 +58,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function firstname()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getFirstname();
-        }
-        else return $this->firstname;
+        return $this->firstname;
     }
 
     /**
@@ -75,12 +68,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function prefix()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getPrefix();
-        }
-        else return $this->prefix;
+        return $this->prefix;
     }
 
     /**
@@ -90,12 +78,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function middlename()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getMiddlename();
-        }
-        else return $this->middlename;
+		return $this->middlename;
     }
 
     /**
@@ -104,12 +87,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
      */
     public function lastname()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getLastname();
-        }
-        else return $this->lastname;
+		return $this->lastname;
     }
 
     /**

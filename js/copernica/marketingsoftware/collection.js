@@ -25,6 +25,7 @@ function CopernicaCollection(database, type)
     if (type == 'cartproducts')         var theFields = cartItemFields;
     else if (type == 'orders')          var theFields = orderFields;
     else if (type == 'orderproducts')   var theFields = orderItemFields;
+    else if (type == 'viewedproduct')   var theFields = viewedProductFields;
     else                                var theFields = addressFields;
 
     // we always want to have an object, PHP can do this

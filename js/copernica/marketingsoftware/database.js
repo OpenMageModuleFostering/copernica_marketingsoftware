@@ -20,6 +20,7 @@ function CopernicaDatabase()
     this.ordersCollection = new CopernicaCollection(this, 'orders');
     this.orderItemsCollection = new CopernicaCollection(this, 'orderproducts');
     this.addressCollection = new CopernicaCollection(this, 'addresses');
+    this.viewedProductCollection = new CopernicaCollection(this, 'viewedproduct');
     
     // construct an array of all fields in this collection
     this.fields = [];
@@ -88,7 +89,7 @@ CopernicaDatabase.prototype.modified = function()
     }
     
     // check if the collections were modified
-    return this.cartItemsCollection.modified() || this.orderItemsCollection.modified() || this.ordersCollection.modified() || this.addressCollection.modified();
+    return this.cartItemsCollection.modified() || this.orderItemsCollection.modified() || this.ordersCollection.modified() || this.addressCollection.modified() || this.viewedProductCollection.modified();
 }
 
 /**
@@ -256,6 +257,11 @@ CopernicaDatabase.prototype.checkFields = function()
             // check the orders collection   
             self.addressCollection.check(function() { checkField(counter + 1); })
         }
+        else if (counter == self.fields.length + 4) 
+        {
+            // check the orders collection   
+            self.viewedProductCollection.check(function() { checkField(counter + 1); })
+        }
         else if (counter < self.fields.length)
         {
             // check if the field exist, with a callback for checking the next field
@@ -327,6 +333,7 @@ CopernicaDatabase.prototype.setStatus = function(status)
         this.cartItemsCollection.setStatus('impossible');
         this.orderItemsCollection.setStatus('impossible');
         this.addressCollection.setStatus('impossible');
+        this.viewedProductCollection.setStatus('impossible');
     }
 }
 

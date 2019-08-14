@@ -30,12 +30,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Sales_Model_Order_Item
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $id;
@@ -54,7 +48,20 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-        $this->original = $original;
+    	$this->id = $original->getId();
+    	$this->orderId = $original->getOrder()->getId();
+    	$this->quantity = $original->getQtyOrdered();
+    	$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+    	$this->weight = $original->getWeight();
+    	$this->timestamp = $original->getUpdatedAt();
+    	$this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
+    	
+    	$options = Mage::getModel('marketingsoftware/abstraction_order_item_options')->setOriginal($original);
+    	if ($options->attributes()) {
+    		//only return option object if it this order actually has options
+    		$this->options = $options;
+    	} 
+    	
         return $this;
     }
 
@@ -64,12 +71,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function id()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getId();
-        }
-        else return $this->id;
+        return $this->id;
     }
 
     /**
@@ -78,16 +80,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function order()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($order = $this->original->getOrder()) {
-                return Mage::getModel('marketingsoftware/abstraction_order')->setOriginal($order);
-            } else {
-                return null;
-            }
-        }
-        else return Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($this->orderId);
+        return Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($this->orderId);
     }
 
     /**
@@ -96,12 +89,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function quantity()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getQtyOrdered();
-        }
-        else return $this->quantity;
+        return $this->quantity;
     }
 
     /**
@@ -111,13 +99,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function price()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Note that the price may consist of multiple elements
-            return Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($this->original);
-        }
-        else return $this->price;
+        return $this->price;
     }
 
     /**
@@ -126,12 +108,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function weight()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getWeight();
-        }
-        else return $this->weight;
+        return $this->weight;
     }
 
     /**
@@ -140,12 +117,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function timestamp()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getUpdatedAt();
-        }
-        else return $this->timestamp;
+        return $this->timestamp;
     }
 
     /**
@@ -154,18 +126,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function options()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $options = Mage::getModel('marketingsoftware/abstraction_order_item_options')->setOriginal($this->original);
-            if ($options->attributes()) {
-                //only return option object if it this order actually has options
-                return $options;
-            } else {
-                return null;
-            }
-        }
-        else return $this->options;
+        return $this->options;
     }
 
     /**
@@ -174,12 +135,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
      */
     public function product()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($this->original);
-        }
-        else return $this->product;
+        return $this->product;
     }
 
     /**

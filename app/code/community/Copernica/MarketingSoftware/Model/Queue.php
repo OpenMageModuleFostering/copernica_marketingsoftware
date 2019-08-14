@@ -72,7 +72,7 @@ class Copernica_MarketingSoftware_Model_Queue extends Mage_Core_Model_Abstract
         $factory = Mage::getSingleton('marketingsoftware/QueueEvent_Factory');
             	
     	// Wrap the event in a command object (pattern alarm!)
-    	$event = $factory->get($this);        
+    	$event = $factory->get($this);  
     
         // call the process function on the object
         return $event->process();

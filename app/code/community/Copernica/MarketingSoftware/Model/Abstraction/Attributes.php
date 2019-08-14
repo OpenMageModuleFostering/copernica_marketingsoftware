@@ -1,21 +1,21 @@
 <?php
 /**
- * Copernica Marketing Software 
+ * Copernica Marketing Software
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0).
  * It is available through the world-wide-web at this URL:
  * http://opensource.org/licenses/osl-3.0.php
- * If you are unable to obtain a copy of the license through the 
- * world-wide-web, please send an email to copernica@support.cream.nl 
+ * If you are unable to obtain a copy of the license through the
+ * world-wide-web, please send an email to copernica@support.cream.nl
  * so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
- * Do not edit or add to this file if you wish to upgrade this software 
- * to newer versions in the future. If you wish to customize this module 
- * for your needs please refer to http://www.magento.com/ for more 
+ * Do not edit or add to this file if you wish to upgrade this software
+ * to newer versions in the future. If you wish to customize this module
+ * for your needs please refer to http://www.magento.com/ for more
  * information.
  *
  * @category     Copernica
@@ -30,12 +30,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Catalog_Model_Product
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $name;
@@ -48,7 +42,28 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
      */
     public function setOriginal(Mage_Catalog_Model_Product $original)
     {
-        $this->original = $original;
+    	if ($attributeSet = Mage::getModel('eav/entity_attribute_set')->load($original->getAttributeSetId())) {
+    		$this->name = $attributeSet->getAttributeSetName();
+    	}    	
+    	
+    	$data = array();
+    	$attributes = $original->getAttributes();
+    	
+    	foreach ($attributes as $attribute) {
+    		if (
+    				$attribute->getIsUserDefined() &&
+    				in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
+    				($label = $attribute->getAttributeCode()) &&
+    				($value = $attribute->getFrontend()->getValue($original))
+    		) {
+    			// is this an object which is not serializable    	
+    			// add the value to the array of data
+    			$data[$label] = $value;
+    		}
+    	}
+    	$this->attributes = $data;
+    	 
+
         return $this;
     }
 
@@ -58,44 +73,18 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
      */
     public function name()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($attributeSet = Mage::getModel('eav/entity_attribute_set')->load($this->original->getAttributeSetId())) {
-                return $attributeSet->getAttributeSetName();
-            }
-        }
-        else return $this->name;
+		return $this->name;
     }
 
     /**
-     *  Return an assoc array with attributes
+     *  Return an assoc array with attributes.
+     *
+     *  @param      Bool $useAttribcode
      *  @return     array
      */
-    public function attributes()
+    public function attributes($useAttribCode = false)
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            $attributes = $this->original->getAttributes();
-
-            foreach ($attributes as $attribute) {
-                if (
-                    $attribute->getIsUserDefined() &&
-                    in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
-                    ($label = $attribute->getFrontendLabel()) &&
-                    ($value = $attribute->getFrontend()->getValue($this->original))
-                ) {
-                    // is this an object which is not serializable
-                
-                    // add the value to the array of data
-                    $data[$label] = $value;
-                }
-            }
-            return $data;
-        }
-        else return $this->attributes;
+		return $this->attributes;
     }
 
     /**

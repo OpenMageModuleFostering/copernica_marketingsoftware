@@ -27,18 +27,12 @@
 /**
  *  A wrapper object around a magento Product
  */
-class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializable
+class Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct implements Serializable
 {
-    /**
-     *  The original object
-     *  @param      Mage_Catalog_Model_Product
-     */
-    protected $original;
-
-    /**
+        /**
      * Predefine the internal fields
      */
-    protected $id;
+    public $id;
     protected $sku;
     protected $name;
     protected $description;
@@ -53,13 +47,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     protected $modified;
     protected $attributes;
     protected $attributeSet;
+    public $customerId;
+    protected $timestamp;
 
     /**
      *  Sets the original model
      *  @param      Mage_Catalog_Model_Product|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
      *  @return     Copernica_MarketingSoftware_Model_Abstraction_Product
      */
-    public function setOriginal($original)
+    public function setOriginal($original, $id)
     {
         if ($original instanceof Mage_Catalog_Model_Product) {
             //this is the original product
@@ -108,6 +104,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
             
             $this->timestamp = time();
             
+            $this->customerId = $id;
+            $this->storeId = Mage::app()->getStore()->getStoreId();
 
             return $this;
         } else {
@@ -176,6 +174,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
                 $this->created      =   '';
                 $this->modified     =   '';
                 $this->attributes   =   '';
+                $this->customerId   =	$id;
+                $this->storeId 		= 	Mage::app()->getStore()->getStoreId();
             }
 
             return $this;
@@ -293,7 +293,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
     public function imageUrl($storeId = null)
     {
         return $this->imagePath;
-    }       
+    }
 
     /**
      *  Return the weight of this magento product
@@ -357,9 +357,15 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
 
     public function attributeSet()
     {
-    	return $this->attributeSet;
+   		return $this->attributeSet;
     }
 
+    public function timestamp()
+    {
+    	return $this->timestamp;
+    }
+    
+    
     /**
      *  Serialize the object
      *  @return     string
@@ -383,6 +389,9 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
             $this->created(),
             $this->modified(),
             $this->attributes(),
+        	$this->customerId,
+        	$this->storeId,
+        	$this->timestamp()
         ));
     }
 
@@ -408,7 +417,10 @@ class Copernica_MarketingSoftware_Model_Abstraction_Product implements Serializa
         	$this->specialPrice,
             $this->created,
             $this->modified,
-            $this->attributes
+            $this->attributes,
+        	$this->customerId,
+        	$this->storeId,
+        	$this->timestamp
         ) = unserialize($string);
         return $this;
     }

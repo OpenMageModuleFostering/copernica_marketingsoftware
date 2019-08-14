@@ -29,11 +29,14 @@
  */
 class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializable
 {
-    /**
-     *  The original object
-     *  @param      Mage_Sales_Model_Order
-     */
-    protected $original;
+	/**
+	 * Getting payment name does not work with Klarna. Klarna gets the
+	 * payment name from a quote shipping address. Since this is an order
+	 * a quote is no longer available.
+	 * 
+	 * @var string
+	 */
+	const PAYMENT_METHOD_KLARNA = 'klarna_partpayment';
 
     /**
      * Predefine the internal fields
@@ -56,7 +59,6 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
     protected $shippingDescription;
     protected $paymentDescription;
 
-
     /**
      *  Sets the original model
      *  @param      Mage_Sales_Model_Order $original
@@ -64,7 +66,50 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function setOriginal(Mage_Sales_Model_Order $original)
     {
-        $this->original = $original;
+		$this->id = $original->getId();
+		$this->incrementId = $original->getIncrementId();
+		$this->quoteId = $original->getQuoteId();
+		$this->state = $original->getState();
+		$this->status = $original->getStatus();
+		$this->quantity = $original->getTotalQtyOrdered();
+		$this->currency = $original->getOrderCurrencyCode();
+		$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+		$this->weight = $original->getWeight();
+		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+		$this->timestamp = $original->getUpdatedAt();
+		$this->shippingDescription = $original->getShippingDescription();
+		$this->customerIP = $original->getRemoteIp();
+		
+		$data = array();
+		$items = $original->getAllVisibleItems();
+		foreach ($items as $item) {
+			$data[] = Mage::getModel('marketingsoftware/abstraction_order_item')->setOriginal($item);
+		}
+		$this->items = $data;	
+
+		//the order model only returns a customer if it exists
+		if ($customerId = $original->getCustomerId()) {
+			$this->customerId = $customerId;
+		}	
+		
+		$data = array();
+		//retrieve this quote's addresses
+		$addresses = $original->getAddressesCollection();
+		foreach ($addresses as $address) {
+			$data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
+		}
+		$this->addresses = $data;
+
+		if ($payment = $original->getPayment()) {
+			try {
+				if ($payment->getMethod() == self::PAYMENT_METHOD_KLARNA) {
+					$this->paymentDescription = 'Klarna';
+				} else {
+					$this->paymentDescription = $payment->getMethodInstance()->getTitle();
+				}
+			} catch (Mage_Core_Exception $exception) { }		
+		}
+		
         return $this;
     }
 
@@ -78,7 +123,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
         $order = Mage::getModel('sales/order')->load($orderId);
         if ($order->getId()) {
             //set the original model if the quote exists
-            $this->original = $order;
+            $this->setOriginal($order);
         }
         return $this;
     }
@@ -89,12 +134,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function id()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getId();
-        }
-        else return $this->id;
+		return $this->id;
     }
 
     /**
@@ -103,12 +143,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function incrementId()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getIncrementId();
-        }
-        else return $this->incrementId;
+        return $this->incrementId;
     }
 
     /**
@@ -117,12 +152,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function quoteId()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getQuoteId();
-        }
-        else return $this->quoteId;
+        return $this->quoteId;
     }
 
     /**
@@ -131,12 +161,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function state()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getState();
-        }
-        else return $this->state;
+		return $this->state;
     }
 
     /**
@@ -145,12 +170,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function status()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getStatus();
-        }
-        else return $this->status;
+        return $this->status;
     }
 
     /**
@@ -159,12 +179,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function quantity()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getTotalQtyOrdered();
-        }
-        else return $this->quantity;
+		return $this->quantity;
     }
 
     /**
@@ -173,12 +188,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function currency()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getOrderCurrencyCode();
-        }
-        else return $this->currency;
+        return $this->currency;
     }
 
     /**
@@ -188,13 +198,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function price()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Note that the price may consist of multiple elements
-            return Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($this->original);
-        }
-        else return $this->price;
+    	return $this->price;
     }
 
     /**
@@ -203,12 +207,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function weight()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getWeight();
-        }
-        else return $this->weight;
+        return $this->weight;
     }
 
     /**
@@ -217,12 +216,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function storeview()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->original->getStore());
-        }
-        else return $this->storeview;
+        return $this->storeview;
     }
 
     /**
@@ -231,17 +225,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function items()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            $items = $this->original->getAllVisibleItems();
-            foreach ($items as $item) {
-                $data[] = Mage::getModel('marketingsoftware/abstraction_order_item')->setOriginal($item);
-            }
-            return $data;
-        }
-        else return $this->items;
+        return $this->items;
     }
 
     /**
@@ -250,12 +234,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function timestamp()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getUpdatedAt();
-        }
-        else return $this->timestamp;
+        return $this->timestamp;
     }
 
     /**
@@ -264,21 +243,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function customer()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            //the order model only returns a customer if it exists
-            if ($customerId = $this->original->getCustomerId()) {
-                return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($customerId);
-            } else {
-                return null;
-            }
-        }
-        elseif ($this->customerId)
-        {
+        if ($this->customerId) {
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
+        } else {
+        	return null;
         }
-        else return null;
     }
 
     /**
@@ -287,18 +256,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function addresses()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            //retrieve this quote's addresses
-            $addresses = $this->original->getAddressesCollection();
-            foreach ($addresses as $address) {
-                $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
-            }
-            return $data;
-        }
-        else return $this->addresses;
+        return $this->addresses;
     }
 
     /**
@@ -307,12 +265,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function shippingDescription()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getShippingDescription();
-        }
-        else return $this->shippingDescription;
+        return $this->shippingDescription;
     }
 
     /**
@@ -321,19 +274,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function paymentDescription()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($payment = $this->original->getPayment()) {
-                try {
-                    return $payment->getMethodInstance()->getTitle();
-                } catch (Mage_Core_Exception $exception) {
-                    return null;
-                }
-            }
-            return null;
-        }
-        else return $this->paymentDescription;
+		return $this->paymentDescription;
     }
 
     /**
@@ -342,12 +283,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      */
     public function customerIP()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getRemoteIp();
-        }
-        else return $this->customerIP;
+        return $this->customerIP;
     }
 
     /**
@@ -355,7 +291,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      *  @return     string
      */
     public function serialize()
-    {
+    {    	
         // serialize the data
         return serialize(array(
             $this->id(),
@@ -404,6 +340,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
             $this->shippingDescription,
             $this->paymentDescription
         ) = unserialize($string);
+        
         return $this;
     }
 }

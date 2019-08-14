@@ -46,7 +46,7 @@ class Copernica_MarketingSoftware_Model_QueueEvent_Factory
 	
 		// Prepare the action, to append it to the classname
 		$action = ucfirst($queueItem->getAction());
-	
+		
 		// What kind of class is given
 		switch (get_class($queueItem->getObject()))
 		{
@@ -69,15 +69,19 @@ class Copernica_MarketingSoftware_Model_QueueEvent_Factory
 			case "Copernica_MarketingSoftware_Model_Abstraction_Subscription":
 				$classname = "marketingsoftware/QueueEvent_Subscription".$action;
 				break;
+				
+			case "Copernica_MarketingSoftware_Model_Abstraction_Viewedproduct":
+				$classname = "marketingsoftware/QueueEvent_ViewedProduct".$action;
+				break;
 		}
 	
 		// No classname, throw an error
 		if (!isset($classname)) throw new CopernicaError(COPERNICAERROR_UNRECOGNIZEDEVENT);
-	
+
 		// Get correct classname
 		$classname = Mage::getConfig()->getModelClassName($classname);
 		if (!class_exists($classname)) throw new CopernicaError(COPERNICAERROR_UNRECOGNIZEDEVENT);
-	
+
 		// construct the object
 		return new $classname($queueItem);
 	}

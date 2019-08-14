@@ -482,6 +482,96 @@ $_config = Mage::helper('marketingsoftware/config') ?>
             </div>
         </div>
 <!-- end of fifth section. -->
+        
+<!-- sixt section: viewed product collection. -->   
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-edit-form fieldset-legend" id="edit_viewedproduct_collection_current_label" name="edit_viewedproduct_collection_current_label">Viewed product Collection</h4>
+            <a href="#" onclick ="document.getElementById('collection_help').style.display='block'; return false;" id="page-help-link" style="float: right; line-height:18px;">More information</a>            
+        </div>
+       <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tbody>
+                        <tr>
+                            <td class="value">Collection name</td>
+                        </tr>
+                        <tr>
+                            <td class="value">
+                                <input type="text" class="input-text validate-code" title="Viewed Product Collection" value="<?php echo(htmlspecialchars($_config->getViewedProductCollectionName())); ?>" name="viewedproduct_input" id="viewedproduct_input">
+                            </td>
+                            <td class="value">
+                                <span style="display:none;" id="viewedproduct_checking">Checking collection....</span>
+                                <span style="display:none;" id="viewedproduct_impossible">Collection cannot be checked.</span>
+                                <span style="display:none;" id="viewedproduct_notexists">Collection does not exist. <a href="javascript:database.viewedProductCollection.create()">Create collection.</a></span>
+                                <span style="display:none;" id="viewedproduct_notvalid">Collection structure not valid.<a href="javascript:database.viewedProductCollection.repair()">Repair collection.</a></span>
+                                <span style="display:none;" id="viewedproduct_ok">Collection exists.</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tbody>
+                        <tr>
+                        <td class="value">Magento field</td>
+                        <td class="value">Copernica link</td>
+                        <td class="value">Copernica field</td>
+                        <td class="value">Status</td>
+                        </tr>
+                        <?php
+                        // get the linked Customer fields
+                        $linkedFields = $_config->getLinkedViewedProductFields();
+                        $viewedProductFields = array();
+                        
+                        foreach ($_helper->supportedViewedProductFields() as $magentoField => $label)
+                        {
+                            // Get the field which is used in Copernica
+                            $copernicaField = isset($linkedFields[$magentoField]) ? $linkedFields[$magentoField] : '';
+
+                            // append a prefix to the fieldname
+                            $magentoField = 'viewedproduct_'.$magentoField;
+                            
+                            // append the data to the array
+                            $viewedProductFields[$magentoField] = $copernicaField;
+                            
+                            // Name for the dropdown field, and name for the textfield
+                            $dropdown_name = "select_$magentoField";
+                            $textfield_name = "input_$magentoField";
+                        ?>
+                        <tr>
+                            <td class="value">
+                                <input type="text" class="input-text disabled" value="<?php echo(htmlspecialchars($label)); ?>" name="<?php echo(htmlspecialchars($label)); ?>" disabled="disabled" />
+                            </td>
+                            <td class="value">
+                                <select class="select" id="<?php echo htmlspecialchars($dropdown_name); ?>" name="<?php echo htmlspecialchars($dropdown_name); ?>">
+                                    <option value="0">Don't link</option>
+                                    <option value="1" <?php if ($copernicaField != '') echo "selected='selected'"; ?>>Create link</option>
+                                    <option value="2">Use default name</option>
+                                </select>
+                            </td>
+                            <td class="value">
+                                <input type="text" class="input-text validate-code" value="<?php echo htmlspecialchars($copernicaField); ?>" name="<?php echo htmlspecialchars($textfield_name); ?>" id="<?php echo htmlspecialchars($textfield_name); ?>" <?php if ($copernicaField == '') echo "style='display: none;'"; ?>>
+                            </td>
+                            <td class="value">
+                                <span style="display:none;" id="checking_<?php echo $magentoField; ?>">Checking field....</span>
+                                <span style="display:none;" id="impossible_<?php echo $magentoField; ?>">Field cannot be checked.</span>
+                                <span style="display:none;" id="notexists_<?php echo $magentoField; ?>">Field does not exist. <a href="javascript:database.viewedProductCollection.field('<?php echo $magentoField; ?>').create()">Create field.</a></span>
+                                <span style="display:none;" id="notlinked_<?php echo $magentoField; ?>">Field is not linked.</a></span>
+                                <span style="display:none;" id="notvalid_<?php echo $magentoField; ?>">Field is not valid. <a href="javascript:database.viewedProductCollection.field('<?php echo $magentoField; ?>').repair()">Repair field.</a></span>
+                                <span style="display:none;" id="ok_<?php echo $magentoField; ?>">Field exists.</span>
+                            </td>                            
+                        </tr>
+                        <?php
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+<!-- end of sixt section. -->
 
     </form>
 <!-- end of fields linking form. -->
@@ -624,7 +714,7 @@ var cartItemFields = <?php echo(json_encode($cartItemFields)); ?>;
 var orderFields = <?php echo(json_encode($orderFields)); ?>;
 var orderItemFields = <?php echo(json_encode($orderItemFields)); ?>;
 var addressFields = <?php echo(json_encode($addressFields)); ?>;
-
+var viewedProductFields = <?php echo(json_encode($viewedProductFields)); ?>;
 
 /**
  *  The main database object (that also does all initialisation)

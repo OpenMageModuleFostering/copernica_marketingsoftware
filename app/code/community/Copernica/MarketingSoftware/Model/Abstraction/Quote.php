@@ -30,12 +30,6 @@
 class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializable
 {
     /**
-     *  The original object
-     *  @param      Mage_Sales_Model_Quote
-     */
-    protected $original;
-
-    /**
      * Predefine the internal fields
      */
     protected $quoteId;
@@ -60,7 +54,51 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function setOriginal(Mage_Sales_Model_Quote $original)
     {
-        $this->original = $original;
+		$this->quoteId = $original->getId();
+		$this->active = (bool) $original->getIsActive();
+		$this->quantity = $original->getItemsQty();
+		$this->currency = $original->getQuoteCurrencyCode();
+		$this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+		$this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+		$this->timestamp = $original->getUpdatedAt();
+		$this->customerIP = $original->getRemoteIp();
+		
+		if ($address = $original->getShippingAddress()) {
+			$this->weight = $address->getWeight();
+		} 
+		
+		$data = array();
+		$items = $original->getAllVisibleItems();
+		foreach ($items as $item) {
+			$data[] = Mage::getModel('marketingsoftware/abstraction_quote_item')->setOriginal($item);
+		}	
+		$this->items = $data;
+		
+		// The quote model only returns a customer if it exists
+		if ($customerId = $original->getCustomerId()) {
+			$this->customerId = $customerId;
+		}
+		
+		$data = array();
+		//retrieve this quote's addresses
+		//Note: this may return empty addresses, since quotes always have address records. Check the email field of the address.
+		$addresses = $original->getAddressesCollection();
+		foreach ($addresses as $address) {
+			$data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
+		}
+		$this->addresses = $data;
+		
+		if ($address = $original->getShippingAddress()) {
+			$this->shippingDescription = $address->getShippingDescription();
+		} 
+		
+		if ($payment = $original->getPayment()) {
+			//this try/catch is needed because getMethodInstance throws an exception instead of returning null
+			try {
+				$this->paymentDescription = $payment->getMethodInstance()->getTitle();
+			} catch (Mage_Core_Exception $exception) { }
+		}
+		
         return $this;
     }
 
@@ -88,8 +126,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
         else $quote->loadByIdWithoutStore($quoteId);
         
         // we did load a valid quote, set the original model
-        if ($quote->getId()) $this->original = $quote;
-        else $this->quoteId = $quoteId;
+        if ($quote->getId()) {
+        	$this->setOriginal($quote);
+        } else {
+        	$this->quoteId = $quoteId;
+        }
         
         // return this
         return $this;
@@ -101,12 +142,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function id()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getId();
-        }
-        else return $this->quoteId;
+		return $this->quoteId;
     }
 
     /**
@@ -115,12 +151,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function active()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return (bool)$this->original->getIsActive();
-        }
-        else return $this->active;
+		return $this->active;
     }
 
     /**
@@ -129,12 +160,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function quantity()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getItemsQty();
-        }
-        else return $this->quantity;
+		return $this->quantity;
     }
 
     /**
@@ -143,12 +169,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function currency()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getQuoteCurrencyCode();
-        }
-        else return $this->currency;
+		return $this->currency;
     }
 
     /**
@@ -158,13 +179,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function price()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // Note that the price may consist of multiple elements
-            return Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($this->original);
-        }
-        else return $this->price;
+        return $this->price;
     }
 
     /**
@@ -173,16 +188,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function weight()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($address = $this->original->getShippingAddress()) {
-                return $address->getWeight();
-            } else {
-                return null;
-            }
-        }
-        else return $this->price;
+        return $this->weight;
     }
 
     /**
@@ -191,12 +197,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function storeview()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->original->getStore());
-        }
-        else return $this->storeview;
+        return $this->storeview;
     }
 
     /**
@@ -205,17 +206,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function items()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            $items = $this->original->getAllVisibleItems();
-            foreach ($items as $item) {
-                $data[] = Mage::getModel('marketingsoftware/abstraction_quote_item')->setOriginal($item);
-            }
-            return $data;
-        }
-        else return $this->items;
+		return $this->items;
     }
 
     /**
@@ -224,12 +215,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function timestamp()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getUpdatedAt();
-        }
-        else return $this->timestamp;
+        return $this->timestamp;
     }
 
     /**
@@ -238,22 +224,12 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function customer()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            // The quote model only returns a customer if it exists
-            if ($customerId = $this->original->getCustomerId())
-            {
-                return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($customerId);
-            }
-        }
-        elseif ($this->customerId)
-        {
+		if ($this->customerId) {
             return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
+        } else {
+        	// default fallback
+        	return null;
         }
-        
-        // default fallback
-        return null;
     }
 
     /**
@@ -262,19 +238,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function addresses()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            $data = array();
-            //retrieve this quote's addresses
-            //Note: this may return empty addresses, since quotes always have address records. Check the email field of the address.
-            $addresses = $this->original->getAddressesCollection();
-            foreach ($addresses as $address) {
-                $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
-            }
-            return $data;
-        }
-        else return $this->addresses;
+		return $this->addresses;
     }
 
     /**
@@ -283,12 +247,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function customerIP()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            return $this->original->getRemoteIp();
-        }
-        else return $this->customerIP;
+		return $this->customerIP;
     }
 
     /**
@@ -297,16 +256,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function shippingDescription()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($address = $this->original->getShippingAddress()) {
-                return $address->getShippingDescription();
-            } else {
-                return null;
-            }
-        }
-        else return $this->shippingDescription;
+		return $this->shippingDescription;
     }
 
     /**
@@ -315,20 +265,7 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
      */
     public function paymentDescription()
     {
-        // Is this object still present?
-        if (is_object($this->original))
-        {
-            if ($payment = $this->original->getPayment()) {
-                //this try/catch is needed because getMethodInstance throws an exception instead of returning null
-                try {
-                    return $payment->getMethodInstance()->getTitle();
-                } catch (Mage_Core_Exception $exception) {
-                    return null;
-                }
-            }
-            return null;
-        }
-        else return $this->paymentDescription;
+		return $this->paymentDescription;
     }
 
     /**
