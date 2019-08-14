@@ -24,6 +24,10 @@
 * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
 */
 
+$config = Mage::helper('marketingsoftware/config');
+$config->setVanillaCrons(true);
+$config->setEnabledStores(null);
+
 return;
 
 // array of all configs entries that are describing linked fields

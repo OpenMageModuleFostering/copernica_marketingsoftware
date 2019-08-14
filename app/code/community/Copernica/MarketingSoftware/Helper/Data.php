@@ -31,42 +31,44 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
      *  Helper method returns all supported customer fields
+     *  
      *  @return array
      */
     public function supportedCustomerFields()
     {
         return array(
-            'gender' => 'Gender',
-            'firstname' => 'Firstname', 
-            'middlename' => 'Middlename',
-            'lastname' => 'Lastname',
-            'email' => 'E-mail',
-            'birthdate' => 'Birth date',
-            'group' => 'Customer group',
-            'newsletter' => 'Newsletter',
-            'storeView' => 'Store view',
-            'registrationDate' => 'Registration date',
+            'gender'			=>	'Gender',
+            'firstname'			=>	'Firstname', 
+            'middlename'		=>	'Middlename',
+            'lastname'			=>	'Lastname',
+            'email'				=>	'E-mail',
+            'birthdate'			=>	'Birth date',
+            'group'				=>	'Customer group',
+            'newsletter'		=>	'Newsletter',
+            'storeView'			=>	'Store view',
+            'registrationDate'	=>	'Registration date',
         );
     }
     
     /**
      *  Helper method returns all supported fields for 
-     *  the cart item collection
+     *  the quote item collection
+     *  
      *  @return array
      */
-    public function supportedCartItemFields()
+    public function supportedQuoteItemFields()
     {
         return array(
-            'productId'     =>  'product id',
+            'productId'     =>  'Product id',
             'name'          =>  'Product name',
             'sku'           =>  'SKU',
-            'attributeSet'  =>  'Attribute set',
+            'attributeSet'	=>	'Attribute set',
             'weight'        =>  'Weight',
             'quantity'      =>  'Quantity',
             'price'         =>  'Price',
+        	'totalPrice'    =>  'Total price',
             'timestamp'     =>  'Modified',
-            'storeView'     =>  'Store view', 
-            'totalPrice'    =>  'Total price',
+            'storeView'     =>  'Store view',             
             'url'           =>  'Details URL',
             'image'         =>  'Image URL',
             'categories'    =>  'Categories',
@@ -78,109 +80,141 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      *  Helper method returns all supported fields for 
      *  the order collection
-     *  @return array
+     *  
+     *  @return	array
      */
     public function supportedOrderFields()
     {
         return array(
-            'incrementId' => 'Increment id',
-            'timestamp' => 'Timestamp',
-            'quantity' => 'Quantity',
+            'incrementId' 			=>	'Increment id',
+            'timestamp' 			=>	'Timestamp',
+            'quantity' 				=>	'Quantity',
             //'subtotal' => 'Subtotal',
-            'shipping' => 'Shipping costs',
-            'total' => 'Order total',
-            'weight' => 'Total weight',
-            'currency' => 'Currency',
-            'status' => 'Order status',
-            'storeView' => 'Store view',
-            'remoteIp' => 'Order ip address',
-            'shippingDescription' => 'Shipping description',
-            'paymentDescription' => 'Payment description',
-            'shippingAddressId' => 'Shipping Address id',
-            'billingAddressId' => 'Billing Address id',
-            'couponCode' => 'Coupon code',
+            'shipping' 				=>	'Shipping costs',
+            'total' 				=>	'Order total',
+            'weight' 				=>	'Total weight',
+            'currency' 				=>	'Currency',
+            'status' 				=>	'Order status',
+            'storeView' 			=>	'Store view',
+            'remoteIp' 				=>	'Order ip address',
+            'shippingDescription'	=>	'Shipping description',
+            'paymentDescription' 	=>	'Payment description',
+            'shippingAddressId' 	=>	'Shipping Address id',
+            'billingAddressId' 		=>	'Billing Address id',
+            'couponCode' 			=>	'Coupon code',
         );
     }
 
     /**
      *  Helper method returns all supported fields for 
-     *  the cart item collection
+     *  the order item collection
+     *  
      *  @return array
      */
     public function supportedOrderItemFields()
     {
         return array(
-            'productId' => 'product id',
-            'incrementId' => 'Increment id',
-            'name' => 'Product name',
-            'sku' => 'SKU',
-            'attributeSet' => 'Attribute set',                
-            'weight' => 'Weight',
-            'quantity' => 'Quantity',
-            'price' => 'Price',
-            'timestamp' => 'Modified',
-            'storeView' => 'Store view', 
-            'totalPrice' => 'Total price',
-            'url' => 'Details URL',
-            'image' => 'Image URL',
-            'categories' => 'Categories',
-            'options' => 'Product options',
-            'attributes' => 'Product Attributes',
-            'salesRules' => 'Sales rules',
+            'productId' 	=>	'Product id',
+            'incrementId'	=>	'Increment id',
+            'name' 			=>	'Product name',
+            'sku' 			=>	'SKU',
+            'attributeSet' 	=>	'Attribute set',                
+            'weight' 		=>	'Weight',
+            'quantity' 		=>	'Quantity',
+            'price' 		=>	'Price',
+        	'totalPrice' 	=>	'Total price',
+        	'timestamp' 	=>	'Modified',
+            'storeView' 	=>	'Store view',             
+            'url' 			=>	'Details URL',
+            'image' 		=>	'Image URL',
+            'categories' 	=>	'Categories',
+            'options' 		=>	'Product options',
+            'attributes' 	=>	'Product Attributes',
+            'salesRules' 	=>	'Sales rules',
         );
     }
     
     /**
      *  Helper method returns all supported fields for 
      *  the address collection
+     *  
      *  @return array
      */
     public function supportedAddressFields()
     {
         return array(
-            'firstname'     => 'Firstname', 
-            'middlename'    => 'Middlename',
-            'prefix'        => 'Prefix',
-            'lastname'      => 'Lastname',
-            'email'         => 'E-mail',
-            'company'       => 'Company',
-            'street'        => 'Street',
-            'city'          => 'City',
-            'state'         => 'State',
-            'zipcode'       => 'Zip code',
-            'countryId'     => 'Country',
-            'telephone'     => 'Telephone number',
-            'fax'           => 'Fax number',
+            'firstname'     =>	'Firstname', 
+            'middlename'	=>	'Middlename',
+            'prefix'        =>	'Prefix',
+            'lastname'      =>	'Lastname',
+            'email'         =>	'E-mail',
+            'company'       =>	'Company',
+            'street'        =>	'Street',
+            'city'          =>	'City',
+            'state'         =>	'State',
+            'zipcode'       =>	'Zip code',
+            'countryId'     =>	'Country',
+            'telephone'     =>	'Telephone number',
+            'fax'           =>	'Fax number',
         );
     }
 
     /**
      *  Helper method returns all supported fields for 
      *  the viewed product collection
+     *  
      *  @return array
      */
     public function supportedViewedProductFields()
     {
         return array(
-            'productId'    =>  'product id',
+            'productId'     =>  'Product id',
             'name'          =>  'Product name',
             'sku'           =>  'SKU',
-            'attributeSet' =>  'Attribute set',
+            'attributeSet'  =>  'Attribute set',
             'weight'        =>  'Weight',
             'price'         =>  'Price',
-            'storeView'    =>  'Store view', 
-            'totalPrice'   =>  'Total price',
+        	'timestamp'     =>  'Timestamp',
+        	'storeView'     =>  'Store view',
             'url'           =>  'Details URL',
             'image'         =>  'Image URL',
             'categories'    =>  'Categories',
             'options'       =>  'Product options',
-            'attributes'    =>  'Product Attributes',
-            'timestamp'     =>  'Timestamp',
+            'attributes'    =>  'Product Attributes',            
         );
+    }
+    
+    /**
+     *  Helper method returns all supported fields for
+     *  the wishlist item collection
+     *
+     *  @return array
+     */
+    public function supportedWishlistItemFields()
+    {
+    	return array(
+    		'productId'		=>  'Product id',
+    		'name'          =>  'Product name',
+    		'sku'           =>  'SKU',
+    		'attributeSet'  =>  'Attribute set',
+    		'weight'        =>  'Weight',
+    		'quantity'      =>  'Quantity',
+    		'price'         =>  'Price',
+    		'totalPrice'    =>  'Total price',
+    		'timestamp'		=>  'Timestamp',
+    		'description'	=>	'Description',
+    		'storeView'		=>	'Store view',
+    		'url'           =>  'Details URL',
+    		'image'         =>  'Image URL',
+    		'categories'    =>  'Categories',
+    		'options'       =>  'Product options',
+    		'attributes'    =>  'Product Attributes',    			
+    	);
     }
 
     /**
      *  Required fields for copernica customer profile.
+     *  
      *  @return array
      */
     public function requiredCustomerFields()
@@ -189,16 +223,18 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     *  Required fields for copernica cart items collection.
+     *  Required fields for copernica quote item collection.
+     *  
      *  @return array
      */
-    public function requiredCartItemFields()
+    public function requiredQuoteItemFields()
     {
         return array('item_id', 'quote_id', 'status');
     }
 
     /**
      *  Required fields for copernica orders collection
+     *  
      *  @return array
      */
     public function requiredOrderFields()
@@ -207,7 +243,8 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     *  Required fields for copernica order items collection
+     *  Required fields for copernica order item collection
+     *  
      *  @return array
      */
     public function requiredOrderItemFields()
@@ -217,6 +254,7 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      *  Required fields for copernica address collection
+     *  
      *  @return array
      */
     public function requiredAddressFields()
@@ -226,6 +264,7 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      *  Required fields for copernica viewed products collection
+     *  
      *  @return array
      */
     public function requiredViewedProductFields()
@@ -233,6 +272,16 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
         return array('product_id');
     }
 
+    /**
+     *  Required fields for copernica wislist collection
+     *
+     *  @return array
+     */
+    public function requiredWishlistItemFields()
+    {
+    	return array('item_id', 'wishlist_id');
+    }
+    
     /**
      *  Get field definition by collection type and magento field name.
      *
@@ -242,13 +291,12 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
      *  platform we should also have a field of type email. Same goes for phones,
      *  dates, etc.
      *
-     *  @param  string  collection type
-     *  @param  string  magento field name
+     *  @param	string	$collectionType
+     *  @param	string	$magentoName
      *  @return array
      */
     public function getCollectionFieldDefinition($collectionType, $magentoName)
     {
-        // table with field definitions.
         $definitions = array(
             'cartproducts' => array (
                 'timestamp' => array (
@@ -270,8 +318,18 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ),
                 'storeView' => array (
                     'type' => 'text',
-                    'length' => 100
-                )
+                    'length' => 250
+                ),
+				'options' => array (
+            		'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
+				),
+				'attributes' => array (
+            		'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
+				),
             ),
             'orderproducts' => array (
                 'timestamp' => array (
@@ -293,21 +351,22 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ),
                 'storeView' => array (
                     'type' => 'text',
-                    'length' => 100
+                    'length' => 250
                 ),
-                // small note on following 2 fields. They can be very big. For 
-                // options, when we have a bundled product it will contain 
-                // title, product name, product price and quantity of product. 
-                // For attributes it will contain a key-value string of every 
-                // attribute. That is why we want to set the type to big.
                 'options' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
                 'attributes' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
                 'salesRules' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
             ),
             'viewedproducts' => array (
@@ -330,18 +389,17 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ),
                 'storeView' => array (
                     'type' => 'text',
-                    'length' => 100
+                    'length' => 250
                 ),
-                // small note on following 2 fields. They can be very big. For 
-                // options, when we have a bundled product it will contain 
-                // title, product name, product price and quantity of product. 
-                // For attributes it will contain a key-value string of every 
-                // attribute. That is why we want to set the type to big.
                 'options' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
                 'attributes' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ) 
             ),
             'orders' => array (
@@ -350,13 +408,17 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 ),
                 'storeView' => array (
                     'type' => 'text',
-                    'length' => 100
+                    'length' => 250
                 ),
                 'shippingDescription' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
                 'paymentDescription' => array (
-                    'type' => 'big'
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
                 ),
                 'couponCode' => array (
                     'type' => 'text',
@@ -373,35 +435,70 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
                 'fax' => array (
                     'type' => 'phone_fax'
                 )
-            )
+            ),
+        	'wishlistproducts' => array (
+        		'timestamp' => array (
+        			'type' => 'datetime'
+        		),
+        		'description' => array (
+                    'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
+        		),
+                'url' => array (
+                    'type' => 'text',
+                    'length' => 255
+                ),
+                'image' => array (
+                    'type' => 'text',
+                    'length' => 255
+                ),
+                'categories' => array (
+                    'type' => 'text',
+                    'length' => 255,
+                    'textlines' => 4,
+                    'lines' => 4
+                ),
+                'storeView' => array (
+                    'type' => 'text',
+                    'length' => 250
+                ),
+				'options' => array (
+            		'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
+				),
+				'attributes' => array (
+            		'type' => 'big',
+                    'textlines' => 4,
+                    'lines' => 4
+				),
+        	)
         );
 
-        // check if we have a special definition for field
-        if (!isset($definitions[$collectionType]) || !isset($definitions[$collectionType][$magentoName])) 
-        {
-            // by default we will say that field should be a text field
+        if (!isset($definitions[$collectionType]) || !isset($definitions[$collectionType][$magentoName])) {
             return array ('type' => 'text');
         }
 
-        // return field definition
         return $definitions[$collectionType][$magentoName];
     }
 
     /**
      * Get the version of this extension.
      * 
-     * @return string version number
+     * @return string
      */
     public function getExtensionVersion()
     {
-        // Get the config and return the version from the config
         $config = Mage::getConfig()->getModuleConfig('Copernica_MarketingSoftware')->asArray();
+        
         return $config['version'];
     }
 
     /**
      *  Get the url for the unsubscribe callback
-     *  @return String
+     *  
+     *  @return string
      */
     public function unsubscribeCallbackUrl()
     {
@@ -411,26 +508,25 @@ class Copernica_MarketingSoftware_Helper_Data extends Mage_Core_Helper_Abstract
     /** 
      *  Does the queue contain the magic token, which indicates that the synchronisation
      *  should be started?
+     *  
      *  @return boolean
      */
     public function isSynchronisationStartScheduled()
     {
-        // Construct a new resource for this because caching fucks it all up
-        $count = Mage::getResourceModel('marketingsoftware/queue_collection')
+        $count = Mage::getResourceModel('marketingsoftware/queue_item_collection')
             ->addFieldToFilter('action', 'start_sync')
             ->getSize();
     
-        // Reset the count
         return ($count > 0);        
     }
     
     /**
      *  Is the Copernica module enabled?
+     *  
      *  @return boolean
      */
     public function enabled()
     {
-        // Get the setting from 'advanced/modules_disable_output/Copernica_MarketingSoftware'
         return (Mage::getConfig()->getNode('advanced/modules_disable_output/Copernica_MarketingSoftware', 'default', 0) == 0);
     }
 }

@@ -32,29 +32,30 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
     /**
      * Predefine the internal fields
      */
-    protected $id;
-    protected $websiteCode;
-    protected $websiteLabel;
-    protected $storeCode;
-    protected $storeLabel;
-    protected $viewCode;
-    protected $viewLabel;
+    protected $_id;
+    protected $_websiteCode;
+    protected $_websiteLabel;
+    protected $_storeCode;
+    protected $_storeLabel;
+    protected $_viewCode;
+    protected $_viewLabel;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Core_Model_Store $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @param	Mage_Core_Model_Store $original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function setOriginal(Mage_Core_Model_Store $original)
     {
         if ($original->getWebsite() instanceof Mage_Core_Model_Website) {
-            $this->id = $original->getId();
-            $this->websiteCode = $original->getWebsite()->getCode();
-            $this->websiteLabel = $original->getWebsite()->getName();
-            $this->storeCode = $original->getGroup()->getId();
-            $this->storeLabel = $original->getGroup()->getName();
-            $this->viewCode = $original->getCode();
-            $this->viewLabel = $original->getName();            
+            $this->_id = $original->getId();
+            $this->_websiteCode = $original->getWebsite()->getCode();
+            $this->_websiteLabel = $original->getWebsite()->getName();
+            $this->_storeCode = $original->getGroup()->getId();
+            $this->_storeLabel = $original->getGroup()->getName();
+            $this->_viewCode = $original->getCode();
+            $this->_viewLabel = $original->getName();            
         }
             
         return $this;
@@ -62,70 +63,78 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
 
     /**
      *  Return the id for the storeview
-     *  @return     int
+     *  
+     *  @return	int
      */
     public function id()
     {
-        return $this->id;
+        return $this->_id;
     }
 
     /**
      *  Return the code for the website
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function websiteCode()
     {       
-        return $this->websiteCode;
+        return $this->_websiteCode;
     }
 
     /**
      *  Return the label for the website
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function websiteLabel()
     {
-        return $this->websiteLabel;
+        return $this->_websiteLabel;
     }
 
     /**
      *  Return the code for the store
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function storeCode()
     {
-        return $this->storeCode;
+        return $this->_storeCode;
     }
 
     /**
      *  Return the label for the store
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function storeLabel()
     {
-        return $this->storeLabel;
+        return $this->_storeLabel;
     }
 
     /**
      *  Return the code for the store
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function viewCode()
     {
-        return $this->viewCode;
+        return $this->_viewCode;
     }
 
     /**
      *  Return the label for the store
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function viewLabel()
     {
-        return $this->viewLabel;
+        return $this->_viewLabel;
     }
 
     /**
      *  Convert this value to a string
-     *  @return String
+     *  
+     *  @return	String
      */
     public function __toString()
     {
@@ -138,11 +147,11 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
             $this->id(),
             $this->websiteCode(),
@@ -156,19 +165,22 @@ class Copernica_MarketingSoftware_Model_Abstraction_Storeview implements Seriali
 
     /**
      *  Unserialize the object
-     *  @param      Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function unserialize($string)
     {
         list(
-            $this->id,
-            $this->websiteCode,
-            $this->websiteLabel,
-            $this->storeCode,
-            $this->storeLabel,
-            $this->viewCode,
-            $this->viewLabel
+            $this->_id,
+            $this->_websiteCode,
+            $this->_websiteLabel,
+            $this->_storeCode,
+            $this->_storeLabel,
+            $this->_viewCode,
+            $this->_viewLabel
         ) = unserialize($string);
+        
         return $this;
     }
 }

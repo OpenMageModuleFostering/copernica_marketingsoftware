@@ -1,0 +1,43 @@
+<?php
+/**
+ *  View for setting access token manually
+ *  Copernica Marketing Software
+ *  http://www.copernica.com 
+ */
+
+?>
+
+<div class="content-header">
+    <h3 class="icon-head head-system-account">
+        Copernica Marketing Software: Access Token
+    </h3>
+</div>
+
+<div class="entry-edit">
+    <form action="<?php echo $this->getPostUrl(); ?>" method="post">
+        <?php echo $this->getBlockHtml('formkey'); ?>
+        <div class="fieldset">
+            <div class="hor-scroll">
+                <table cellspacing="0" class="form-list">
+                    <tbody>
+                        <tr>
+                            <td class="label">
+                                <label>Access Token Value</label>
+                            </td>
+                            <td class="value">
+                                <input type="text" class="required-entry input-text" title="Access Token" name="access_token" value="<?php echo $this->getAccessTokenValue(); ?>">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                <button>
+                                    Store access token
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+</div>

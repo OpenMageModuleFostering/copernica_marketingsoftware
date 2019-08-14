@@ -31,49 +31,59 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote extends Copernica
 {
     /**
      *  Cached quote instance
-     *  @var Mage_Sales_Model_Quote
+     *  
+     *  @var	Mage_Sales_Model_Quote
      */
-    private $quote;
+    protected $_quote;
 
     /**
      *  Cached quote items
-     *  @var array
+     *  
+     *  @var	array
      */
-    private $items;
-
-    /**
-     *  Construct quote entity
-     *  @param Mage_Sales_Model_Quote
-     */
-    public function __construct($quote)
-    {
-        $this->quote = $quote;
-    }
+    protected $_quoteItems;
 
     /**
      *  @return array
      */
     public function getItems()
     {
-        // check if we already fetched all items 
-        if (!is_null($this->items)) return $this->items;
+        if (!is_null($this->$_quoteItems)) {
+        	return $this->$_quoteItems;
+        }
 
-        // data holder for quote items
-        $items = array();
+        $quoteItems = array();
 
-        // convert all items into copernica entities
-        foreach ($this->quote->getAllItems() as $item) $items[] = new Copernica_MarketingSoftware_Model_Copernica_Entity_CartItem($item);
+        foreach ($this->_quote->getAllItems() as $quoteItem) {
+        	$quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+        	$quoteItemEntity->setQuoteItem($quoteItem);
+        	        	
+        	$quoteItems[] = $quoteItemEntity;
+        }
 
-        // cache and return items
-        return $this->items = $items;
+        return $this->_quoteItems = $quoteItems;
     }
 
     /**
-     *  Get RESTEntity for this quote.
-     *  @return Copernica_MarketingSoftware_Model_REST_Quote
+     *  Get REST quote entity
+     *  
+     *  @return Copernica_MarketingSoftware_Model_Rest_Quote
      */ 
-    public function getREST()
+    public function getRestQuote()
     {
-        return new Copernica_MarketingSoftware_Model_REST_Quote($this);
+    	$restQuote = Mage::getModel('marketingsoftware/rest_quote');
+    	$restQuote->setQuoteEntity($this);
+    	 
+    	return $restQuote;
+    }
+    
+    /**
+     *  Set quote entity
+     *
+     *  @param	Mage_Sales_Model_Quote	$quote
+     */
+    public function setQuote($quote)
+    {
+    	$this->_quote = $quote;
     }
 }

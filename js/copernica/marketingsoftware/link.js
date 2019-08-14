@@ -25,7 +25,7 @@ Copernica.MainView = function (rootElement) {
      */
     var current;
 
-    // install on lick handler on collection list
+    // install on click handler on collection list
     rootElement.select('#collection_list')[0].observe('click', function (event) {
 
         // change active tab
@@ -53,8 +53,8 @@ Copernica.MainView = function (rootElement) {
 
     });
 
-    // chanage collection to main database collection (the database)
-    rootElement.select('#collection_list [data-target="main"] a')[0].click();
+    // change collection to default structure
+    rootElement.select('#collection_list [data-target="default"] a')[0].click();
 
     // install on click handler on save button
     $('save').observe('click', function (event) {
@@ -87,7 +87,7 @@ Copernica.DefaultView = function (rootElement) {
             requestHeaders: { Accept: 'application/json' },
             parameters: { name: name },
             onComplete: function (response) {
-                window.location.reload();
+                //window.location.reload();
             }
         });
     });
@@ -228,7 +228,7 @@ Copernica.CollectionView = function (rootElement, name) {
          *  Show main collection
          */
         var showMainCollection = function () {
-            $$('#collection_list [data-collection="main"] a')[0].click();
+            $$('#collection_list [data-target="main"] a')[0].click();
         };
 
         // show that we are fetching data
@@ -245,7 +245,11 @@ Copernica.CollectionView = function (rootElement, name) {
                 var answer = response.responseText.evalJSON();
 
                 // check if we have an error
-                if (answer.error == 'no database') return showMainCollection();
+                if (answer.error == 'no database') {
+                    var html = '<ul class="messages" id="no-data-warning"><li class="warning-msg"><ul><li>A database has not been entered.</li></ul></li></ul>';
+                    $('messages').update(html);
+                	return showMainCollection(); 
+                }
 
                 // clear root element
                 rootElement.innerHTML = '';
@@ -289,7 +293,7 @@ Copernica.CollectionView = function (rootElement, name) {
                 // create input
                 var input = new Element('input', { class: 'input-text', name: 'collection_name' }).setValue(answer.linkedName);
                 value.insert(input);
-
+            
                 // create fieldset
                 var fieldSet = new Element('div', { class: 'fieldset fieldset-wide' });
                 entryEdit.insert(fieldSet);

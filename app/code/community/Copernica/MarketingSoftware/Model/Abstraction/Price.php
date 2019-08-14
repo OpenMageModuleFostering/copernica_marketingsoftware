@@ -40,175 +40,177 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
     /**
      * Predefine the internal fields
      */
-    protected $total;
-    protected $costs;
-    protected $itemPrice;
-    protected $originalPrice;
-    protected $discount;
-    protected $tax;
-    protected $shipping;
-    protected $currency;
+    protected $_total;
+    protected $_costs;
+    protected $_itemPrice;
+    protected $_originalPrice;
+    protected $_discount;
+    protected $_tax;
+    protected $_shipping;
+    protected $_currency;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Sales_Model_Quote|Mage_Sales_Model_Order|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  
+     *  @param	Mage_Sales_Model_Quote|Mage_Sales_Model_Order|Mage_Sales_Model_Quote_Item|Mage_Sales_Model_Order_Item $original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function setOriginal($original)
     {
         if ($grandTotal = $original->getGrandTotal()) {
-            $this->total = $grandTotal;
+            $this->_total = $grandTotal;
         } elseif ($rowTotalInclTax = $original->getRowTotalInclTax()) {
-            $this->total = $rowTotalInclTax;
+            $this->_total = $rowTotalInclTax;
         } elseif ($baseRowTotal = $original->getBaseRowTotal()) {
-            $this->total = $baseRowTotal;
+            $this->_total = $baseRowTotal;
         }
         
-        // Used for quotes and orders
         if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
             $costs = 0;
         
-            // iterate over all visisble items
             foreach ($original->getAllVisibleItems() as $item) {
                 $costs += $item->getBaseCost();
             }
         
-            // return the costs
-            $this->costs = $costs;
+            $this->_costs = $costs;
         } elseif ($baseCost = $original->getBaseCost()) {
-            $this->costs = $baseCost;
+            $this->_costs = $baseCost;
         }
         
-        // no price for an individual item
-        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
-            $this->itemPrice = 0;
-        
-        // Used for quote items and order items
-        elseif ($price = $original->getPrice())
-            $this->itemPrice = $price;
-        
-        // no price for an individual item
-        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
-            $this->originalPrice = 0;
-
-        // it's not safe to call ::getOriginalPrice() on quote item
-        elseif ($original instanceOf Mage_Sales_Model_Quote_Item)
-            $this->originalPrice = 0;
-
-        // Used for quote items and order items
-        elseif ($originalPrice = $original->getOriginalPrice())
-            $this->originalPrice = $originalPrice;
-
-        if ($discountAmount = $original->getDiscountAmount()) 
-            $this->discount = $discountAmount;
-        
-        if ($taxAmount = $original->getTaxAmount()) 
-            $this->tax = $taxAmount;
-        
-        // Shipping is only available for quotes and orders, but not for items
-        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order)
-        {
-            // Get the shipping amount
-            if ($shippingAmount = $original->getShippingAmount())
-                $this->shipping = $shippingAmount;
-            else
-                $this->shipping = 0;
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
+            $this->_itemPrice = 0;
+        } elseif ($price = $original->getPrice()) {
+            $this->_itemPrice = $price;
         }
-        else $this->shipping = 0;
         
-        if ($currency = $original->getOrderCurrencyCode()) 
-            $this->currency = $currency;
-        elseif ($currency = $original->getQuoteCurrencyCode())
-            $this->currency = $currency;
-        elseif (($order = $original->getOrder()) && ($currency = $order->getOrderCurrencyCode()))
-            $this->currency = $currency;
-        elseif (($quote = $original->getQuote()) && ($currency = $quote->getQuoteCurrencyCode()))
-            $this->currency = $currency;
-        else
-            $this->currency = '';
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
+            $this->_originalPrice = 0;
+        } elseif ($original instanceOf Mage_Sales_Model_Quote_Item) {
+            $this->_originalPrice = 0;
+        } elseif ($originalPrice = $original->getOriginalPrice()) {
+            $this->_originalPrice = $originalPrice;
+        }
+
+        if ($discountAmount = $original->getDiscountAmount()) { 
+            $this->_discount = $discountAmount;
+        }
+        
+        if ($taxAmount = $original->getTaxAmount()) { 
+            $this->_tax = $taxAmount;
+        }
+        
+        if ($original instanceOf Mage_Sales_Model_Quote || $original instanceOf Mage_Sales_Model_Order) {
+            if ($shippingAmount = $original->getShippingAmount()) {
+                $this->_shipping = $shippingAmount;
+            } else {
+                $this->_shipping = 0;
+            }
+        } else { 
+        	$this->_shipping = 0;
+        }
+        
+        if ($currency = $original->getOrderCurrencyCode()) { 
+            $this->_currency = $currency;
+        } elseif ($currency = $original->getQuoteCurrencyCode()) {
+            $this->_currency = $currency;
+        } elseif (($order = $original->getOrder()) && ($currency = $order->getOrderCurrencyCode())) {
+            $this->_currency = $currency;
+        } elseif (($quote = $original->getQuote()) && ($currency = $quote->getQuoteCurrencyCode())) {
+            $this->_currency = $currency;
+        } else {
+            $this->_currency = '';
+        }
         
         return $this;
     }
 
     /**
      *  Return the total price
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function total()
     {
-        return $this->total;
+        return $this->_total;
     }
     
     /**
      *  Return the price for the individual item
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function costs()
     {
-        return $this->costs;
+        return $this->_costs;
     }
     
     /**
      *  Return the price for the individual item
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function itemPrice()
     {
-        return $this->itemPrice;
+        return $this->_itemPrice;
     }
     
     /**
      *  Return the original price for the individual item
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function originalPrice()
     {
-        return $this->originalPrice;
+        return $this->_originalPrice;
     }
     
     /**
      *  Return the discount which was given
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function discount()
     {
-        return $this->discount;
+        return $this->_discount;
     }
     
     /**
      *  Return the tax which was paid
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function tax()
     {
-        return $this->tax;
+        return $this->_tax;
     }
     
     /**
      *  Return the shipping costs
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function shipping()
     {
-        return $this->shipping;
+        return $this->_shipping;
     }
     
     /**
      *  Return the currency code
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function currency()
     {
-        return $this->currency;
+        return $this->_currency;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
             $this->total(),
             $this->costs(),
@@ -223,21 +225,24 @@ class Copernica_MarketingSoftware_Model_Abstraction_Price implements Serializabl
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function unserialize($string)
     {
         list(
-            $this->total,
-            $this->costs,
-            $this->itemPrice,
-            $this->originalPrice,
-            $this->discount,
-            $this->tax,
-            $this->shipping,
-            $this->currency
+            $this->_total,
+            $this->_costs,
+            $this->_itemPrice,
+            $this->_originalPrice,
+            $this->_discount,
+            $this->_tax,
+            $this->_shipping,
+            $this->_currency
         ) = unserialize($string);
+        
+        return $this;
     }
 }
 

@@ -30,12 +30,13 @@
 class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Copernica_MarketingSoftware_Model_Copernica_Abstract
 {
     /**
-     *  @var Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
-    protected $order = false;
+    protected $_order = false;
 
     /** 
      *  Return the identifier for this profile
+     *  
      *  @return string
      */
     public function id()
@@ -45,16 +46,20 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
     
     /**
      *  Try to store a quote item
-     *  @param  Copernica_MarketingSoftware_Model_Abstract
+     *  
+     *  @param	Copernica_MarketingSoftware_Model_Abstract	$order
+     *  @return Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile
      */
-    public function setOrder($order)
+    public function setOrder(Copernica_MarketingSoftware_Model_Abstract $order)
     {
-        $this->order = $order;
+        $this->_order = $order;
+        
         return $this;
     }
 
     /**
      *  Get linked fields
+     *  
      *  @return array
      */
     public function linkedFields()
@@ -64,6 +69,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
 
     /**
      *  Get the required fields
+     *  
      *  @return array
      */
     public function requiredFields()
@@ -73,41 +79,44 @@ class Copernica_MarketingSoftware_Model_Copernica_Order_Subprofile extends Coper
     
     /** 
      *  Retrieve the data for this object
+     *  
      *  @return array
      */
     protected function _data()
     {
-        // initialize the addresses
         $billingAddress = $shippingAddress = false;
 
-        // get all addresses associated with given order
-        $addresses = $this->order->addresses();
+        $addresses = $this->_order->addresses();
     
-        // Get the addresses
-        if (is_array($addresses)) foreach ($addresses as $address) {
-            if (in_array('billing', $address->type()))  $billingAddress = $address;
-            if (in_array('shipping', $address->type())) $shippingAddress = $address;
+        if (is_array($addresses)) {
+        	foreach ($addresses as $address) {
+            	if (in_array('billing', $address->type()))  {
+            		$billingAddress = $address;
+            	}
+            	
+            	if (in_array('shipping', $address->type())) {
+            		$shippingAddress = $address;
+            	}
+        	}
         }
 
-        // Get the price
-        $price = $this->order->price();
+        $price = $this->_order->price();
     
-        // Return the data array
         return array(
-            'order_id'      =>  $this->order->id(),
-            'quote_id'      =>  $this->order->quoteId(),
-            'increment_id'  =>  $this->order->incrementId(),
-            'timestamp'     =>  $this->order->timestamp(),
-            'quantity'      =>  $this->order->quantity(),
+            'order_id'      =>  $this->_order->id(),
+            'quote_id'      =>  $this->_order->quoteId(),
+            'increment_id'  =>  $this->_order->incrementId(),
+            'timestamp'     =>  $this->_order->timestamp(),
+            'quantity'      =>  $this->_order->quantity(),
             'total'         =>  is_object($price) ? $price->total() : null,
             'shipping'      =>  is_object($price) ? $price->shipping() : null,
             'currency'      =>  is_object($price) ? $price->currency() : null,
-            'weight'        =>  $this->order->weight(),
-            'status'        =>  $this->order->status(),
-            'store_view'    =>  (string)$this->order->storeview(),
-            'remote_ip'     =>  $this->order->customerIP(),
-            'shipping_description'  =>  $this->order->shippingDescription(),
-            'payment_description'   =>  $this->order->paymentDescription(),
+            'weight'        =>  $this->_order->weight(),
+            'status'        =>  $this->_order->status(),
+            'store_view'    =>  (string)$this->_order->storeview(),
+            'remote_ip'     =>  $this->_order->customerIP(),
+            'shipping_description'  =>  $this->_order->shippingDescription(),
+            'payment_description'   =>  $this->_order->paymentDescription(),
             'shipping_address_id'   =>  is_object($shippingAddress) ? $shippingAddress->id() : '',
             'billing_address_id'    =>  is_object($billingAddress) ? $billingAddress->id() : '',
         );

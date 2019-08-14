@@ -32,31 +32,29 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
     /**
      * Predefine the internal fields
      */
-    protected $name;
-    protected $attributes = null;
+    protected $_name;
+    protected $_attributes = null;
 
 
     /**
      *  Sets the original model
-     *  @param      Mage_Sales_Model_Order_Item $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
+     *  
+     *  @param	Mage_Sales_Model_Order_Item $original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-        $this->name = $original->getName();
+        $this->_name = $original->getName();
 
         $attributes = array();
         $data = array();
         $options = $original->getProductOptions();
         
         if (isset($options['attributes_info'])) {
-            //configurable products
             $attributes = $options['attributes_info'];
         } elseif (isset($options['bundle_options'])) {
-            //bundle products
             $attributes = $options['bundle_options'];
         } elseif (isset($options['options'])) {
-            //generic products
             $attributes = $options['options'];
         }
         
@@ -64,7 +62,8 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
             foreach ($attributes as $attribute) {
                 $data[$attribute['label']] = $attribute['value'];
             }
-            $this->attributes = $data;
+            
+            $this->_attributes = $data;
         }   
         
         return $this;
@@ -72,79 +71,86 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options implement
 
     /**
      *  The name of this order item
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function name()
     {
-        return $this->name;
+        return $this->_name;
     }
 
     /**
      *  Return an assoc array with attributes
-     *  @return     array
+     *  
+     *  @return	array
      */
     public function attributes()
     {
-        return $this->attributes;
+        return $this->_attributes;
     }
 
     /**
      *  Return a string representation
-     *  @return String
+     *  
+     *  @return string
      */
     public function __toString()
     {
-        return $this->arrayToString($this->attributes());
+        return $this->_arrayToString($this->_attributes());
     }
 
     /**
      *  Return a string representation of an array
-     *  @param array
-     *  @return String
+     *  
+     *  @param	array	$value
+     *  @param	string	$prefix
+     *  @return string
      */
-    protected function arrayToString($value, $prefix = '')
+    protected function _arrayToString($value, $prefix = '')
     {
         $string = "";
-        foreach ($value as $key => $value)
-        {
-            // is the value an array
-            if (is_array($value))
-            {
-                // if there is only one subvalue, use that instead
-                if (isset($value[0]) && count($value) == 1) $value = $value[0];
+        
+        foreach ($value as $key => $value) {
+            if (is_array($value)) {
+                if (isset($value[0]) && count($value) == 1) {
+                	$value = $value[0];
+                }
 
-                // compose the string
-                $string .= $prefix.$key.":\n".$this->arrayToString($value, $prefix.'  ');
+                $string .= $prefix.$key.":\n".$this->_arrayToString($value, $prefix.'  ');
+            } else {
+            	$string.= $prefix.$key.": $value\n";
             }
-            else $string.= $prefix.$key.": $value\n";
         }
+        
         return $string;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
-            $this->name(),
-            $this->attributes(),
+            $this->_name(),
+            $this->_attributes(),
         ));
     }
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
      */
     public function unserialize($string)
     {
         list(
-            $this->name,
-            $this->attributes
+            $this->_name,
+            $this->_attributes
         ) = unserialize($string);
+        
         return $this;
     }
 }

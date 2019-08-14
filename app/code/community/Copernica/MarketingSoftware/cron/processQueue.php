@@ -36,9 +36,7 @@ chdir('../../../../../../');
 
 $cliOptions = getopt('h::c::l::v::r::', array('help::', 'customer::', 'lock::', 'verbose::', 'runtime::'));
 
-// should be display usage/help?
-if (array_key_exists('h', $cliOptions) || array_key_exists('help', $cliOptions))
-{
+if (array_key_exists('h', $cliOptions) || array_key_exists('help', $cliOptions)) {
     echo "======================================================================".PHP_EOL;
     echo " Copernica Marketing Software Magento Extension".PHP_EOL;
     echo "======================================================================".PHP_EOL;
@@ -70,83 +68,75 @@ if (array_key_exists('h', $cliOptions) || array_key_exists('help', $cliOptions))
     exit(); 
 }
 
-$customerId = -1;
+try {
+    $customerId = -1;
 
-// check if we should process events associated with one customer
-if (array_key_exists('c', $cliOptions) || array_key_exists('customer', $cliOptions))
-{
-    $customerId = array_key_exists('c', $cliOptions) ? $cliOptions['c'] : 0;
-    if (array_key_exists('customer', $cliOptions)) $customerId = $cliOptions['customer'];
-}
-
-$lock = false;
-
-if (array_key_exists('l', $cliOptions) || array_key_exists('lock', $cliOptions))
-{
-    $lock = true;
-}
-
-$verbose = false;
-
-if (array_key_exists('v', $cliOptions) || array_key_exists('verbose', $cliOptions))
-{
-    $verbose = array_key_exists('v', $cliOptions) ? $cliOptions['v'] : 'TEXT';
-    if (array_key_exists('verbose', $cliOptions)) $verbose = $cliOptions['verbose'] ? $cliOptions['verbose'] : 'TEXT';
-}
-
-$runtime = 45;
-
-if (array_key_exists('r', $cliOptions) || array_key_exists('runtime', $cliOptions))
-{
-    $runtime = array_key_exists('r', $cliOptions) ? $cliOptions['r'] : 45;
-    if (array_key_exists('runtime', $cliOptions)) $runtime = $cliOptions['runtime'];
-}
-
-/**
- *  We need to require magento facade. Since this script should always be in same
- *  relative place we can require by relative path.
- */
-require_once 'app/Mage.php';
-
-// remove current mask
-umask(0);
-
-// if magento is not installed we will just exit this scrtipt
-if (!Mage::isInstalled()) exit;
-
-// don't use sessions
-Mage::app('admin')->setUseSessionInUrl(false);
-
-// init config
-Mage::getConfig()->init();
-
-// get queue processor
-$processor = Mage::getModel('marketingsoftware/QueueProcessor');
-
-// check if we should lock our processor
-if ($lock === false) $processor->processQueue($customerId);
-
-// we should lock our processor
-else {
-
-    // try to aqcuire a lock that will be used when processing
-    $lock = $processor->aqcuireLock();
-
-    // check if we have a lock
-    if ($lock === false) 
-    {
-        /*
-         *  When this script is executed by supervisor or similiar software it 
-         *  will be restarted just after it exits. To not hammer servers with 
-         *  script super quick executions we will sleep for couple of seconds.
-         */
-        if ($runtime > 0 ) sleep($runtime);
-        return;
+    if (array_key_exists('c', $cliOptions) || array_key_exists('customer', $cliOptions)) {
+        $customerId = array_key_exists('c', $cliOptions) ? $cliOptions['c'] : 0;
+        
+        if (array_key_exists('customer', $cliOptions)) {
+        	$customerId = $cliOptions['customer'];
+        }
     }
 
-    // process queue with locking
-    $processor->processWithLocking($lock);
-}
+    $lock = false;
 
-// check if we should output something
-if ($verbose !== false) echo $processor->fetchReport($verbose);
+    if (array_key_exists('l', $cliOptions) || array_key_exists('lock', $cliOptions)) {
+        $lock = true;
+    }
+
+    $verbose = false;
+
+    if (array_key_exists('v', $cliOptions) || array_key_exists('verbose', $cliOptions)) {
+        $verbose = array_key_exists('v', $cliOptions) ? $cliOptions['v'] : 'TEXT';
+        
+        if (array_key_exists('verbose', $cliOptions)) {
+        	$verbose = $cliOptions['verbose'] ? $cliOptions['verbose'] : 'TEXT';
+        }
+    }
+
+    $runtime = 45;
+
+    if (array_key_exists('r', $cliOptions) || array_key_exists('runtime', $cliOptions)) {
+        $runtime = array_key_exists('r', $cliOptions) ? $cliOptions['r'] : 45;
+        
+        if (array_key_exists('runtime', $cliOptions)) {
+        	$runtime = $cliOptions['runtime'];
+        }
+    }
+
+    require_once 'app/Mage.php';
+
+    umask(0);
+
+    if (!Mage::isInstalled()) {
+    	exit;
+    }
+
+    Mage::app('admin')->setUseSessionInUrl(false);
+
+    Mage::getConfig()->init();
+
+    $processor = Mage::getModel('marketingsoftware/queue_processor');
+
+    if ($lock === false) {
+    	$processor->processQueue($customerId);
+    } else {
+        $lock = $processor->aqcuireLock();
+
+        if ($lock === false) {
+            if ($runtime > 0 ) {
+            	sleep($runtime);
+            }
+            return;
+        }
+
+        $processor->processWithLocking($lock);
+    }
+
+    if ($verbose !== false) {
+    	echo $processor->fetchReport($verbose);
+    }
+} catch (Exception $e) {
+    print_r($e);
+}

@@ -31,64 +31,74 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
 {
     /**
      *  Magento customer
-     *  @var Mage_Customer_Model_Customer
+     *  
+     *  @var	Mage_Customer_Model_Customer
      */
-    private $customer = null;
+    protected $_customer = null;
 
     /**
      *  Array of customer addresses
-     *  @var array
+     *  
+     *  @var	array
      */
-    private $addresses = null;
+    protected $_addresses = null;
 
     /**
      *  Array of customer orders
-     *  @var array
+     *  
+     *  @var	array
      */
-    private $orders = null;
+    protected $_orders = null;
+    
+    
+    /**
+     * Array of customer wishlist items
+     * 
+     * @var		array
+     */
+    protected $_wishlistItems = null;
 
     /**
      *  Cache profile Id
-     *  @var string
+     *  
+     *  @var	string
      */
-    private $profileId = null;
+    protected $_profileId = null;
+    
+    
+    /**
+     * 
+     * @var Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     */
+    protected $_store = null;
 
     /**
-     *  Construct customer entity
-     *  @param int
-     */
-    public function __construct($customerId)
-    {
-        // get magento customer
-        $customer = Mage::getModel('customer/customer')->load($customerId);
-
-        // check if it's a new customer
-        if (!$customer->isObjectNew()) $this->customer = $customer;
-
-        // it's an existing customer
-        else throw Mage::exception('Copernica_MarketingSoftware', 'Customer does not exists', Copernica_MarketingSoftware_Exception::CUSTOMER_NOT_EXISTS);
-    }
-
-    /**
-     *  Get customer store view
-     *  @return Copernica_MarketingSoftware_Model_Abstraction_StoreView
+     *  Fetch store view
+     *  
+     *  @return Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function fetchStoreView()
-    {
-        return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->customer->getStore());
+    {    	
+    	if ($this->_store) { 
+    		return $this->_store;
+    	} else {
+        	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($this->_customer->getStore());
+    	}
     }
 
     /**
-     *  Get customer id. Magento customer Id
+     *  Fetch magento customer id
+     *  
      *  @return string
      */
     public function fetchId()
     {
-        return $this->customer->getId();
+        return $this->_customer->getId();
     }
 
     /**
-     *  Our unique customer ID in form of customer_ID|storeView_ID
+     *  Our unique customer ID in the form of customer_ID|storeView_ID
+     *  
      *  @return string
      */
     public function fetchCustomerId()
@@ -97,16 +107,18 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     }
 
     /**
-     *  Get customer name
+     *  Fetch name
+     *  
      *  @return Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function fetchName()
     {
-        return Mage::getModel('marketingsoftware/abstraction_name')->setOriginal($this->customer);
+        return Mage::getModel('marketingsoftware/abstraction_name')->setOriginal($this->_customer);
     }
 
     /**
-     *  Get customer firstname
+     *  Fetch firstname
+     *  
      *  @return string
      */
     public function fetchFirstname()
@@ -115,7 +127,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     }
 
     /**
-     *  Get customer middlename
+     *  Fetch middlename
+     *  
      *  @return string
      */
     public function fetchMiddlename()
@@ -124,7 +137,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     }
 
     /**
-     *  Fetch customer lastname
+     *  Fetch lastname
+     *  
      *  @return string
      */
     public function fetchLastname()
@@ -133,167 +147,238 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Customer extends Copern
     }
 
     /**
-     *  Get customer email
+     *  Fetch email
+     *  
      *  @return string
      */
     public function fetchEmail()
     {
-        return $this->customer->getEmail();
+        return $this->_customer->getEmail();
     }
 
     /**
-     *  Get registration date of a customer
+     *  Fetch registration date
+     *  
      *  @return string
      */
     public function fetchRegistrationDate()
     {
-        return date('Y-m-d H:i:s', $this->customer->getCreatedAtTimestamp());
+        return date('Y-m-d H:i:s', $this->_customer->getCreatedAtTimestamp());
     }
 
     /**
      *  Fetch newsletter status
+     *  
      *  @return string
      */
     public function fetchNewsletter()
     {
-        // get magento subscriber model
-        $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($this->customer);
+        $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($this->_customer);
 
-        // if thre is no subscriber we just will return unknown status
-        if (!$subscriber->getId()) return 'unknown';
+        if (!$subscriber->getId()) {
+        	return 'unknown';
+        }
 
-        // return diffetent result depending on subscriber status
-        switch($subscriber->getStatus())
-        {
+        switch($subscriber->getStatus()) {
             case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
                 return 'subscribed';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE:
                 return 'not active';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED:
                 return 'unsubscribed';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
                 return 'unconfirmed';
+                
             default:
                 return 'unknown';
         }
     }
 
     /**
-     *  Get customer gender
+     *  Fetch gender
+     *  
      *  @return string
      */
     public function fetchGender()
     {
-        // get gender options
-        $options = $this->customer->getAttribute('gender')->getSource()->getAllOptions();
+        $options = $this->_customer->getAttribute('gender')->getSource()->getAllOptions();
 
-        // get customer idx
-        $customerGenderIdx = $this->customer->getGender();
+        $customerGenderIdx = $this->_customer->getGender();
 
-        // iterater over all options to get proper gender
-        foreach ($options as $option)
-        {
-            if ($option['value'] == $customerGenderIdx) return $option['label'];
+        foreach ($options as $option) {
+            if ($option['value'] == $customerGenderIdx) {
+            	return $option['label'];
+            }
         }
 
-        // we don't know
         return 'unknown';
     }
 
     /**
-     *  Get customer date of birth
+     *  Fetch date of birth
+     *  
      *  @return string
      */
     public function getBirthDate()
     {
-        return $this->customer->getDob();
+        return $this->_customer->getDob();
     }
 
     /**
      *  Return all customer addresses
+     *  
      *  @return array
      */
     public function getAddresses()
     {
-        if (!is_null($this->addresses)) return $this->addresses;
-
-        // data holder for customer addresses
-        $addresses = array();
-
-        // create copernica entities from addresses
-        foreach ($this->customer->getAddresses() as $address)
-        {
-            $addresses[] = new Copernica_MarketingSoftware_Model_Copernica_Entity_Address($address);
+        if (!is_null($this->_addresses)) {
+        	return $this->_addresses;
         }
 
-        // cache and return all customer addresses
-        return $this->addresses = $addresses;
+        $addresses = array();
+
+        foreach ($this->_customer->getAddresses() as $address) {
+        	$addressEntity = Mage::getModel('marketingsoftware/copernica_entity_address');
+        	$addressEntity->setAddress($address);
+        	
+            $addresses[] = $addressEntity;
+        }
+
+        return $this->_addresses = $addresses;
     }
 
     /**
      *  Get all customer orders
+     *  
      *  @return array
      */
     public function getOrders()
     {
-        // check if we did already cached orders
-        if (!is_null($this->orders)) return $this->orders;
-
-        // data holder for customer orders
-        $orders = array();
-
-        // get collection with all customers orders
-        $ordersCollection = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('customer_id', $this->customer->getId());
-
-        // iterate over all orders
-        foreach ($ordersCollection as $order)
-        {
-            $orders[] = new Copernica_MarketingSoftware_Model_Copernica_Entity_Order($order);
+        if (!is_null($this->_orders)) { 
+        	return $this->_orders;
         }
 
-        // return all customer orders and cache them
-        return $orders;
+        $orders = array();
+
+        $ordersCollection = Mage::getModel('sales/order')->getCollection()->addFieldToFilter('customer_id', $this->_customer->getId());
+
+        foreach ($ordersCollection as $order) {
+        	$orderEntity = Mage::getModel('marketingsoftware/copernica_entity_order');
+        	$orderEntity->setOrder($order);
+        	
+            $orders[] = $orderEntity;
+        }
+
+        return $this->_orders = $orders;
     }
+    
+    /**
+     *  Get all customer wishlist items
+     *
+     *  @return array
+     */
+    public function getWishlistItems()
+    {
+    	if (!is_null($this->_wishlistItems)) {
+    		return $this->_wishlistItems;
+    	}
+    
+    	$wishlistItems = array();
+    
+    	$wishlist = Mage::getModel('wishlist/wishlist')->loadByCustomer($this->getId());
+    	
+    	$wishlistItemCollection = Mage::getModel('wishlist/item')->getCollection()->addFieldToFilter('wishlist_id', $wishlist->getId());
+    	
+    	foreach ($wishlistItemCollection as $wishlistItem) {
+    		$wishlistItemEntity = Mage::getModel('marketingsoftware/copernica_entity_wishlist_item');
+    		$wishlistItemEntity->setWishlistItem($wishlistItem);
+    		 
+    		$wishlistItems[] = $wishlistItemEntity;
+    	}
+    
+    	return $this->_wishlistItems = $wishlistItems;
+    }    
 
     /**
-     *  Get customer group
+     *  Fetch group
+     *  
      *  @return string
      */
     public function fetchGroup()
     {
-        // fetch customer group
-        return Mage::getModel('customer/group')->load($this->customer->getGroupId())->getCode();
+        return Mage::getModel('customer/group')->load($this->_customer->getGroupId())->getCode();
     }
 
     /**
-     *  Get profile
-     *  @return Copernica_MarketingSoftware_Model_REST_Customer
+     *  Get REST customer
+     *  
+     *  @return Copernica_MarketingSoftware_Model_Rest_Customer
      */
-    public function getREST()
+    public function getRestCustomer()
     {
-        return new Copernica_MarketingSoftware_Model_REST_Customer($this);
+    	$restCustomer = Mage::getModel('marketingsoftware/rest_customer');
+    	$restCustomer->setCustomerEntity($this);
+    	
+    	return $restCustomer;
     }
 
     /**
      *  Get profile Id
+     *  
+     *  @param	string	$storeviewText
+     *  @param	int	$id
      *  @return string|false
      */
     public function getProfileId()
     {
-        // check if we already stored profile Id
-        if (!is_null($this->profileId)) return $this->profileId;
-
-        // try to fetch profile Id from API helper
+        if (!is_null($this->_profileId)) { 
+        	return $this->_profileId;
+        }
+        
         $profileId = Mage::helper('marketingsoftware/api')->getProfileId(array(
             'id' => $this->getCustomerId(),
             'email' => $this->getEmail(),
-            'storeView' => strval($this->getStoreView())
+            'storeView' => strval($this->getStoreView()),
         ));
+        
+        if ($profileId) { 
+        	return $this->_profileId = $profileId;
+        }
 
-        // if we have a profile Id we can cache it and return it
-        if ($profileId) return $this->profileId = $profileId;
-
-        // we don't have any sensible info, so just return false
         return false;
+    }
+    
+    /**
+     *  Set customer entity
+     *
+     *  @param	int	$customerId
+     */
+    public function setCustomer($customerId) 
+    {
+    	$customer = Mage::getModel('customer/customer')->load($customerId);
+    	
+    	if (!$customer->isObjectNew()) {
+    		$this->_customer = $customer;
+    	} else {
+    		throw Mage::exception('Copernica_MarketingSoftware', 'Customer does not exists', Copernica_MarketingSoftware_Exception::CUSTOMER_NOT_EXISTS);
+    	}
+    }
+    
+    /**
+     * Set the storeView
+     * 
+     * @param	Copernica_MarketingSoftware_Model_Abstraction_Storeview	$store
+     */
+    public function setStore($store) 
+    {
+    	if (!$this->_store || $this->_store->id() != $store->id()) {
+	    	unset($this->_data['storeView']);
+    		unset($this->_data['customerId']);
+    		$this->_profileId = null;
+    		$this->_store = $store;
+    	}
     }
 }

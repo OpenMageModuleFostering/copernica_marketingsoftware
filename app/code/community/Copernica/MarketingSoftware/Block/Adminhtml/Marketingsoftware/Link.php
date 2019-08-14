@@ -41,6 +41,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
 
     /**
      *  Return Ajax url that can be used to validate collection
+     *  
      *  @return  string
      */
     public function getAjaxCollectionValidateUrl()
@@ -50,6 +51,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
 
     /**
      *  Return Ajax url that can be used ti fetch information about collection field
+     *  
      *  @return string
      */
     public function getAjaxCollectionFetchUrl()
@@ -59,6 +61,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
     
     /**
      *  Return Ajax url that can be used to store collection.
+     *  
      *  @return string
      */
     public function getAjaxCollectionStoreUrl()
@@ -68,6 +71,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Link extends
 
     /**
      *  Return Ajax url that can be used to create default structure.
+     *  
      *  @return string
      */
     public function getAjaxCollectionDefaultUrl()

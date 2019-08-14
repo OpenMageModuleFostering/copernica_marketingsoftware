@@ -31,6 +31,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
 {
     /**
      *  Return the identifier for this profile
+     *  
      *  @return string
      */
     public function id()
@@ -40,16 +41,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
 
     /**
      *  Try to store a quote item
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  
+     *  @param	Copernica_MarketingSoftware_Model_Abstraction_Address	$address
      */
     public function setAddress($address)
     {
         $this->address = $address;
+        
         return $this;
     }
 
     /**
      *  Get linked fields
+     *  
      *  @return array
      */
     public function linkedFields()
@@ -59,6 +63,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
 
     /**
      *  Get the required fields
+     *  
      *  @return array
      */
     public function requiredFields()
@@ -68,20 +73,17 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
 
     /**
      *  Retrieve the data for this object
+     *  
      *  @return array
      */
     protected function _data()
     {
-        // We might need to get the e-mail from the customer
-        if (($email = $this->address->email()) == "" && is_object($customer = $this->address->customer()))
-        {
+        if (($email = $this->address->email()) == "" && is_object($customer = $this->address->customer())) {
             $email = $customer->email();
         }
 
-        // fetch the name object
         $name = $this->address->name();
 
-        // Combine the data
         return array(
             'address_id'    =>  $this->address->id(),
             'firstname'     =>  is_object($name) ? $name->firstname() : null,
@@ -94,7 +96,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Address_Subprofile extends Cop
             'city'          =>  $this->address->city(),
             'state'         =>  $this->address->state(),
             'zipcode'       =>  $this->address->zipcode(),
-            'country_id'    =>  $this->address->countryCode(),
+            'country_id'    =>  $this->address->countryId(),
             'telephone'     =>  $this->address->telephone(),
             'fax'           =>  $this->address->fax(),
         );

@@ -31,6 +31,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Profile extends Coper
 {
     /**
      *  Return the identifier for this profile
+     *  
      *  @return string
      */
     public function id()
@@ -40,12 +41,14 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Profile extends Coper
 
     /**
      *  Return email associated with profile
+     *  
      *  @return string
      */    
     abstract public function email();
 
     /**
      *  Return store view associated with profile
+     *  
      *  @return string
      */
     abstract public function storeView();
@@ -62,6 +65,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Profile extends Coper
 
     /**
      *  Get linked fields
+     *  
      *  @return array
      */
     public function linkedFields()
@@ -71,6 +75,7 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Profile extends Coper
 
     /**
      *  Get the required fields
+     *  
      *  @return array
      */
     public function requiredFields()

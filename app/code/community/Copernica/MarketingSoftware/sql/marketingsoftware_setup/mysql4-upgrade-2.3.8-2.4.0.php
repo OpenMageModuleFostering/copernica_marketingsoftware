@@ -43,10 +43,17 @@ try
     // we should remove all events that were on queue till this point
     $installer->getConnection()->query("DELETE FROM $queueTableName");
 
+    /**
+     *  Varien lib is a piece of s***. It has problems with defining text types 
+     *  for mysql tables. This is why we have to check if we have our desired 
+     *  type and make a fallback on some auxiliary type.
+     */
+    $textType = defined('Varien_Db_Ddl_Table::TYPE_TEXT') ? Varien_Db_Ddl_Table::TYPE_TEXT : Varien_Db_Ddl_Table::TYPE_VARCHAR;
+
     // We will need a name for our events. 
     $installer->getConnection()->addColumn($queueTableName, 'name', array(
         'comment' => 'name of the event',
-        'type' => Varien_Db_Ddl_Table::TYPE_TEXT,
+        'type' => $textType,
         'length' => 255,
         'nullable' => true,
         'default' => null

@@ -32,71 +32,76 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
     /**
      * Predefine the internal fields
      */
-    protected $firstname;
-    protected $prefix;
-    protected $middlename;
-    protected $lastname;
+    protected $_firstname;
+    protected $_prefix;
+    protected $_middlename;
+    protected $_lastname;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Customer_Model_Customer|Mage_Customer_Model_Customer_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  
+     *  @param	Mage_Customer_Model_Customer|Mage_Customer_Model_Customer_Address|Mage_Sales_Model_Order_Address|Mage_Sales_Model_Quote_Address|Mage_Customer_Model_Address
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function setOriginal($original)
     {
-        $this->firstname = $original->getFirstname();
-        $this->prefix = $original->getPrefix();
-        $this->middlename = $original->getMiddlename();
-        $this->lastname = $original->getLastname();
+        $this->_firstname = $original->getFirstname();
+        $this->_prefix = $original->getPrefix();
+        $this->_middlename = $original->getMiddlename();
+        $this->_lastname = $original->getLastname();
         
         return $this;
     }
 
     /**
      *  Return the firstname of the customer
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function firstname()
     {
-        return $this->firstname;
+        return $this->_firstname;
     }
 
     /**
      *  Return the prefix of the customer
      *  NOTE: the prefix field is not displayed by default
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function prefix()
     {
-        return $this->prefix;
+        return $this->_prefix;
     }
 
     /**
      *  Return the middlename of the customer
      *  NOTE: the middlename field is not displayed by default
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function middlename()
     {
-        return $this->middlename;
+        return $this->_middlename;
     }
 
     /**
      *  Return the lastname of the customer
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function lastname()
     {
-        return $this->lastname;
+        return $this->_lastname;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
             $this->firstname(),
             $this->prefix(),
@@ -107,17 +112,20 @@ class Copernica_MarketingSoftware_Model_Abstraction_Name implements Serializable
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Name
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Name
      */
     public function unserialize($string)
     {
         list(
-            $this->firstname,
-            $this->prefix,
-            $this->middlename,
-            $this->lastname
+            $this->_firstname,
+            $this->_prefix,
+            $this->_middlename,
+            $this->_lastname
         ) = unserialize($string);
+        
+        return $this;
     }
 }
 

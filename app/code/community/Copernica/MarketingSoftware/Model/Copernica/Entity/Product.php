@@ -31,227 +31,406 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Product extends Coperni
 {
     /**
      *  Magento product that will be used during sync
-     *  @var Mage_Catalog_Model_Product
+     *  
+     *  @var	Mage_Catalog_Model_Product
      */
-    protected $product = null;
+    protected $_product = null;
+    
+    /**
+     * Timestamp of when the product was viewed
+     * 
+     * @var	int
+     */
+    protected $_timestamp;
 
     /**
-     *  Construct product entity by it's id
-     *  @param int
+     *  Get native magento object
+     *  
+     *  @return Mage_Catalog_Model_Product
      */
-    public function __construct($productId)
+    public function getNative()
     {
-        $this->product = Mage::getModel('catalog/product')->load($productId);
+        return $this->_product;
     }
 
     /**
      *  Fetch product Id
+     *  
      *  @return string
      */
     public function fetchProductId()
     {
-        return $this->product->getId();
+        return $this->_product->getId();
     }
 
     /**
      *  Get product name
+     *  
      *  @return string
      */
     public function fetchName()
     {
-        return $this->product->getName();
+        return $this->_product->getName();
     }
 
     /**
      *  Get SKU
+     *  
      *  @return string
      */
     public function fetchSku()
     {
-        return $this->product->getSku();
+        return $this->_product->getSku();
     }
 
     /**
      *  Get description
+     *  
      *  @return string
      */
     public function fetchDescription()
     {
-        return $this->product->getShortDescription();
+        return $this->_product->getShortDescription();
     }
 
     /**
      *  Get price
+     *  
      *  @return string
      */
     public function fetchPrice()
     {
-        return $this->product->getPrice();
+        return $this->_product->getPrice();
     }
 
     /**
-     *  Get total product total price
+     *  Fetch special price
+     *  
+     *  @todo test me!
      *  @return string
      */
-    public function fetchTotal()
+    public function fetchSpecialPrice() 
     {
-        return $this->product->getTotal();
+        return $this->_product->getSpecialPrice();
+    }
+
+    /**
+     *  Get product viewed at
+     *
+     *  @return string
+     */
+    public function fetchTimestamp()
+    {
+    	return $this->_timestamp;
     }
 
     /**
      *  Get url to product page
+     *  
      *  @return string
      */
     public function fetchUrl()
     {
-        // get raw url
-        $url = $this->product->getProductUrl($this->getStoreId());
+        $url = $this->_product->getProductUrl($this->getStoreId());
+        
+        if (strpos($url, 'processQueue.php')) {
+        	$url = str_replace('processQueue.php', 'index.php', $url);
+        }
 
-        /*
-         *  This is funny one. Magento can produce url that will point to our 
-         *  process queue script as a filename. It's even more funny cause it will
-         *  not point to correct location of that script but rather than that it 
-         *  will point to such file in root directory. It's obviously wrong. 
-         *  That is why we want to change that to index.php that should point to
-         *  actuall magento installation.
-         */
-        if (strpos($url, 'processQueue.php')) $url = str_replace('processQueue.php', 'index.php', $url);
-
-        // return parsed url
         return $url;
     }
 
     /**
-     *  Get url to product image
-     *  @return string
-     */
-    public function fetchImage()
+     *  Get image URL by it's type. Note that type should be compatible with
+     *  magento internal types, so 'image' or 'thumbnail' can be used. 
+     *
+     *  When image can't be found or identified or magento has some other 
+     *  problems with beforementioned image empty string will be returned.
+     *
+     *  @return	string
+     */ 
+    protected function _getImageByType($type)
     {
-        return $this->product->getImageUrl();
+        try {
+            return Mage::helper('catalog/image')->init($this->_product, $type);    
+        } catch (Exception $e) {
+            Mage::logException($e);
+            return '';
+        }
     }
 
     /**
-     *  This method should be overriden in child classes cause product can be
+     *  Get URL to product image
+     *  
+     *  @return	string
+     */
+    public function fetchImage()
+    {
+        return $this->_getImageByType('image');
+    }
+
+    /**
+     *  Get URL to product thumbnail
+     *  
+     *  @return	string
+     */
+    public function fetchThumbnail()
+    {
+        return $this->_getImageByType('thumbnail');
+    }
+
+    /**
+     *  This method should be overriden in child classes because product can be
      *  placed inside multiple stores so it's not possible to point to one certain
      *  store Id.
+     *  
      *  @return int
      */
     public function getStoreId()
     {
-        return 0;
+    	if ($this->_product->getStoreId()) {
+    		return $this->_product->getStoreId();
+    	} else {
+    		return 0;
+    	}
     }
 
     /**
      *  Get product Id
+     *  
      *  @return string
      */
     public function fetchId()
     {
-        return $this->product->getId();
+        return $this->_product->getId();
     }
 
     /**
+     *  Fetch store view
+     *
+     *  @return string
+     */
+    public function fetchStoreView()
+    {
+    	$store = Mage::getModel('core/store')->load($this->getStoreId());
+    	
+    	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
+    }
+    
+    /**
      *  Get product weight
+     *  
      *  @return string
      */
     public function fetchWeight()
     {
-        return $this->product->getWeight();
+        return $this->_product->getWeight();
+    }
+
+    /**
+     *  Get last modification date
+     *  
+     *  @return string
+     */
+    public function getModified()
+    {
+        return $this->_product->getUpdatedAt();
+    }
+
+    /**
+     *  Get product creation date
+     *  
+     *  @return string
+     */
+    public function getCreated()
+    {
+        return $this->_product->getCreatedAt();
+    }
+
+    /**
+     *  Fetch categories list
+     *  
+     *  @return array
+     */
+    public function fetchCategoriesList()
+    {
+        $categoryIds = $this->_product->getCategoryIds();
+
+        $data = array();
+
+        foreach ($categoryIds as $id) {  
+            $categoryName = array();
+
+            $parent = Mage::getModel('catalog/category')->load($id);
+
+            while($parent->getId() > 1) {
+                $categoryName [] = $parent->getName();
+                
+                $parent = $parent->getParentCategory();
+            }
+
+            $data[$id] = implode(' > ', $categoryName);
+        }
+
+        return $data;
     }
 
     /**
      *  Get product category path
+     *  
      *  @return string
      */
     public function fetchCategories()
     {
-        // get all categories ids
-        $categoryIds = $this->product->getCategoryIds();
-
-        // placeholder for categories
-        $data = array();
-
-        // iterate over all categories
-        foreach ($categoryIds as $id)
-        {  
-            // array that will hold category name parts
-            $categoryName = array();
-
-            // assign current category as parent category
-            $parent = Mage::getModel('catalog/category')->load($id);
-
-            // while we have a parent we have to iterate
-            while($parent->getId() > 1)
-            {
-                $categoryName [] = $parent->getName();
-                $parent = $parent->getParentCategory();
-            }
-
-            // append next category name to data
-            $data[] = implode(' > ', $categoryName);
-        }
-
-        // return whole category string
-        return implode("\n", $data);
+        return implode("\n", $this->fetchCategoriesList());
     }
 
     /**
      *  Fetch options associated with given product.
+     *  
      *  @return string
      */
     public function fetchOptions()
     {
-        // this is implemented in item class. Check if it can be moved here
-        return 'options';
+        $options = $this->_product->getTypeInstance(true)->getOrderOptions($this->_product);
+
+        $neededOptions = array();
+        
+        if (isset($options['attributes_info'])) {
+            $neededOptions = $options['attributes_info'];
+        } elseif (isset($options['bundle_options'])) {
+            $neededOptions = $options['bundle_options'];
+        } elseif (isset($options['options'])) {
+            $neeededOptions = $options['options'];
+        }
+
+        return $this->_stringifyOptions($neededOptions);
+    }
+
+    /**
+     *  Fetch attribute list
+     *  
+     *  @return array
+     */
+    public function fetchAttributesList()
+    {
+        $attributes = $this->_product->getAttributes();
+
+        $resultSet = array();
+        
+        $stringRepresentation = '';
+
+        foreach ($attributes as $attr) {
+            if (!$attr->getIsUserDefined()) {
+            	continue;
+            }
+
+            $compareArray = array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect');
+            
+            if (!in_array($attr->getFrontendInput(), $compareArray)) {
+            	continue;
+            }
+
+            if ($attr->getAttributeCode() && $value = $attr->getFrontend()->getValue($this->_product)) {
+                $resultSet []= array ( 
+                    'code' => $attr->getAttributeCode(), 
+                    'value' => $value, 
+                    'type' => $attr->getFrontendInput(), 
+                    'label' => $attr->getFrontendLabel() 
+                );
+            }
+        }
+
+        return $resultSet;
+    }
+
+    /**
+     *  Is product a new product?
+     *  
+     *  @return boolean
+     */
+    public function fetchNew()
+    {
+        $newsFrom = $this->_product->getNewsFromDate();
+        $newsTo = $this->_product->getNewsToDate();
+
+        if (!$newsFrom && !$newsTo) {
+        	return false;
+        }
+
+        $from = Mage::app()->getLocale()->date($newsFrom);
+        $to = Mage::app()->getLocale()->date($newsTo);
+        $now = Zend_Date::now();
+
+        $new = true;
+
+        $new = $from ? $new && $from->isEarlier($now) : $new;
+        $new = $to ? $new && $to->isLater($now) : $new;
+
+        return $new;
     }
 
     /**
      *  Fetch attributes string representation.
+     *  
      *  @return string
      */
     public function fetchAttributes()
     {
-        // get product attributes
-        $attributes = $this->product->getAttributes();
+        $attributes = array_map( function ($item) {
+            return sprintf("%s: %s", $item['code'], $item['value']);
+        }, $this->getAttributesList());
 
-        // data holder
-        $stringRepresentation = '';
-
-        // iterate over all attributes
-        foreach ($attributes as $attr)
-        {
-            // we only want user defined
-            if (!$attr->getIsUserDefined()) continue;
-
-            // we only want ones that have valid input
-            if (!in_array($attr->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect'))) continue;
-
-            // check if we have valid label and value
-            if ($label = $attr->getAttributeCode() && $value = $attr->getFrontend()->getValue($this->product))
-                $stringRepresentation .= "$label: $value\n";
+        if (!is_array($attributes)) {
+        	return '';
         }
 
-        // return string representation
-        return $stringRepresentation;
+        return implode ("\n", $attributes);
     }
 
     /**
      *  Fetch attribute set name
+     *  
      *  @return string
      */
     public function fetchAttributeSet()
     {
-        $set = Mage::getModel('eav/entity_attribute_set')->load($this->product->getAttributeSetId());
+        $set = Mage::getModel('eav/entity_attribute_set')->load($this->_product->getAttributeSetId());
 
         return $set->getAttributeSetName();
     }
 
     /**
-     *  Get REST entity
-     *  @return Copernica_MarketingSoftware_Model_REST_Product
+     *  Get REST product entity
+     *  
+     *  @return Copernica_MarketingSoftware_Model_Rest_Product
      */
-    public function getREST()
+    public function getRestProduct()
     {
-        return new Copernica_MarketingSoftware_Model_REST_Product($this);
+    	$restProduct = Mage::getModel('marketingsoftware/rest_product');
+    	$restProduct->setProductEntity($this);
+    	 
+    	return $restProduct;
+    }
+    
+    /**
+     *  Set product entity
+     *
+     *  @param	int	$productId
+     */
+    public function setProduct($productId)
+    {
+    	$this->_product = Mage::getModel('catalog/product')->load($productId);
+    }
+    
+    
+    /**
+     * Set the timestamp for when the product was viewed
+     * 
+     * @param unknown $viewedAt
+     */
+    public function setTimestamp($viewedAt)
+    {
+    	$this->_timestamp = $viewedAt;
     }
 }

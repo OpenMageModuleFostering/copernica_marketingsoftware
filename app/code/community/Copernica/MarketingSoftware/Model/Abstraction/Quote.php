@@ -32,257 +32,279 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
     /**
      * Predefine the internal fields
      */
-    protected $quoteId;
-    protected $quantity;
-    protected $currency;
-    protected $timestamp;
-    protected $customerIP;
-    protected $items;
-    protected $storeview;
-    protected $customerId;
-    protected $addresses;
-    protected $price;
-    protected $weight;
-    protected $active;
-    protected $shippingDescription;
-    protected $paymentDescription;
+    protected $_quoteId;
+    protected $_quantity;
+    protected $_currency;
+    protected $_timestamp;
+    protected $_customerIP;
+    protected $_items;
+    
+    /**
+     * The storeview object
+     *
+     * @var Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     */    
+    protected $_storeview;
+    
+    protected $_customerId;
+    protected $_addresses;
+    protected $_price;
+    protected $_weight;
+    protected $_active;
+    protected $_shippingDescription;
+    protected $_paymentDescription;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Sales_Model_Quote $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  
+     *  @param	Mage_Sales_Model_Quote	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function setOriginal(Mage_Sales_Model_Quote $original)
     {
-        // store quote ID
-        $this->quoteId = $original->getId();
+        $this->_quoteId = $original->getId();
 
-        // we do not want to set whole class in this method
         return $this;
     }
 
     /**
      *  Loads a quote model
-     *  @param      integer $quoteId
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  
+     *  @param	integer	$quoteId
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function loadQuote($quoteId)
     {
-        // Get the model
         $quote = Mage::getModel('sales/quote');
     
-        // Difference between Magento 1.4 / 1.5
-        if (!is_callable($quote, 'loadByIdWithoutStore'))
-        {
-            // construct an array with store ids
+        if (!is_callable($quote, 'loadByIdWithoutStore')) {
             $storeIDs = array();
-            foreach (Mage::app()->getStores() as $id => $store)  $storeIDs[] = $id;
+            
+            foreach (Mage::app()->getStores() as $id => $store)  {
+            	$storeIDs[] = $id;
+            }
         
-            // The store ids are used for loading the quote, independant of the store
             $quote->setSharedStoreIds($storeIDs);
             $quote->load($quoteId);
-        }
-        else $quote->loadByIdWithoutStore($quoteId);
-        
-        // we did load a valid quote, set the original model
-        if ($quote->getId()) {
-            $this->importFromObject($quote);
         } else {
-            $this->quoteId = $quoteId;
+        	$quote->loadByIdWithoutStore($quoteId);
         }
         
-        // return this
+        if ($quote->getId()) {
+            $this->_importFromObject($quote);
+        } else {
+            $this->_quoteId = $quoteId;
+        }
+        
         return $this;
     }
 
     /**
      *  Import this abstract from a real magento one
-     *  @param  Mage_Sales_Model_Quote
-     *  @return Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  
+     *  @param	Mage_Sales_Model_Quote	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
-    protected function importFromObject(Mage_Sales_Model_Quote $original)
+    protected function _importFromObject(Mage_Sales_Model_Quote $original)
     {
-        $this->quoteId = $original->getId();
-        $this->active = (bool) $original->getIsActive();
-        $this->quantity = $original->getItemsQty();
-        $this->currency = $original->getQuoteCurrencyCode();
-        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
-        $this->timestamp = $original->getUpdatedAt();
-        $this->customerIP = $original->getRemoteIp();
+        $this->_quoteId = $original->getId();
+        $this->_active = (bool) $original->getIsActive();
+        $this->_quantity = $original->getItemsQty();
+        $this->_currency = $original->getQuoteCurrencyCode();
+        $this->_price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->_storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+        $this->_timestamp = $original->getUpdatedAt();
+        $this->_customerIP = $original->getRemoteIp();
         
         if ($address = $original->getShippingAddress()) {
-            $this->weight = $address->getWeight();
+            $this->_weight = $address->getWeight();
         } 
         
         $data = array();
+        
         $items = $original->getAllVisibleItems();
+        
         foreach ($items as $item) {
             $data[] = Mage::getModel('marketingsoftware/abstraction_quote_item')->setOriginal($item);
         }   
-        $this->items = $data;
         
-        // The quote model only returns a customer if it exists
+        $this->_items = $data;
+        
         if ($customerId = $original->getCustomerId()) {
-            $this->customerId = $customerId;
+            $this->_customerId = $customerId;
         }
         
         $data = array();
-        //retrieve this quote's addresses
-        //Note: this may return empty addresses, since quotes always have address records. Check the email field of the address.
+        
         $addresses = $original->getAddressesCollection();
+        
         foreach ($addresses as $address) {
             $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
         }
-        $this->addresses = $data;
+        
+        $this->_addresses = $data;
         
         if ($address = $original->getShippingAddress()) {
-            $this->shippingDescription = $address->getShippingDescription();
+            $this->_shippingDescription = $address->getShippingDescription();
         } 
         
         if ($payment = $original->getPayment()) {
-            //this try/catch is needed because getMethodInstance throws an exception instead of returning null
             try {
-                $this->paymentDescription = $payment->getMethodInstance()->getTitle();
+                $this->_paymentDescription = $payment->getMethodInstance()->getTitle();
             } catch (Mage_Core_Exception $exception) { }
         } 
     }
 
     /**
      *  The quote id of this quote object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function id()
     {
-        return $this->quoteId;
+        return $this->_quoteId;
     }
 
     /**
      *  Is this quote still active
-     *  @return     boolean
+     *  
+     *  @return	boolean
      */
     public function active()
     {
-        return $this->active;
+        return $this->_active;
     }
 
     /**
      *  The number of items present in this quote
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function quantity()
     {
-        return $this->quantity;
+        return $this->_quantity;
     }
 
     /**
      *  The payment currency of this quote
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function currency()
     {
-        return $this->currency;
+        return $this->_currency;
     }
 
     /**
      *  The price
      *  Note that an object is returned, which may consist of multiple components
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
-        return $this->price;
+        return $this->_price;
     }
 
     /**
      *  The weight
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function weight()
     {
-        return $this->weight;
+        return $this->_weight;
     }
 
     /**
      *  To what storeview does this quote belong
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
-        return $this->storeview;
+        return $this->_storeview;
     }
 
     /**
      *  Get the items from the quote
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
+     *  
+     *  @return	array
      */
     public function items()
     {
-        return $this->items;
+        return $this->_items;
     }
 
     /**
      *  The timestamp at which this quote was modified
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function timestamp()
     {
-        return $this->timestamp;
+        return $this->_timestamp;
     }
 
     /**
      *  The customer may return null
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
-        if ($this->customerId) {
-            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
+        if ($this->_customerId) {
+            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->_customerId);
         } else {
-            // default fallback
             return null;
         }
     }
 
     /**
      *  The addresses of this quote
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  
+     *  @return	array
      */
     public function addresses()
     {
-        return $this->addresses;
+        return $this->_addresses;
     }
 
     /**
      *  The IP from which this quote was constructed
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function customerIP()
     {
-        return $this->customerIP;
+        return $this->_customerIP;
     }
 
     /**
      *  The shipping method of this quote
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function shippingDescription()
     {
-        return $this->shippingDescription;
+        return $this->_shippingDescription;
     }
 
     /**
      *  The payment method of this quote
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function paymentDescription()
     {
-        return $this->paymentDescription;
+        return $this->_paymentDescription;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @todo	Two returns??
+     *  @return	string
      */
     public function serialize()
     {
@@ -290,7 +312,6 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
             $this->id()
         ));
 
-        // serialize the data
         return serialize(array(
             $this->id(),
             $this->quantity(),
@@ -311,38 +332,38 @@ class Copernica_MarketingSoftware_Model_Abstraction_Quote implements Serializabl
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Quote
+     *  
+     *  @todo	Two returns??
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Quote
      */
     public function unserialize($string)
     {
-        // unserialize data
         list (
-            $this->quoteId 
+            $this->_quoteId 
         ) = unserialize($string);
 
-        // load quote by it's Id
-        $this->loadQuote($this->quoteId);
+        $this->loadQuote($this->_quoteId);
 
-        // return same object
         return $this;
 
         list(
-            $this->quoteId,
-            $this->quantity,
-            $this->currency,
-            $this->timestamp,
-            $this->customerIP,
-            $this->items,
-            $this->storeview,
-            $this->customerId,
-            $this->addresses,
-            $this->price,
-            $this->weight,
-            $this->active,
-            $this->shippingDescription,
-            $this->paymentDescription
+            $this->_quoteId,
+            $this->_quantity,
+            $this->_currency,
+            $this->_timestamp,
+            $this->_customerIP,
+            $this->_items,
+            $this->_storeview,
+            $this->_customerId,
+            $this->_addresses,
+            $this->_price,
+            $this->_weight,
+            $this->_active,
+            $this->_shippingDescription,
+            $this->_paymentDescription
         ) = unserialize($string);
+        
         return $this;
     }
 }

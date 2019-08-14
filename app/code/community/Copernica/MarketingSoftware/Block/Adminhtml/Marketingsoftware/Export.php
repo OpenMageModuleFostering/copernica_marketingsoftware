@@ -61,6 +61,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Export exten
 
     /**
      *  Get url that will try to start data sync. 
+     *  
      *  @return string
      */
     public function getDataUrl()

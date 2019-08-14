@@ -28,7 +28,7 @@
  * Link Controller takes care of the link fields menu.
  *  
  */
-class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController extends Copernica_MarketingSoftware_Controller_Base
+class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController extends Copernica_MarketingSoftware_Controller_Action
 {
     /**
      *  indexAction() takes care of displaying the form which
@@ -36,266 +36,203 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_LinkController ext
      */
     public function indexAction()
     {
-        // Load the layout
         $this->loadLayout();
 
-        // set menu
         $this->_setActiveMenu('copernica');
 
-        // get current layout
         $layout = $this->getLayout();
 
-        // get content block
         $contentBlock = $layout->getBlock('content');
 
-        // create linkBlock
         $linkBlock = $layout->createBlock('marketingsoftware/adminhtml_marketingsoftware_link');
 
-        // append link block to content block
         $contentBlock->append($linkBlock);
 
-        // get head block
         $headBlock = $layout->getBlock('head');
-
-        // set title
         $headBlock->setTitle($this->__('Link Fields / Copernica Marketing Software / Magento Admin'));
-
-        // add javascript
         $headBlock->addJs('copernica/marketingsoftware/link.js');
         
-        // Render the layout
         $this->renderLayout();
     }
 
     /**
      *  This action will save all form data.
+     *  @todo	Never used, Ajaxcollection is always called to perform the save per collection.
      */
     public function saveFormAction()
     {
-        // get post variables
         $post = $this->getRequest()->getPost();
-
-        /*
-         *  Magento + prototype do not really allow to send complex data via post,
-         *  or just use raw post body. When we try to send complex data via normal
-         *  post request that data is somewhere lost (Zend Framework? or Magento?),
-         *  when we try to use raw post body magento will complain about missing
-         *  form key (since it's raw post data, it does not know how to deal with it).
-         *  Cause of that we do serialize data on js side and we are sending it 
-         *  as 'data' post field. 
-         */
         $post = json_decode($post['data'], true);
 
-        // do we have a database ?
-        if (isset($post['database']['name'])) $this->saveDatabaseData($post['database']);
+        if (isset($post['database']['name'])) {
+        	$this->_saveDatabaseData($post['database']);
+        }
 
-        // do we have collections?
-        if (isset($post['collections'])) $this->saveCollections($post['collections']);
+        if (isset($post['collections'])) {
+        	$this->_saveCollections($post['collections']);
+        }
 
-        // set response as true
-        $this->setResponse();
+        $this->_setResponse();
     }
 
     /**
      *  This method will save database related informations.
-     *  @param  assoc
+     *  
+     *  @param	assoc	$data
      */
-    private function saveDatabaseData($data)
+    protected function _saveDatabaseData($data)
     {
-        // store database name
-        $this->saveDatabaseName($data['name']);
+        $this->_saveDatabaseName($data['name']);
 
-        // store database fields
-        $this->saveDatabaseFields($data['fields']);
+        $this->_saveDatabaseFields($data['fields']);
     }
 
     /**
      *  This method will store database name.
      */
-    private function saveDatabaseName($name)
+    protected function _saveDatabaseName($name)
     {
-        // store database name in config
         Mage::helper('marketingsoftware/config')->setDatabase($name);
 
-        // get database Id from Api
-        $databaseId = Mage::helper('marketingsoftware/ApiBase')->getDatabaseId($name);
+        $databaseId = Mage::helper('marketingsoftware/api_abstract')->getDatabaseId($name);
 
-        // store database Id in config
         Mage::helper('marketingsoftware/config')->setDatabaseId($databaseId);
     }
 
     /**
      *  This method will save database fields
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveDatabaseFields($data)
+    protected function _saveDatabaseFields($data)
     {
-        // store linked customer fields inside config
         Mage::helper('marketingsoftware/config')->setLinkedCustomerFields($data);   
     }
 
     /**
      *  This method will save all collections from data
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveCollections($data)
+    protected function _saveCollections($data)
     {
-        // get config
         $config = Mage::helper('marketingsoftware/config');
 
-        // we want to clear all data about linked collections
         $config->clearLinkedCollections();
+ 
+        if (isset($data['cartproducts'])) {
+        	$this->_saveQuoteProductsCollection($data['cartproducts']);
+        }
 
-        // do we have data for cart items? 
-        if (isset($data['cartproducts'])) $this->saveCartProductsCollection($data['cartproducts']);
+        if (isset($data['orders'])) {
+        	$this->_saveOrdersCollection($data['orders']);
+        }
+  
+        if (isset($data['orderproducts'])) {
+        	$this->_saveOrderItemsCollection($data['orderproducts']);
+        }
 
-        // do we have data for orders?
-        if (isset($data['orders'])) $this->saveOrdersCollection($data['orders']);
+        if (isset($data['addresses'])) {
+        	$this->_saveAddressesCollection($data['addresses']);
+        }
 
-        // do we have data for oreder items?  
-        if (isset($data['orderproducts'])) $this->saveOrderItemsCollection($data['orderproducts']);
-
-        // do we have data for addresses?
-        if (isset($data['addresses'])) $this->saveAddressesCollection($data['addresses']);
-
-        // do we have data for viewed products?
-        if (isset($data['viewedproduct'])) $this->saveViewedProductsCollection($data['viewedproduct']);
+        if (isset($data['viewedproduct'])) {
+        	$this->_saveViewedProductsCollection($data['viewedproduct']);
+        }
     }
 
     /**
      *  Save cart products info
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveCartProductsCollection($data)
+    protected function _saveQuoteProductsCollection($data)
     {
-        // get cart item collection Id
-        $collectionId = Mage::helper('marketingsoftware/ApiBase')->getCollectionId($data['name']);
+        $collectionId = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($data['name']);
 
-        // get config into local scope
         $config = Mage::helper('marketingsoftware/config');
-
-        // set cart item name in config
-        $config->setCartItemsCollectionName($data['name']);
-
-        // set cart item Id in config
-        $config->setCartItemsCollectionId($collectionId);
-
-        // set fields
-        $config->setLinkedCartItemFields($data['fields']);
+        $config->setQuoteItemCollectionName($data['name']);
+        $config->setQuoteItemCollectionId($collectionId);
+        $config->setLinkedQuoteItemFields($data['fields']);
     }
 
     /**
      *  Save order collection info
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveOrdersCollection($data)
+    protected function _saveOrdersCollection($data)
     {
-        // get collection Id
-        $collectionId = Mage::helper('marketingsoftware/ApiBase')->getCollectionId($data['name']);
+        $collectionId = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($data['name']);
 
-        // get config instance into local scope
         $config = Mage::helper('marketingsoftware/config');
-
-        // set collection name
         $config->setOrdersCollectionName($data['name']);
-
-        // set collection Id
         $config->setOrdersCollectionId($collectionId);
-
-        // set collection fields
         $config->setLinkedOrderFields($data['fields']);
     }
 
     /** 
      *  Save order items collection info
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveOrderItemsCollection($data)
+    protected function _saveOrderItemsCollection($data)
     {
-        // get collection Id
-        $collectionId = Mage::helper('marketingsoftware/ApiBase')->getCollectionId($data['name']);
+        $collectionId = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($data['name']);
 
-        // get config instance into local scope
         $config = Mage::helper('marketingsoftware/config');
-
-        // set collection name
-        $config->setOrderItemsCollectionName($data['name']);
-
-        // set collection Id
-        $config->setOrderItemsCollectionId($collectionId);
-
-        // set collection fields
+        $config->setOrderItemCollectionName($data['name']);
+        $config->setOrderItemCollectionId($collectionId);
         $config->setLinkedOrderItemFields($data['fields']);
     }
 
     /**
      *  Save addresses collection info
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveAddressesCollection($data)
+    protected function _saveAddressesCollection($data)
     {
-        // get collection Id
-        $collectionId = Mage::helper('marketingsoftware/ApiBase')->getCollectionId($data['name']);
+        $collectionId = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($data['name']);
 
-        // get config instance into local scope
         $config = Mage::helper('marketingsoftware/config');
-
-        // set collection name
-        $config->setAddressesCollectionName($data['name']);
-
-        // set collection id
-        $config->setAddressesCollectionId($collectionId);
-
-        // set collection fields
+        $config->setAddressCollectionName($data['name']);
+        $config->setAddressCollectionId($collectionId);
         $config->setLinkedAddressFields($data['fields']);
     }
 
     /**
      *  Save viewed products collection info
-     *  @param  assoc
+     *  
+     *  @param  assoc	$data
      */
-    private function saveViewedProductsCollection($data)
+    protected function _saveViewedProductsCollection($data)
     {
-        // get collection Id
-        $collectionId = Mage::helper('marketingsoftware/ApiBase')->getCollectionId($data['name']);
+        $collectionId = Mage::helper('marketingsoftware/api_abstract')->getCollectionId($data['name']);
 
-        // get config instance into local scope
         $config = Mage::helper('marketingsoftware/config');
-
-        // set collection name
         $config->setViewedProductCollectionName($data['name']);
-
-        // set collection Id
         $config->setViewedProductCollectionId($collectionId);
-
-        // set collection fields
         $config->setLinkedViewedProductFields($data['fields']);
     }
 
     /**
      *  Prepare response instance for AJAX response
      */
-    private function prepareAjaxResponse()
+    protected function _prepareAjaxResponse()
     {
-        // get the response instance
         $response = $this->getResponse();
-
-        // clear response body fron anything that is there
         $response->clearBody();
-
-        // all AJAX responses should be encoded with JSON
         $response->setHeader('Content-Type', 'application/json');
     }
 
     /**
-     *  @param  bool did we succed ?
+     *  @param  bool	$error
      */
-    private function setResponse($error = false)
+    protected function _setResponse($error = false)
     {
-        // prepare response instance to be an AJAX respone
-        $this->prepareAjaxResponse();
+        $this->_prepareAjaxResponse();
 
-        // set response body
         $this->getResponse()->setBody(json_encode(Array(
             'error' => $error ? 1 : 0
         )));

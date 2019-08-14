@@ -36,196 +36,167 @@ class Copernica_MarketingSoftware_Helper_Profile
 {
     /**
      *  Get copernica Id based on something and store view.
-     *  @param  mixed
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_StoreView
+     *  
+     *  @param	mixed	$something
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
      */
-    public function getCopernicaId($something, $storeView)
+    public function getCopernicaId($something, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)
     {
         switch (true) {
             // is it a customer instance? 
-            case ($something instanceof Copernica_MarketingSoftware_Model_Copernica_Customer):
-                return $this->getCustomerCopernicaId($something, $storeView);
+            case ($something instanceof Copernica_MarketingSoftware_Model_Copernica_Profile_Customer):
+                return $this->getCustomerCopernicaId($something, $storeview);
 
             // is it a string? most likely it's an email address
             case (is_string($something)):
-                return $this->getEmailCopernicaId($something, $storeView);
+                return $this->getEmailCopernicaId($something, $storeview);
         }
     }
 
     /**
      *  Get copernica Id by customer instance
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Customer
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_StoreView
+     *  
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer	$customer
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
      *  @return string
      */
-    public function getCustomerCopernicaId($customer, $storeView) 
+    public function getCustomerCopernicaId(Copernica_MarketingSoftware_Model_Abstraction_Customer $customer, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
     {
-        // get customer Id
         $customerId = $customer->id();
 
-        // try to get a profile cache that matches customer and store view
-        $profileCache = Mage::getModel('marketingsoftware/profileCache')
+        $profileCache = Mage::getModel('marketingsoftware/profile_cache')
             ->getCollection()
             ->addFieldToFilter('customer_id', $customerId)
-            ->addFieldToFilter('store_view', $storeView->id())
+            ->addFieldToFilter('store_view', $storeview->id())
             ->setPageSize(1);
 
-        // return copernica Id
-        if ($profileCache->count()) return $profileCache->getFirstItem()->getCopernicaId();
+        if ($profileCache->count()) {
+        	return $profileCache->getFirstItem()->getCopernicaId();
+        }
 
-        /*
-         *  Since same customer could be already subscribed to newsletter, we 
-         *  want to check if we have an entry that matches customer email address.
-         */
-
-        $profileCache = Mage::getModel('marketingsoftware/profileCache')
+        $profileCache = Mage::getModel('marketingsoftware/profile_cache')
             ->getCollection()
-            ->addFieldToFilter('store_view', $storeView->id())
+            ->addFieldToFilter('store_view', $storeview->id())
             ->addFieldToFilter('email', $customer->email())
             ->setPageSize(1);
 
-        // check if we have some cached profiles
-        if ($profileCache->count()) 
-        {
-            // we want a specific item
+        if ($profileCache->count()) {
             $profileCache = $profileCache->getFirstItem();
-
-            // set customer Id
             $profileCache->setCustomerId($customer->id());
 
-            // upgrade subscriber copernica Id
-            $this->upgradeSubscriberCopernicaId($profileCache);
+            $this->_upgradeSubscriberCopernicaId($profileCache);
 
-            // generate copernica Id
-            $copernicaId = $this->generateCustomerCopernicaId($customer, $storeView);
+            $copernicaId = $this->generateCustomerCopernicaId($customer, $storeview);
 
-            // convert old customer Id on copernica platform
-            $this->convertCustomerId($this->generateEmailCopernicaId($customer->email(), $storeView), $copernicaId);
+            $this->_convertCustomerId($this->generateEmailCopernicaId($customer->email(), $storeview), $copernicaId);
 
-            // return new customer copernica Id
             return $copernicaId;
         }
 
-        // we want a specific item
         $profileCache = $profileCache->getFirstItem();
 
-        // generate copernica Id
-        $copernicaId = $this->generateCustomerCopernicaId($customer, $storeView);
+        $copernicaId = $this->generateCustomerCopernicaId($customer, $storeview);
 
-        // set copernica Id
         $profileCache->setCopernicaId($copernicaId);
-        $profileCache->setStoreView($storeView->id());
+        $profileCache->setStoreView($storeview->id());
         $profileCache->setCustomerId($customer->id());
-
-        // store profile cache instance
         $profileCache->save();
 
-        // generate old copernica Id
-        $oldCopernicaId = $this->generateOldCopernicaId($customer->oldEmail(), (string)$storeView);
+        $oldCopernicaId = $this->_generateOldCopernicaId($customer->oldEmail(), (string)$storeview);
 
-        // We want to convert old coeprnica Id with new one.
-        $this->convertCustomerId($oldCopernicaId, $copernicaId);
+        $this->_convertCustomerId($oldCopernicaId, $copernicaId);
 
-        // return copernica Id
         return $copernicaId;
     }
 
     /**
      *  This method will upgrade profile cache data.
-     *  @param  Copernica_MarketingSoftware_Model_ProfileCache
+     *  
+     *  @param	Copernica_MarketingSoftware_Model_Profile_Cache	$profileCache
      */
-    private function upgradeSubscriberCopernicaId($profileCache) 
+    protected function _upgradeSubscriberCopernicaId(Copernica_MarketingSoftware_Model_Profile_Cache $profileCache) 
     {
-        // get customer Id and store view
         $customerId = $profileCache->getCustomerId();
-        $storeViewId = $profileCache->getStoreView();
+        
+        $storeviewId = $profileCache->getStoreView();
 
-        // set new copernica Id
-        $profileCache->setCopernicaId($customerId.'|'.$storeViewId);
-
-        // save profile cache right away
+        $profileCache->setCopernicaId($customerId.'|'.$storeviewId);
         $profileCache->save();
     }
 
     /**
      *  Generate Copernica Id from our customer instance and store view
-     *  @param  Copernica_MarketingSoftware_Abstraction_Customer
-     *  @param  Copernica_MarketingSoftware_Abstraction_StoreView
+     *  
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Customer	$customer
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
      *  @return string
      */
-    public function generateCustomerCopernicaId($customer, $storeView) 
+    public function generateCustomerCopernicaId(Copernica_MarketingSoftware_Model_Abstraction_Customer $customer, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
     {
-        return $customer->id().'|'.$storeView->id();
+        return $customer->id().'|'.$storeview->id();
     }
 
     /**
      *  Generate copernica Id from an email address and store View.
-     *  @param  string
-     *  @param  Copernica_MarketingSoftware_Abstraction_StoreView
+     *  
+     *  @param  string	$email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
      *  @return string
      */
-    public function getEmailCopernicaId($email, $storeView) 
+    public function getEmailCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview) 
     {
-        // fetch profile cache
-        $profileCache = Mage::getModel('marketingsoftware/profileCache')
+        $profileCache = Mage::getModel('marketingsoftware/profile_cache')
             ->getCollection()
             ->addFieldToFilter('email', $email)
-            ->addFieldToFilter('store_view', $storeView->id())
+            ->addFieldToFilter('store_view', $storeview->id())
             ->setPageSize(1);
 
-        // return copernica Id
-        if ($profileCache->count()) return $profileCache->getFirstItem()->getCopernicaId();
+        if ($profileCache->count()) {
+        	return $profileCache->getFirstItem()->getCopernicaId();
+        }
 
-        // we want a specific entity
         $profileCache = $profileCache->getFirstItem();
 
-        // get old copernica Id
-        $oldCopernicaId = $this->generateOldCopernicaId($email, (string)$storeView);   
+        $oldCopernicaId = $this->_generateOldCopernicaId($email, (string)$storeview);   
 
-        // generate copernica Id from email and store view
-        $copernicaId = $this->generateEmailCopernicaId($email, $storeView);
+        $copernicaId = $this->generateEmailCopernicaId($email, $storeview);
 
-        // convert profiles in copernica platform also
-        $this->convertCustomerId($oldCopernicaId, $copernicaId);
+        $this->_convertCustomerId($oldCopernicaId, $copernicaId);
 
-        // set data for profile cache
         $profileCache->setEmail($email);
         $profileCache->setCopernicaId($copernicaId);
-        $profileCache->setStoreView($storeView->id());
+        $profileCache->setStoreView($storeview->id());
 
-        // save profile cache entry
         $profileCache->save();
 
-        // return copernica Id
         return $copernicaId;
     }
 
     /**
      *  Generate Copernica Id from our email and store view
-     *  @param  Copernica_MarketingSoftware_Model_Copernica_Customer
-     *  @param  Copernica_MarketingSoftware_Model_Abstraction_StoreView
-     *  @return string
+     *  
+     *  @param  string	$email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
+     *  @return	string
      */
-    public function generateEmailCopernicaId($email, $storeView)
+    public function generateEmailCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)
     {
-        return $email.'|'.$storeView->id();
+        return $email.'|'.$storeview->id();
     }
 
     /**
      *  Basically it's a helper method that will convert old customer Id in 
      *  Copernica platform into normal Magento customer Id.
-     *  @param  string
-     *  @param  string
+     *  
+     *  @param	string	$oldCopernicaId
+     *  @param	string	$newCustomerId
      */
-    private function convertCustomerId($oldCopernicaId, $newCustomerId)
+    protected function _convertCustomerId($oldCopernicaId, $newCustomerId)
     {
-        // we will need a REST request instance
-        $request = Mage::helper('marketingsoftware/RESTRequest');
+        $request = Mage::helper('marketingsoftware/rest_request');
 
-        // get database Id
-        $databaseId = Mage::helper('marketingsoftware/Api')->getDatabaseId();
+        $databaseId = Mage::helper('marketingsoftware/api')->getDatabaseId();
 
-        // we want to update profile with new customer Id
         $request->put('database/'.$databaseId.'/profiles',
             array( 'customer_id' => $newCustomerId),
             array( 'fields[]' => 'customer_id=='.$oldCopernicaId )
@@ -235,11 +206,11 @@ class Copernica_MarketingSoftware_Helper_Profile
     /**
      *  Generates a unique customer ID based on the e-mail address and the storeview.
      *
-     *  @param  string 
-     *  @param  string 
+     *  @param  string	$email
+     *  @param  Copernica_MarketingSoftware_Model_Abstraction_Storeview	$storeview
      *  @return string
      */
-    private function generateOldCopernicaId($email, $storeview)
+    protected function _generateOldCopernicaId($email, Copernica_MarketingSoftware_Model_Abstraction_Storeview $storeview)
     {
         return md5(strtolower($email) . $storeview);
     }

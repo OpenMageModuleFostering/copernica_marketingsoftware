@@ -39,21 +39,15 @@ chdir('../../../../../../');
  */
 require_once 'app/Mage.php';
 
-// remove current mask
 umask(0);
 
-// if magento is not installed we will just exit this scrtipt
-if (!Mage::isInstalled()) exit;
+if (!Mage::isInstalled()) {
+	exit;
+}
 
-// don't use sessions
 Mage::app('admin')->setUseSessionInUrl(false);
 
-// init config
 Mage::getConfig()->init();
 
-// get observer
 $observer = Mage::getModel('marketingsoftware/observer');
-
-// detect abandoned carts
 $observer->detectAbandonedCarts();
-

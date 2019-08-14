@@ -34,232 +34,258 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
      * payment name from a quote shipping address. Since this is an order
      * a quote is no longer available.
      * 
-     * @var string
+     * @var	string
      */
     const PAYMENT_METHOD_KLARNA = 'klarna_partpayment';
 
     /**
      * Predefine the internal fields
      */
-    protected $id;
-    protected $incrementId;
-    protected $quoteId;
-    protected $quantity;
-    protected $currency;
-    protected $timestamp;
-    protected $customerIP;
-    protected $items;
-    protected $storeview;
-    protected $customerId;
-    protected $addresses;
-    protected $price;
-    protected $weight;
-    protected $state;
-    protected $status;
-    protected $shippingDescription;
-    protected $paymentDescription;
+    protected $_id;
+    protected $_incrementId;
+    protected $_quoteId;
+    protected $_quantity;
+    protected $_currency;
+    protected $_timestamp;
+    protected $_customerIP;
+    protected $_items;
+    
+    /**
+     * The storeview object
+     * 
+     * @var	Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     */
+    protected $_storeview;
+    
+    protected $_customerId;
+    protected $_addresses;
+    protected $_price;
+    protected $_weight;
+    protected $_state;
+    protected $_status;
+    protected $_shippingDescription;
+    protected $_paymentDescription;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Sales_Model_Order $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  
+     *  @param	Mage_Sales_Model_Order	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function setOriginal(Mage_Sales_Model_Order $original)
     {
-        // set only the Id
-        $this->id = $original->getId();
+        $this->_id = $original->getId();
 
-        // we are done here
         return $this;
         
     }
 
     /**
      *  This method will set the state of this order from original magento order
-     *  @param  Mage_Sales_Model_Order
+     *  
+     *  @param	Mage_Sales_Model_Order	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function importFromOriginal(Mage_Sales_Model_Order $original)
     {
-        $this->id = $original->getId();
-        $this->incrementId = $original->getIncrementId();
-        $this->quoteId = $original->getQuoteId();
-        $this->state = $original->getState();
-        $this->status = $original->getStatus();
-        $this->quantity = $original->getTotalQtyOrdered();
-        $this->currency = $original->getOrderCurrencyCode();
-        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-        $this->weight = $original->getWeight();
-        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
-        $this->timestamp = $original->getUpdatedAt();
-        $this->shippingDescription = $original->getShippingDescription();
-        $this->customerIP = $original->getRemoteIp();
+        $this->_id = $original->getId();
+        $this->_incrementId = $original->getIncrementId();
+        $this->_quoteId = $original->getQuoteId();
+        $this->_state = $original->getState();
+        $this->_status = $original->getStatus();
+        $this->_quantity = $original->getTotalQtyOrdered();
+        $this->_currency = $original->getOrderCurrencyCode();
+        $this->_price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->_weight = $original->getWeight();
+        $this->_storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($original->getStore());
+        $this->_timestamp = $original->getUpdatedAt();
+        $this->_shippingDescription = $original->getShippingDescription();
+        $this->_customerIP = $original->getRemoteIp();
         
         $data = array();
+        
         $items = $original->getAllVisibleItems();
+        
         foreach ($items as $item) {
             $data[] = Mage::getModel('marketingsoftware/abstraction_order_item')->setOriginal($item);
         }
-        $this->items = $data;   
+        
+        $this->_items = $data;   
 
-        //the order model only returns a customer if it exists
         if ($customerId = $original->getCustomerId()) {
-            $this->customerId = $customerId;
+            $this->_customerId = $customerId;
         }   
         
         $data = array();
-        //retrieve this quote's addresses
+
         $addresses = $original->getAddressesCollection();
+        
         foreach ($addresses as $address) {
             $data[] = Mage::getModel('marketingsoftware/abstraction_address')->setOriginal($address);
         }
-        $this->addresses = $data;
+        
+        $this->_addresses = $data;
 
         if ($payment = $original->getPayment()) {
             try {
                 if ($payment->getMethod() == self::PAYMENT_METHOD_KLARNA) {
-                    $this->paymentDescription = 'Klarna';
+                    $this->_paymentDescription = 'Klarna';
                 } else {
-                    $this->paymentDescription = $payment->getMethodInstance()->getTitle();
+                    $this->_paymentDescription = $payment->getMethodInstance()->getTitle();
                 }
             } catch (Mage_Core_Exception $exception) { }        
         }
         
-        // allow chaining
         return $this;
     }
 
     /**
      *  Loads an order model
-     *  @param      integer $orderId
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  
+     *  @param	integer	$orderId
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function loadOrder($orderId)
     {
         $order = Mage::getModel('sales/order')->load($orderId);
+        
         if ($order->getId()) {
-            //set the original model if the quote exists
             $this->importFromOriginal($order);
         }
+        
         return $this;
     }
 
     /**
      *  The id of this order object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function id()
     {
-        return $this->id;
+        return $this->_id;
     }
 
     /**
      *  The increment (longer) id of this order object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function incrementId()
     {
-        return $this->incrementId;
+        return $this->_incrementId;
     }
 
     /**
      *  The quote id of this order object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function quoteId()
     {
-        return $this->quoteId;
+        return $this->_quoteId;
     }
 
     /**
      *  The state of this order
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function state()
     {
-        return $this->state;
+        return $this->_state;
     }
 
     /**
      *  The status of this order
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function status()
     {
-        return $this->status;
+        return $this->_status;
     }
 
     /**
      *  The number of items present in this order
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function quantity()
     {
-        return $this->quantity;
+        return $this->_quantity;
     }
 
     /**
      *  The number of items present in this order
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function currency()
     {
-        return $this->currency;
+        return $this->_currency;
     }
 
     /**
      *  The price
      *  Note that an object is returned, which may consist of multiple components
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
-        return $this->price;
+        return $this->_price;
     }
 
     /**
      *  The weight
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function weight()
     {
-        return $this->weight;
+        return $this->_weight;
     }
 
     /**
      *  To what storeview does this order belong
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeview()
     {
-        return $this->storeview;
+        return $this->_storeview;
     }
 
     /**
      *  Get the items from the order
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Quote_Item
+     *  
+     *  @return	array
      */
     public function items()
     {
-        return $this->items;
+        return $this->_items;
     }
 
     /**
      *  The timestamp at which this order was modified
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function timestamp()
     {
-        return $this->timestamp;
+        return $this->_timestamp;
     }
 
     /**
      *  The customer may return null
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer|null
      */
     public function customer()
     {
-        if ($this->customerId) {
-            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
+        if ($this->_customerId) {
+            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->_customerId);
         } else {
             return null;
         }
@@ -267,65 +293,67 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order implements Serializabl
 
     /**
      *  The addresses of the order
-     *  @return     array of Copernica_MarketingSoftware_Model_Abstraction_Address
+     *  
+     *  @return	array of Copernica_MarketingSoftware_Model_Abstraction_Address
      */
     public function addresses()
     {
-        return $this->addresses;
+        return $this->_addresses;
     }
 
     /**
      *  The shipping method of the order
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function shippingDescription()
     {
-        return $this->shippingDescription;
+        return $this->_shippingDescription;
     }
 
     /**
      *  The payment method of the order
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function paymentDescription()
     {
-        return $this->paymentDescription;
+        return $this->_paymentDescription;
     }
 
     /**
      *  The IP from which this order was constructed
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function customerIP()
     {
-        return $this->customerIP;
+        return $this->_customerIP;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {       
-        // serialize the data
-        return serialize(array(
-            $this->id()
-        ));
+        return serialize(array($this->id()));
     }
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function unserialize($string)
     {
         list(
-            $this->id
+            $this->_id
         ) = unserialize($string);
 
-        // load order by it's Id
-        $this->loadOrder($this->id);
+        $this->loadOrder($this->_id);
         
         return $this;
     }

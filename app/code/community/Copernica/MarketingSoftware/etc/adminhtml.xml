@@ -19,6 +19,10 @@
                     <title>Synchronize Data</title>
                     <action>adminhtml/marketingsoftware_export</action>
                 </export>
+                <!-- <accessToken translate="title" module="marketingsoftware">
+                    <title>Access Token</title>
+                    <action>adminhtml/marketingsoftware_accesstoken</action>
+                </accessToken> -->
                 <!-- <sync translate="title" module="marketingsoftware">
                     <title>Synchronization profiles</title>
                     <action>adminhtml/marketingsoftware_sync</action>

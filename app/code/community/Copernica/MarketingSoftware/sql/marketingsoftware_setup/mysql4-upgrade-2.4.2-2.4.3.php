@@ -36,7 +36,7 @@ try
     $tableName = $this->getTable('marketingsoftware/abandonedCart');
 
     // drop old table (it should be safe to drop such table)
-    $installer->getConnection()->dropTable($tableName);
+    $installer->run("DROP TABLE IF EXISTS {$tableName}");
 
     /* 
      *  Create new table. Note that it will create DDL table definition. It's 
@@ -60,7 +60,7 @@ try
     ), 'Quote id associated with abandoned cart');
 
     // add copernica customer Id column
-    $table->addColumn('timestamp', Varien_Db_Ddl_Table::TYPE_DATETIME, 255, array(
+    $table->addColumn('timestamp', Varien_Db_Ddl_Table::TYPE_TIMESTAMP, 255, array(
         'nullable'  => false
     ), 'When cart was detected');
 

@@ -31,14 +31,13 @@ class Copernica_MarketingSoftware_Model_Observer
 {
     /**
      *  Check if event is added in store that we want to sync.
+     *  
      *  @return bool
      */
-    protected function isValidStore()
+    protected function _isValidStore()
     {
-        // get current store Id
         $currentStoreId = Mage::app()->getStore()->getId();
 
-        // check if current store is enabled stores
         return Mage::helper('marketingsoftware/config')->isEnabledStore($currentStoreId);
     }
 
@@ -48,182 +47,174 @@ class Copernica_MarketingSoftware_Model_Observer
      * 'checkout_controller_multishipping_shipping_post'
      * This method is fired during checkout process, after the customer has entered billing address
      * and saved the shipping method
-     * @param Varien_Event_Observer
+     * 
+     * @param	Varien_Event_Observer	$observer
      */
     public function checkoutSaveStep(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$quote = $observer->getEvent()->getQuote();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quote)) {
+        	return;
+        }
+        
+        $customerId = $quote->getCustomerId(); 
 
-        // Do we have a valid item?
-        if (!is_object($quote = $observer->getEvent()->getQuote())) return;
-
-        // get customer Id
-        $customerId = $quote->getCustomerId();
-
-        // if we don't have a customer this event is useless
-        if (!$customerId) return;
-
-        // get order
+        // !!!! Why is this called?? !!!!
         $order = $quote->getOrder();
 
-        // There is a slight difference between this event and order add/modify.
-        // We have to clean up cart items.
-        Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('customer' => $customerId))
+        Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('customerId' => $customerId, 'quoteId' => $quote->getId()))
+            ->setCustomer($customerId)
             ->setName('checkout')
             ->setAction('add')
-            ->setEntityId($quote->getId())
-            ->setCustomer($customerId)
+            ->setEntityId($quote->getEntityId())
             ->save();
     }
 
     /**
      *  Method for event 'sales_quote_item_delete_before'.
      *  An item is removed from a quote
-     *  @param  Varien_Event_Observer
+     *  
+     *  @param	Varien_Event_Observer	$observer
      */
     public function quoteItemRemoved(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$quoteItem = $observer->getEvent()->getItem();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quoteItem) || $quoteItem->getParentItemId()) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($item = $observer->getEvent()->getItem())) return;
+        $quote = $quoteItem->getQuote();
 
-        // if this item has a parent, it's data is already container within
-        // parent item
-        if ($item->getParentItemId()) return;
+        $customerId = $quote->getCustomerId();
+        
+        if (!$customerId) {
+        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+        		return;
+        	}
+        
+        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+        
+        	if (!$customerId) {
+        		return;
+        	}
+        }
 
-        // get quote into local scope
-        $quote = $item->getQuote();
+        $quoteItemEntity = Mage::getModel('marketingsoftware/copernica_entity_quote_item');
+        $quoteItemEntity->setQuoteItem($quoteItem);
+        
+        $quoteItemData = array(
+        	'item_id' => $quoteItemEntity->getId(),
+        	'storeview_id' => $quoteItemEntity->getStoreView()->id(),
+        	'status' => 'deleted',
+        );
 
-        // get customer Id
-        $customerId  = $quote->getCustomerId();
-
-        // cehck if we have customer
-        if (!$customerId) return;
-
-        /*
-         *  Since this item is about to be removed from magento system we will have to
-         *  fetch all data right now and pass that data to queue event instance.
-         */
-        $item = new Copernica_MarketingSoftware_Model_Copernica_Entity_CartItem($item);
-        $itemData = $item->getREST()->getCartSubprofileData($quote->getId());
-        $itemData['status'] = 'deleted';
-
-        // This quote item should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('quote' => $quote->getId(), 'customer' => $customerId, 'item' => $itemData))
-            ->setCustomer($customerId)
-            ->setAction('remove')
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('quoteId' => $quote->getId(), 'customerId' => $customerId, 'quoteItem' => $quoteItemData))
+            ->setCustomer($customerId)            
             ->setName('item')
-            ->setEntityId($item->getId())
+            ->setAction('remove')
+            ->setEntityId($quoteItem->getId())
             ->save();
     }
 
     /**
      *  Method for event 'sales_quote_item_save_after'.
      *  An item is added or modified
-     *  @param  Varien_Event_Observer
+     *  
+     *  @param	Varien_Event_Observer	$observer
      */
     public function quoteItemModified(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
-
-        // Do we have a valid item?
-        if (!is_object($item = $observer->getEvent()->getItem())) return;
-
-        // unfortunately hasDataChanges is only available in Mage 1.5 and up
-        if (method_exists($item, 'hasDataChanges') && !$item->hasDataChanges()) {
-            //an event is triggered every time the object is saved, even when nothing has changed
-            //for example, when an item is added to the quote
-            //however, the update date may have changed (even by 1 second) which will trigger a new queue item any way
+    	$quoteItem = $observer->getEvent()->getItem();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quoteItem) || $quoteItem->getParentItemId()) {
+        	return;
+        }
+        
+        if (method_exists($quoteItem, 'hasDataChanges') && !$quoteItem->hasDataChanges()) {
             return;
         }
-
-        // if this item has a prent item, this item will also be synced during parent item sync
-        if ($item->getParentItemId()) return;
-
-        // get quote
-        $quote = $item->getQuote();
-
-        // get customer Id
+        
+        $quote = $quoteItem->getQuote();
+        
         $customerId = $quote->getCustomerId();
 
-        /**
-         *  Funny fakt: Magento does not always set customer id on quote instance.
-         *  For example when quote was not finalized. Thus we will check the 
-         *  session user to get customer Id.
-         */
-        if (!$customerId) 
-        {
-            // check if there is a user that is logged in
-            if (!Mage::getSingleton('customer/session')->isLoggedIn()) return;
+        if (!$customerId) {
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+            	return;
+            }
 
-            // assign new user id
             $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
 
-            // well, a nasty error that we can not do anything about it
-            if (!$customerId) return;
+            if (!$customerId) {
+            	return;
+            }
         }
-
-        // This quote item should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('quote' => $quote->getId(), 'customer' => $customerId))
-            ->setCustomer($customerId)
-            ->setAction($item->isObjectNew() ? 'add' : 'modify')
-            ->setName('item')
-            ->setEntityId($item->getId())
-            ->save();
+        
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+        	->setObject(array('quoteItemId' => $quoteItem->getId(), 'quoteId' => $quote->getId(), 'customerId' => $customerId))
+        	->setCustomer($customerId)
+        	->setName('item')
+        	->setAction($quoteItem->isObjectNew() ? 'add' : 'modify')
+        	->setEntityId($quoteItem->getId())
+        	->save();       
     }
 
     /**
      *  Listen to when quote is removed.
-     *  @todo review this one
-     *  @param Varien_Event_Observer
+     *  
+     *  @todo	Review this one
+     *  @param	Varien_Event_Observer	$observer
      */
     public function quoteDelete(Varien_Event_Observer $observer)
     {
-        // if the extension is not enabled, skip this event
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$quote = $observer->getEvent()->getQuote();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($quote)) {
+        	return;
+        }
 
-        // check if we do have a quote instance
-        if (!is_object($quote = $observer->getEvent()->getQuote())) return;
-
-        // get customer Id
         $customerId = $quote->getCustomerId();
 
-        // try to get email address from available data
+        if (!$customerId) {
+            if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+            	return;
+            }
+
+            $customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+
+            if (!$customerId) {
+            	return;
+            }
+        }
+
         $email = $quote->getCustomerEmail();
         $email = $email ? $email : $quote->getBillingAddress()->getEmail();
         $email = $email ? $email : $quote->getShippingAddress()->getEmail();
 
-        // get objects related to store
         $store = $quote->getStore();
         $website = $store->getWebsite();
         $group = $store->getGroup();
 
-        // construct store view identifier
         $storeView = implode(' > ', array ($website->getName(), $group->getName(), $store->getName()));
 
-        /*
-         *  If we don't have an email address it means that we can not pinpoint
-         *  a profile in copernica, so basically we can not do anything useful
-         *  with given quote. Thus, don't even create a queue event for it.
-         */
-        if ($email) Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('customer' => array(
-                'id' => $customerId,
-                'storeView' => $storeView,
-                'email' => $email
-            )))
-            ->setCustomer($customerId)
-            ->setAction('remove')
-            ->setName('quote')
-            ->setEntityId($quote->getId())
-            ->save();
+        if ($email) {
+        	Mage::getModel('marketingsoftware/queue_item')
+            	->setObject(array(
+            		'customerInfo' => array(
+                		'id' => $customerId,
+                		'storeView' => $storeView,
+                		'email' => $email
+            		), 'quoteId' => $quote->getId()))
+            	->setCustomer($customerId)
+            	->setName('quote')
+            	->setAction('remove')            
+            	->setEntityId($quote->getEntityId())
+            	->save();
+        }
     }
 
     /**
@@ -232,49 +223,67 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function orderModified(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$order = $observer->getEvent()->getOrder();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($order) || !$order->getState()) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($order = $observer->getEvent()->getOrder())) return;
-
-        // if an order has no state, it will get one in the next call (usually a few seconds later)
-        if (!$order->getState()) return;
-
-        // get customer Id
         $customerId = $order->getCustomerId();
 
-        // This order should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('customer' => $customerId))
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('customerId' => $customerId, 'orderId' => $order->getId()))
             ->setCustomer($customerId)
-            ->setAction($order->isObjectNew() ? 'add' : 'modify')
             ->setName('order')
+            ->setAction($order->isObjectNew() ? 'add' : 'modify')            
             ->setEntityId($order->getEntityId())
             ->save();
     }
 
+    /**
+     * Method for event 'wishlist_save_after'.
+     * An wishlist item is added or modified
+     */
+    public function wishlistItemModified(Varien_Event_Observer $observer)
+    {
+	    $wishlistItem = $observer->getEvent()->getItem();	    	    
+	    
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($wishlistItem)) {
+        	return;
+        }               
+        
+        $wishlist = Mage::getModel('wishlist/wishlist')->load($wishlistItem->getWishlistId());
+            
+        $customerId = $wishlist->getCustomerId();
+        
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+        	->setObject(array('wishlistItemId' => $wishlistItem->getId(), 'customerId' => $customerId))
+        	->setCustomer($customerId)
+        	->setName('wishlist_item')
+        	->setAction($wishlistItem->isObjectNew() ? 'add' : 'modify')
+        	->setEntityId($wishlistItem->getId())
+        	->save();  
+    }
+    
     /**
      * Method for event 'newsletter_subscriber_delete_before'.
      * The newsletter subscription is deleted, do something with it,
      */
     public function newsletterSubscriptionRemoved(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$subscriber = $observer->getEvent()->getSubscriber();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($subscriber)) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($subscriber = $observer->getEvent()->getSubscriber())) return;
-
-        // get customer Id
         $customerId = $subscriber->getCustomerId();
 
-        // This newsletter subscription should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('store_id' => $subscriber->getStoreId(), 'email' => $subscriber->getSubscriberEmail()))
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('storeId' => $subscriber->getStoreId(), 'email' => $subscriber->getSubscriberEmail()))
             ->setCustomer($customerId ? $customerId : null)
-            ->setAction('remove')
             ->setName('subscription')
+            ->setAction('remove')            
             ->setEntityId($subscriber->getId())
             ->save();
     }
@@ -285,28 +294,22 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function newsletterSubscriptionModified(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
-
-        // Do we have a valid item?
-        if (!is_object($subscriber = $observer->getEvent()->getSubscriber())) return;
-
-        // unfortunately hasDataChanges is only available in Mage 1.5 and up
+    	$subscriber = $observer->getEvent()->getSubscriber();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($subscriber)) {
+        	return;
+        }
+        
         if (method_exists($subscriber, 'hasDataChanges') && !$subscriber->hasDataChanges()) {
-            // an event is triggered every time the object is saved, even when nothing has changed
-            // for example, when an order is placed
             return;
         }
-
-        // get customer Id
         $customerId = $subscriber->getCustomerId();
 
-        // This newsletter subscription should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject()
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('subscriberId' => $subscriber->getId()))
             ->setCustomer($customerId)
-            ->setAction($subscriber->isObjectNew() ? 'add' : 'modify')
             ->setName('subscription')
+            ->setAction($subscriber->isObjectNew() ? 'add' : 'modify')
             ->setEntityId($subscriber->getId())
             ->save();
     }
@@ -317,25 +320,35 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function customerRemoved(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$customer = $observer->getEvent()->getCustomer();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($customer)) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($customer = $observer->getEvent()->getCustomer())) return;
-
-        // get customer Id
         $customerId = $customer->getId();
+        
+        if (!$customerId) {
+        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+        		return;
+        	}
+        
+        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+        
+        	if (!$customerId) {
+        		return;
+        	}
+        }
+        
+        $customerEntity = Mage::getModel('marketingsoftware/copernica_entity_customer');
+        $customerEntity->setCustomer($customerId);
 
-        // get copernica customer
-        $copernicaCustomer = new Copernica_MarketingSoftware_Model_Copernica_Entity_Customer($customerId);
-
-        // This customer should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('profileId' => $copernicaCustomer->getProfileId(), 'email' => $customer->getEmail(), 'store_id' => $customer->getStoreId()))
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('profileId' => $customerEntity->getProfileId(), 'email' => $customer->getEmail(), 'storeId' => $customer->getStoreId()))
             ->setCustomer($customerId)
             ->setAction('remove')
             ->setName('customer')
-            ->setEntityId($customerId)
+            ->setEntityId($customer->getEntityId())
             ->save();
     }
 
@@ -345,25 +358,38 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function customerModified(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$address = $observer->getEvent()->getCustomerAddress();
+    	
+    	if(is_object($address)) {
+    		$customer = $address->getCustomer();
+    	} else {
+    		$customer = $observer->getEvent()->getCustomer();
+    	}
+    	    	    
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($customer)) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($customer = $observer->getEvent()->getCustomer())) return;
-
-        // get customer Id
         $customerId = $customer->getId();
+        
+		if (!$customerId) {
+        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+        		return;
+        	}
+        
+        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+        
+        	if (!$customerId) {
+        		return;
+        	}
+        }
 
-        // just to be sure
-        if (!$customerId) return;
-
-        // This customer should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(null)
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('customerId' => $customerId))
             ->setCustomer($customerId)
             ->setAction($customer->isObjectNew() ? 'add' : 'modify')
             ->setName('customer')
-            ->setEntityId($customerId)
+            ->setEntityId($customer->getEntityId())
             ->save();
     }
 
@@ -373,26 +399,34 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function productViewed(Varien_Event_Observer $observer)
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !$this->isValidStore()) return;
+    	$product = $observer->getEvent()->getProduct();
+    	
+        if (!$this->_enabled() || !$this->_isValidStore() || !is_object($product)) {
+        	return;
+        }
 
-        // Do we have a valid item?
-        if (!is_object($item = $observer->getEvent()->getProduct())) return;
-
-        // get current customer instance and Id
         $customer = Mage::getSingleton('customer/session')->getCustomer();
+        
         $customerId = $customer->getId();
-
-        // this item cannot be linked to a customer, so is not relevant at this moment
-        if (!$customerId) return;
-
-        // This quote item should be added to the queue
-        $queue = Mage::getModel('marketingsoftware/queue')
-            ->setObject(array('customer' => $customerId))
+        
+        if (!$customerId) {
+        	if (!Mage::getSingleton('customer/session')->isLoggedIn()) {
+        		return;
+        	}
+        
+        	$customerId = Mage::getSingleton('customer/session')->getCustomer()->getId();
+        
+        	if (!$customerId) {
+        		return;
+        	}
+        }
+        
+        $queue = Mage::getModel('marketingsoftware/queue_item')
+            ->setObject(array('customerId' => $customerId, 'productId' => $product->getId(), 'viewedAt' => (string) time()))
             ->setCustomer($customerId)
             ->setAction('add')
             ->setName('view')
-            ->setEntityId($item->getEntityId())
+            ->setEntityId($product->getEntityId())
             ->save();
     }
 
@@ -402,13 +436,11 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function detectAbandonedCarts()
     {
-        // check if extension is enabled
-        if (!$this->enabled()) return;
+        if (!$this->_enabled()) {
+        	return;
+        }
 
-        // create abandoned carts processor
-        $processor = new Copernica_MarketingSoftware_Model_AbandonedCartsProcessor();
-
-        // detect abandoned carts
+        $processor = Mage::getModel('marketingsoftware/abandoned_carts_processor');
         $processor->detectAbandonedCarts();
     }
 
@@ -417,9 +449,8 @@ class Copernica_MarketingSoftware_Model_Observer
      *
      * @return boolean
      */
-    protected function enabled()
+    protected function _enabled()
     {
-        // get the result from the helper
         return Mage::helper('marketingsoftware')->enabled();
     }
 
@@ -430,13 +461,11 @@ class Copernica_MarketingSoftware_Model_Observer
      */
     public function processQueue()
     {
-        // if the plug-in is not enabled, skip this
-        if (!$this->enabled() || !Mage::helper('marketingsoftware/config')->getVanillaCrons()) return;
+        if (!$this->_enabled() || !Mage::helper('marketingsoftware/config')->getVanillaCrons()) {
+        	return;
+        }
 
-        // create instance of queue processor
-        $queueProcessor = Mage::getModel('Copernica_MarketingSoftware_Model_QueueProcessor');
-
-        // process queue
+        $queueProcessor = Mage::getModel('marketingsoftware/queue_processor');
         $queueProcessor->processQueue();
     }
 }

@@ -12,7 +12,7 @@ try {
     $tableName = $this->getTable('marketingsoftware/profileCache');
 
     // drop old table (it should be safe to drop such table)
-    $installer->getConnection()->dropTable($tableName);
+    $installer->run("DROP TABLE IF EXISTS {$tableName}");
 
     /* 
      *  Create new table. Note that it will create DDL table definition. It's 

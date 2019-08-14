@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Copernica_MarketingSoftware>
-            <version>3.0.1</version>
+            <version>3.1.0</version>
         </Copernica_MarketingSoftware>
     </modules>
     <global>
@@ -14,24 +14,24 @@
             <marketingsoftware_mysql4>
                 <class>Copernica_MarketingSoftware_Model_Mysql4</class>
                 <entities>
-                    <queue>
+                    <queue_item>
                         <table>copernica_queue</table>
-                    </queue>
+                    </queue_item>
                     <config_data>
                         <table>copernica_config_data</table>
                     </config_data>
-                    <profileCache>
+                    <profile_cache>
                         <table>copernica_profile_cache</table>
-                    </profileCache>
-                    <errorqueue>
+                    </profile_cache>
+                    <error_queue>
                         <table>copernica_error_queue</table>
-                    </errorqueue>
-                    <syncProfile>
+                    </error_queue>
+                    <sync_profile>
                         <table>copernica_sync_profile</table>
-                    </syncProfile>
-                    <abandonedCart>
+                    </sync_profile>
+                    <abandoned_cart>
                         <table>copernica_abandoned_cart</table>
-                    </abandonedCart>
+                    </abandoned_cart>
                 </entities>
             </marketingsoftware_mysql4>
         </models>
@@ -124,6 +124,14 @@
                     </marketingsoftware_observer>
                 </observers>
             </catalog_controller_product_view>
+			<wishlist_item_save_after>
+                <observers>
+                    <marketingsoftware_observer>
+                        <class>marketingsoftware/observer</class>
+                        <method>wishlistItemModified</method>
+                    </marketingsoftware_observer>
+                </observers>
+            </wishlist_item_save_after>
         </events>
         <resources>
             <marketingsoftware_setup>
@@ -185,7 +193,7 @@
                 <run><model>marketingsoftware/observer::processQueue</model></run>
             </marketingsoftware_process_queue>
             <marketingsoftware_detect_abandoned_carts>
-                <schedule><cron_expr>*/5 * * * *</cron_expr></schedule>
+                <schedule><cron_expr>*/30 * * * *</cron_expr></schedule>
                 <run><model>marketingsoftware/observer::detectAbandonedCarts</model></run>
             </marketingsoftware_detect_abandoned_carts>
         </jobs>

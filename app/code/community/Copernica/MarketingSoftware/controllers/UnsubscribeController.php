@@ -32,34 +32,29 @@ class Copernica_MarketingSoftware_UnsubscribeController extends Mage_Core_Contro
 {
     /**
      * Handles a request to copernica/unsubscribe/process
-     * 
      */
     public function processAction()
     {
-        // Get the post
         $post = $this->getRequest()->getPost();
         
-        // there are parameters and they can be json decoded
-        if (isset($post['json']) && $data = json_decode($post['json'])) 
-        {
-            // Get the linked customer fields
+        if (isset($post['json']) && $data = json_decode($post['json'])) {
             $fields = Mage::helper('marketingsoftware/config')->getLinkedCustomerFields();
         
-            // is the 'newsletter' field given
-            if (isset($data->parameters) && property_exists($data->parameters, $fields['newsletter']) && $data->parameters->$fields['newsletter'] == 'unsubscribed_copernica')
-            {
-                // get the customer id
+            if (isset($data->parameters) && property_exists($data->parameters, $fields['newsletter']) && $data->parameters->$fields['newsletter'] == 'unsubscribed_copernica') {
                 $customerID = $data->profile->fields->customer_id;
+                
                 $customer = Mage::getModel('customer/customer')->load($customerID);
+                
                 $email = $data->profile->fields->$fields['email'];
                
-                // Get the subscriber
                 $subscriber = Mage::getModel('newsletter/subscriber');
+				
 				if ($customer) {
 					$subscriber->loadByCustomer($customer)->getId();
 				} else {
 	                $subscriber->loadByEmail($email)->getId();
 				}
+				
 				$subscriber->setEmail($email);
                 $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED)->save();
                 

@@ -31,61 +31,52 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Entity
 {
     /**
      *  Cached data.
-     *  @var array
+     *  
+     *  @var	array
      */
-    protected $data = array();
-
-    /**
-     *  This cosntructor has to be overriden inside child.
-     *  @param int  Id of magento entity
-     */
-    protected function __construct($itemId)
-    {
-        // override in child class
-    }
+    protected $_data = array();
 
     /**
      *  This is a factory method that will produce proper entities.
-     *  @param  string
-     *  @param  string|int
+     *  
+     *  @todo	Verify whether it is actually needed
+     *  @param  string	$itemName
      *  @return Copernica_MarketingSoftware_Model_Copernica_Entity
      */
-    public function create($itemName, $itemId)
+    public function create($itemName)
     {
-        // construct proper child class
-        $childClass = 'Copernica_MarketingSoftware_Model_Copernica_Entity_'.ucfirst($itemName);
-
-        // check if child class exists
-        if (!class_exists($childClass)) return null;
-
-        // create new child class
-        return new $childClass($itemId);
+    	$modelName = 'marketingsoftware/copernica_entity_'. $itemName;
+    	
+    	if (!class_exists(Mage::getConfig()->getModelClassName($modelName))) {
+    		return null;
+    	}    	
+    	
+    	return Mage::getModel($modelName);    	
     }
 
     /**
-     *  @param string method name
+     * 	@todo	param arguments
+     *  @param	string	$methodName
      */
     public function __call($methodName, $arguments)
     {
-        // check if we want to get something
-        if (substr($methodName, 0, 3) != 'get') return null;
+        if (substr($methodName, 0, 3) != 'get') {
+        	return null;
+        }
 
-        // get the name of the property
         $property = substr($methodName, 3);
-
-        // cause some really old PHP can be used...
         $property{0} = strtolower($property{0});
 
-        // check if property was alredy fetched
-        if (array_key_exists($property, $this->data)) return $this->data[$property];
+        if (array_key_exists($property, $this->_data)) {
+        	return $this->_data[$property];
+        }
 
-        // construct fetch method name
         $fetchMethod = 'fetch'.ucfirst($property);
 
-        // try to fetch data and store it inside registry
-        if (method_exists($this, $fetchMethod) && !is_null($value = $this->$fetchMethod())) return $this->data[$property] = $value;
+        if (method_exists($this, $fetchMethod) && !is_null($value = $this->$fetchMethod())) {
+        	return $this->_data[$property] = $value;
+        }
 
-        // we didn't found anything
         return null;
     }
 }

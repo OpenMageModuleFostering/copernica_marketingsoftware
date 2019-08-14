@@ -35,36 +35,28 @@ chdir('../../../../../../');
  */
 require_once 'app/Mage.php';
 
-// remove current mask
 umask(0);
 
-// if magento is not installed we will just exit this scrtipt
-if (!Mage::isInstalled()) exit;
+if (!Mage::isInstalled()) {
+	exit;
+}
 
-// don't use sessions
 Mage::app('admin')->setUseSessionInUrl(false);
 
-// init config
 Mage::getConfig()->init();
 
-// get config helper
 $config = Mage::helper('marketingsoftware/config');
-
-// set customer progress status to date when a-bomb hit Hiroshima. 
-// we can be quite certain that no magento webshop was set up during that 
-// time.
 $config->setCustomerProgressStatus('1945-08-06 08:15:00');
 $config->setOrderProgressStatus('1945-08-06 08:15:00');
 
-// create sync status object
-$syncStatus = Mage::getModel('marketingsoftware/SyncStatus');
+$syncStatus = Mage::getModel('marketingsoftware/sync_status');
 
-// check if current configuration is telling us to filter stores
-if ($enabledStores = $config->getEnabledStores()) $syncStatus->setStoresFilter($enabledStores);
+if ($enabledStores = $config->getEnabledStores()) {
+	$syncStatus->setStoresFilter($enabledStores);
+}
 
-// The start sync token must be added to the queue
-$queue = Mage::getModel('marketingsoftware/queue')
+$queue = Mage::getModel('marketingsoftware/queue_item')
     ->setObject($syncStatus->toArray())
     ->setAction('start_sync')
-    ->setName('startSync')
+    ->setName('startsync')
     ->save();

@@ -32,78 +32,85 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
     /**
      * Predefine the internal fields
      */
-    protected $name;
-    protected $attributes;
+    protected $_name;
+    protected $_attributes;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Catalog_Model_Product $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  
+     *  @param	Mage_Catalog_Model_Product	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function setOriginal(Mage_Catalog_Model_Product $original)
     {
         if ($attributeSet = Mage::getModel('eav/entity_attribute_set')->load($original->getAttributeSetId())) {
-            $this->name = $attributeSet->getAttributeSetName();
+            $this->_name = $attributeSet->getAttributeSetName();
         }       
         
         $data = array();
+        
         $attributes = $original->getAttributes();
         
         foreach ($attributes as $attribute) {
             if (
-                    $attribute->getIsUserDefined() &&
-                    in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
-                    ($label = $attribute->getAttributeCode()) &&
-                    ($value = $attribute->getFrontend()->getValue($original))
+				$attribute->getIsUserDefined() &&
+                in_array($attribute->getFrontendInput(), array('text', 'select', 'multiline', 'textarea', 'price', 'date', 'multiselect')) &&
+                ($label = $attribute->getAttributeCode()) &&
+                ($value = $attribute->getFrontend()->getValue($original))
             ) {
-                // is this an object which is not serializable      
-                // add the value to the array of data
                 $data[$label] = $value;
             }
         }
-        $this->attributes = $data;
+        
+        $this->_attributes = $data;
          
-
         return $this;
     }
 
     /**
      *  The name of this product
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function name()
     {
-        return $this->name;
+        return $this->_name;
     }
 
     /**
      *  Return an assoc array with attributes.
      *
-     *  @param      Bool $useAttribcode
-     *  @return     array
+     *  @param	Bool	$useAttribcode
+     *  @return	array
      */
     public function attributes($useAttribCode = false)
     {
-        return $this->attributes;
+        return $this->_attributes;
     }
 
     /**
      *  Return a string representation
+     *  
+     *  @return	string
      */
     public function __toString()
     {
         $options = "";
-        foreach ($this->attributes() as $key => $value) $options .= "$key: $value\n";
+        
+        foreach ($this->attributes() as $key => $value) {
+        	$options .= "$key: $value\n";
+        }
+        
         return $options;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
             $this->name(),
             $this->attributes(),
@@ -112,15 +119,17 @@ class Copernica_MarketingSoftware_Model_Abstraction_Attributes implements Serial
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Attributes
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Attributes
      */
     public function unserialize($string)
     {
         list(
-            $this->name,
-            $this->attributes
+            $this->_name,
+            $this->_attributes
         ) = unserialize($string);
+        
         return $this;
     }
 }

@@ -30,12 +30,13 @@
 class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends Copernica_MarketingSoftware_Model_Copernica_Abstract
 {
     /**
-     *  @var Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  @var	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
-    protected $orderItem = false;
+    protected $_orderItem = false;
 
     /**
      *  Return the identifier for this profile
+     *  
      *  @return string
      */
     public function id()
@@ -45,16 +46,19 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
 
     /**
      *  Try to store a quote item
+     *  
      *  @return  Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
      */
     public function setOrderItem($item)
     {
-        $this->orderItem = $item;
+        $this->_orderItem = $item;
+        
         return $this;
     }
 
     /**
      *  Get linked fields
+     *  
      *  @return array
      */
     public function linkedFields()
@@ -64,6 +68,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
 
     /**
      *  Get the required fields
+     *  
      *  @return array
      */
     public function requiredFields()
@@ -73,12 +78,13 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
 
     /**
      *  Retrieve the data for this object
+     *  
      *  @return array
      */
     protected function _data()
     {
-        // Store the orderItem and the product localy
-        $orderItem = $this->orderItem;
+        $orderItem = $this->_orderItem;
+        
         $product =  $orderItem->product();
 
         $data = array(
@@ -94,12 +100,9 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
             'options'       =>  (string)$orderItem->options()
         );
 
-        // get order item
         $order = $orderItem->order();
 
-        // check if we have a valid order object
-        if (is_object($order)) 
-        {
+        if (is_object($order)) {
             $data['order_id'] = $order->id();
             $data['increment_id'] = $order->incrementId();
 
@@ -109,21 +112,17 @@ class Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile extends C
             $data['store_view'] = (string)$storeView;
             $data['url'] = $product->productUrl($storeId);
             $data['image'] = $product->imageUrl($storeId);
+        } else {
+        	$data['order_id'] = null;
         }
-        // even when we don't have order we should provide order_id key, since it's required
-        else $data['order_id'] = null;
 
-        // get price object
         $price = $orderItem->price();
 
-        // check if we have a proper price
-        if (is_object($price)) 
-        {
+        if (is_object($price)) {
             $data['price'] = $price->itemPrice();
             $data['total_price'] = $price->total();
         }
 
-        // format categories
         $data['categories'] = implode("\n", array_map(function($category) {
             return implode(' > ', $category);
         }, $product->categories()));

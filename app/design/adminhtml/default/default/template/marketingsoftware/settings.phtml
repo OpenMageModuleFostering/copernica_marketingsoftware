@@ -13,20 +13,20 @@ $authorizeUrl = 'https://www.copernica.com/en/authorize';
 
 // what we will include in our query string
 $query = array(
+	// client_id
+	'client_id'     =>  $_config->getClientKey(),
+
+	// where we should return after we authorize?
+	'redirect_uri'  =>  $this->getStateUrl(),
+
+	// we do store state inside session
+	'state'         =>  Mage::getSingleton('adminhtml/session')->getState(),		
+		
+	// we want response in form of code
+	'response_type' =>  'code',
+				
     // get access to all resources
-    'scope'         =>  'all',
-
-    // we want response in form of code
-    'response_type' =>  'code',
-
-    // we do store state inside session
-    'state'         =>  Mage::getSingleton('adminhtml/session')->getState(),
-
-    // client_id
-    'client_id'     =>  $_config->getClientKey(),
-
-    // where we should return after we authorize?
-    'redirect_uri'  =>  $this->getStateUrl(),
+    'scope'         =>  'all',      
 );
 
 // parts of the query string
@@ -51,15 +51,15 @@ Event.observe(window, 'load', init, false);
 function init() {  
 
     // when button is clicked we want to save information on server
-    $('cp_save').on('click', function(event) {
+    $('cp_save').observe('click', function(event) {
         $('cp_form').submit();
     });
 
-    $('qs_save').on('click', function(event) {
+    $('qs_save').observe('click', function(event) {
         $('qs_form').submit();
     });
 
-    $('ss_save').on('click', function(event) {
+    $('ss_save').observe('click', function(event) {
         $('ss_form').submit();
     });
 }
@@ -145,6 +145,13 @@ function init() {
                                         Fill Client key.
                                     </p>
                                 <?php } ?> 
+                                
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"></td>
+                            <td class="value'">
+                                <a href="<?php echo $this->getAccessTokenUrl(); ?>">inspect access token</a>
                             </td>
                         </tr>
                         <?php if ($response = $this->getRequest()->getParam('response')) { ?>
@@ -206,7 +213,7 @@ function init() {
                                     Api server
                                 </td>
                                 <td class="value">
-                                    <input type="text" name="qs_api_server" id="qs_api_server" class="input-text" value="<?php $host = $_config->getApiHostname(); if ($host) echo $host; else echo 'https://api.copernica.com;' ?>">
+                                    <input type="text" name="qs_api_server" id="qs_api_server" class="input-text" value="<?php $host = $_config->getApiHostname(); if ($host) echo $host; else echo 'https://api.copernica.com'; ?>">
                                 </td>
                             </tr>
                             <tr>

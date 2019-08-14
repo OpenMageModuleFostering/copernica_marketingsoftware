@@ -31,70 +31,75 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
 {
     /**
      *  To where data will be saved? Posible values are 'copernica' and 'magento'
-     *  @var String
+     *  
+     *  @var	String
      */
-    protected $direction = 'copernica';
+    protected $_direction = 'copernica';
 
     /**
      *  Set the direction for this synchronisation
-     *  @param  String
-     *  @return Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
+     *  
+     *  @param	string	$direction
+     *  @return	Copernica_MarketingSoftware_Model_Copernica_Orderitem_Subprofile
      */
     public function setDirection($direction)
     {
-        $this->direction = $direction;
+        $this->_direction = $direction;
+        
         return $this;
     }
 
     /**
      *  Return the identifier for this profile
+     *  
      *  @return string
      */
     abstract public function id();
 
     /**
      *  Retrieve the data for this object
+     *  
      *  @return array
      */
     abstract protected function _data();
 
     /**
      *  Get linked fields
+     *  
      *  @return array
      */
     abstract public function linkedFields();
 
     /**
      *  Get the required fields
+     *  
      *  @return array
      */
     abstract public function requiredFields();
 
     /**
      *  Check if offset exists in array
-     *  @param  mixed
+     *  
+     *  @param	mixed	$offset
      *  @return boolean
      */
     public function offsetExists($offset)
     {
-        // Get the data from this profile
         $data = $this->toArray();
 
-        // Return the data based on whether it exists
         return isset($data[$offset]);
     }
 
     /**
      *  Get offset in array
-     *  @param  mixed
+     *  
+     *  @param	mixed	$offset
      *  @return mixed
      */
     public function offsetGet($offset)
     {
-        // Get the data from this profile
         $data = $this->toArray();
 
-        // Return the data based on whether it exists
         return isset($data[$offset]) ? $data[$offset] : null;
     }
 
@@ -105,37 +110,35 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
      */
     public function toArray()
     {
-        // Get the data
         $data = $this->_data();
 
-        // this data is meant for magento, return the data as is
-        if ($this->direction == 'magento') return $data;
+        if ($this->_direction == 'magento') {
+        	return $data;
+        }
 
-        // construct an array which contains the required base record
         $returndata = array();
 
-        // check the required fields
-        foreach ($this->requiredFields() as $field) $returndata[$field] = $data[$field];
+        foreach ($this->requiredFields() as $field) {
+        	$returndata[$field] = $data[$field];
+        }
 
-        // iterate over the linked fields
-        foreach ($this->linkedFields() as $magentoField => $copernicaField)
-        {
-            // Not linked to a field, skip
-            if (empty($copernicaField) || !isset($data[$magentoField])) continue;
+        foreach ($this->linkedFields() as $magentoField => $copernicaField) {
+            if (empty($copernicaField) || !isset($data[$magentoField])) {
+            	continue;
+            }
 
-            // Append it to the returned array
             $returndata[$copernicaField] = $data[$magentoField];
         }
 
-        // Return the mapped data
         return $returndata;
     }
 
     /**
      *  Set entry in offset of array
+     *  
      *  @deprecated
-     *  @param  mixed
-     *  @param  mixed
+     *  @param	mixed	$offset
+     *  @param  mixed	$value
      */
     public function offsetSet($offset, $value)
     {
@@ -144,8 +147,9 @@ abstract class Copernica_MarketingSoftware_Model_Copernica_Abstract implements A
 
     /**
      *  Remove entry by offset in array
+     *  
      *  @deprecated
-     *  @param  mixed
+     *  @param	mixed	$offset
      */
     public function offsetUnset($offset)
     {

@@ -32,34 +32,35 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
     /**
      * Predefine the internal fields
      */
-    protected $id;
-    protected $orderId;
-    protected $quantity;
-    protected $price;
-    protected $weight;
-    protected $timestamp;
-    protected $options;
-    protected $product;
+    protected $_id;
+    protected $_orderId;
+    protected $_quantity;
+    protected $_price;
+    protected $_weight;
+    protected $_timestamp;
+    protected $_options;
+    protected $_product;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Sales_Model_Order_Item $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  
+     *  @param	Mage_Sales_Model_Order_Item	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
     public function setOriginal(Mage_Sales_Model_Order_Item $original)
     {
-        $this->id = $original->getId();
-        $this->orderId = $original->getOrder()->getId();
-        $this->quantity = $original->getQtyOrdered();
-        $this->price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
-        $this->weight = $original->getWeight();
-        $this->timestamp = $original->getUpdatedAt();
-        $this->product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
+        $this->_id = $original->getId();
+        $this->_orderId = $original->getOrder()->getId();
+        $this->_quantity = $original->getQtyOrdered();
+        $this->_price = Mage::getModel('marketingsoftware/abstraction_price')->setOriginal($original);
+        $this->_weight = $original->getWeight();
+        $this->_timestamp = $original->getUpdatedAt();
+        $this->_product = Mage::getModel('marketingsoftware/abstraction_product')->setOriginal($original);
         
         $options = Mage::getModel('marketingsoftware/abstraction_order_item_options')->setOriginal($original);
+        
         if ($options->attributes()) {
-            //only return option object if it this order actually has options
-            $this->options = $options;
+            $this->_options = $options;
         } 
         
         return $this;
@@ -67,113 +68,123 @@ class Copernica_MarketingSoftware_Model_Abstraction_Order_Item implements Serial
 
     /**
      *  The id of this order item object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function id()
     {
-        return $this->id;
+        return $this->_id;
     }
 
     /**
      *  Get the order to which this item belongs
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order
      */
     public function order()
     {
-        return Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($this->orderId);
+        return Mage::getModel('marketingsoftware/abstraction_order')->loadOrder($this->_orderId);
     }
 
     /**
      *  The amount of this order item
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function quantity()
     {
-        return $this->quantity;
+        return $this->_quantity;
     }
 
     /**
      *  The price
      *  Note that an object is returned, which may consist of multiple components
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Price
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Price
      */
     public function price()
     {
-        return $this->price;
+        return $this->_price;
     }
 
     /**
      *  The weight
-     *  @return     float
+     *  
+     *  @return	float
      */
     public function weight()
     {
-        return $this->weight;
+        return $this->_weight;
     }
 
     /**
      *  The timestamp at which this order was modified
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function timestamp()
     {
-        return $this->timestamp;
+        return $this->_timestamp;
     }
 
     /**
      *  Get the options of this order item
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item_Options
      */
     public function options()
     {
-        return $this->options;
+        return $this->_options;
     }
 
     /**
      *  Get the product which belongs to this item
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Product
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Product
      */
     public function product()
     {
-        return $this->product;
+        return $this->_product;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
-            $this->id(),
+            $this->_id(),
             is_object($order = $this->order()) ? $order->id() : null,
-            $this->quantity(),
-            $this->price(),
-            $this->weight(),
-            $this->timestamp(),
-            $this->options(),
-            $this->product(),
+            $this->_quantity(),
+            $this->_price(),
+            $this->_weight(),
+            $this->_timestamp(),
+            $this->_options(),
+            $this->_product(),
         ));
     }
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Order_Item
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Order_Item
      */
     public function unserialize($string)
     {
         list(
-            $this->id,
-            $this->orderId,
-            $this->quantity,
-            $this->price,
-            $this->weight,
-            $this->timestamp,
-            $this->options,
-            $this->product
+            $this->_id,
+            $this->_orderId,
+            $this->_quantity,
+            $this->_price,
+            $this->_weight,
+            $this->_timestamp,
+            $this->_options,
+            $this->_product
         ) = unserialize($string);
+        
         return $this;
     }
 }

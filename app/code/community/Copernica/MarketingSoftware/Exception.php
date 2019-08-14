@@ -57,7 +57,7 @@ class Copernica_MarketingSoftware_Exception extends Exception
     // structure of field is invalid
     const FIELD_STRUCT_INVALID = 7;
 
-    // collection does not exists
+    // collection does not exist
     const COLLECTION_NOT_EXISTS = 8;
 
     // invalid collection type

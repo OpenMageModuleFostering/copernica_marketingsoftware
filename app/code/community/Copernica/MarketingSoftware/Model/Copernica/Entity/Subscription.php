@@ -31,43 +31,41 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
 {
     /**
      *  Our subscriber
-     *  @var Mage_Newsletter_Model_Subscriber
+     *  
+     *  @var	Mage_Newsletter_Model_Subscriber
      */
-    private $subscription;
-
-    /**
-     *  Construct subscription model
-     *  @param Mage_Newsletter_Model_Subscriber
-     */
-    public function __construct($subscription)
-    {
-        $this->subscription = $subscription;
-    }
+    protected $_subscriber;
 
     /**
      *  Fetch email address
+     *  
      *  @return string
      */
     public function fetchEmail()
     {
-        return $this->subscription->getEmail();
+        return $this->_subscriber->getEmail();
     }
 
     /**
      *  Fetch status
+     *  
      *  @return string
      */
     public function fetchStatus()
     {
-        switch ($this->subscription->getStatus()) {
+        switch ($this->_subscriber->getStatus()) {
             case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
                 return 'subscribed';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE:
                 return 'not active';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED:
                 return 'unsubscribed';
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
                 return 'unconfirmed';
+                
             default:
                 return 'unknown';
         }       
@@ -75,6 +73,7 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
 
     /**
      *  Fetch group
+     *  
      *  @return string
      */
     public function fetchGroup()
@@ -84,59 +83,70 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Subscription extends Co
 
     /**
      *  Fetch store view
+     *  
      *  @return string
      */
     public function fetchStoreView()
     {
-        // get magento store
-        $store = Mage::getModel('core/store')->load($this->subscription->getStoreId());
-
-        // if we don't have a store we are just about done here
-        if (is_null($store)) return '';  
-
-        // parse store to string
-        return implode(' > ', array(
-            $store->getWebsite()->getName(), 
-            $store->getGroup()->getName(), 
-            $store->getName()
-        ));
+    	$store = Mage::getModel('core/store')->load($this->getStoreId());
+    	
+    	return Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);   
     }
 
     /**
      *  Fetch subscriber customer Id
+     *  
      *  @return string
      */
     public function fetchCustomerId()
     {
-        // get store model
-        $store = Mage::getModel('core/store')->load($this->subscription->getStoreId());
+        $store = Mage::getModel('core/store')->load($this->_subscriber->getStoreId());
+        
+        $customer = Mage::getModel('customer/customer')->setWebsiteId($store->getWebsiteId())->loadByEmail($this->_subscriber->getEmail());
 
-        // get customer that would be associated with given email address
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($store->getWebsiteId())->loadByEmail($this->subscription->getEmail());
+        if ($customer->isObjectNew()) {
+        	$identifier = $this->_subscriber->getEmail();
+        } else {
+        	$identifier = $customer->getId();
+        }
 
-        // construct proper id
-        if ($customer->isObjectNew()) $identifier = $this->subscription->getEmail();
-        else $identifier = $customer->getId();
-
-        // return customer Id
-        return $identifier.'|'.$this->subscription->getStoreId();
+        return $identifier.'|'.$this->_subscriber->getStoreId();
     }
 
     /**
      *  Get subscribtion store Id
+     *  
      *  @return int
      */
     public function getStoreId()
     {
-        return $this->subscription->getStoreId();
+    	if($this->_subscriber->getStoreId()) {
+    		return $this->_subscriber->getStoreId();
+    	} else {
+    		return 0;
+    	}        
     }
 
     /**
-     *  Construct REST entity that will take care of synchronization
-     *  @return Copernica_MarketingSoftware_Model_REST_Subscription
+     *  Get REST subscription entity
+     *  
+     *  @return Copernica_MarketingSoftware_Model_Rest_Subscription
      */
-    public function getREST()
+    public function getRestSubscription()
     {
-        return new Copernica_MarketingSoftware_Model_REST_Subscription($this);
+    	$restSubscription = Mage::getModel('marketingsoftware/rest_subscription');
+    	$restSubscription->setSubscriptionEntity($this);
+    	
+    	return $restSubscription;
+    }
+    
+    /**
+     *  Set subscription entity
+     *
+     *  @param	Mage_Newsletter_Model_Subscriber	$subscriber
+     */
+    public function setSubscription($subscriber)
+    {
+    	$this->_subscriber = $subscriber;
     }
 }

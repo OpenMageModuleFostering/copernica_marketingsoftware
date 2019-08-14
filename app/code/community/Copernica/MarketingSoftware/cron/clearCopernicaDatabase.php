@@ -35,28 +35,22 @@ chdir('../../../../../../');
  */
 require_once 'app/Mage.php';
 
-// remove current mask
 umask(0);
 
-// if magento is not installed we will just exit this scrtipt
-if (!Mage::isInstalled()) exit;
+if (!Mage::isInstalled()) {
+	exit;
+}
 
-// don't use sessions
 Mage::app('admin')->setUseSessionInUrl(false);
 
-// init config
 Mage::getConfig()->init();
 
-// construct new request
-$request = Mage::helper('marketingsoftware/RESTRequest');
+$request = Mage::helper('marketingsoftware/rest_request');
 
-// get current database Id
-$databaseId = Mage::helper('marketingsoftware/Config')->getDatabaseId();
+$databaseId = Mage::helper('marketingsoftware/config')->getDatabaseId();
 
-// get profiles
 $profiles = $request->get('database/'.$databaseId.'/profiles');
 
-// iterate over all profiles and remove each of them
-foreach ($profiles['data'] as $profile) $request->delete('profile/'.$profile['ID']);
-
-
+foreach ($profiles['data'] as $profile) {
+	$request->delete('profile/'.$profile['ID']);
+}

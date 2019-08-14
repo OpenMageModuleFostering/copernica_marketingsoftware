@@ -32,41 +32,54 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
     /**
      * Predefine the internal fields
      */
-    protected $id;
-    protected $email;
-    protected $status;
-    protected $storeview;
-    protected $customerId;
+    protected $_id;
+    protected $_email;
+    protected $_status;
+    
+    /**
+     * The storeview object
+     * 
+     * @var Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     */
+    protected $_storeview;
+    
+    protected $_customerId;
 
     /**
      *  Sets the original model
-     *  @param      Mage_Newsletter_Model_Subscriber $original
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @param	Mage_Newsletter_Model_Subscriber	$original
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function setOriginal(Mage_Newsletter_Model_Subscriber $original)
     {
-        $this->id = $original->getId();
-        $this->email = $original->getEmail();
-        $this->customerId = $original->getCustomerId();
+        $this->_id = $original->getId();
+        $this->_email = $original->getEmail();
+        $this->_customerId = $original->getCustomerId();
         
         $store = Mage::getModel('core/store')->load($original->getStoreId());
-        $this->storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
+        
+        $this->_storeview = Mage::getModel('marketingsoftware/abstraction_storeview')->setOriginal($store);
         
         switch ($original->getStatus()) {
             case Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED:
-                $this->status = 'subscribed';
+                $this->_status = 'subscribed';
                 break;
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE:
-                $this->status = 'not active';
+                $this->_status = 'not active';
                 break;
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED:
-                $this->status = 'unsubscribed';
+                $this->_status = 'unsubscribed';
                 break;
+                
             case Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED:
-                $this->status = 'unconfirmed';
+                $this->_status = 'unconfirmed';
                 break;
+                
             default:
-                $this->status = 'unknown';
+                $this->_status = 'unknown';
                 break;
         }       
                 
@@ -75,41 +88,44 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
 
     /**
      *  Return the identifier for this object
-     *  @return     integer
+     *  
+     *  @return	integer
      */
     public function id()
     {
-        return $this->id;
+        return $this->_id;
     }
 
     /**
      *  Return the e-mail address with which the user is subscribed
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function email()
     {
-        return $this->email;
+        return $this->_email;
     }
 
     /**
      *  Return the status of this subscription
      *  Note that subscribed might be returned but the record is currently removed
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function status()
     {
-        return $this->status;
+        return $this->_status;
     }
 
     /**
      *  The customer may return null
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Customer
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Customer
      */
     public function customer()
     {
-        if ($this->customerId) {
-            // construct an object given the identifier
-            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->customerId);
+        if ($this->_customerId) {
+            return Mage::getModel('marketingsoftware/abstraction_customer')->loadCustomer($this->_customerId);
         } else {
             return null;
         }
@@ -117,20 +133,21 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
 
     /**
      *  Return the storeview for this subscription
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Storeview
+     *  
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Storeview
      */
     public function storeView()
     {
-        return $this->storeview;
+        return $this->_storeview;
     }
 
     /**
      *  Serialize the object
-     *  @return     string
+     *  
+     *  @return	string
      */
     public function serialize()
     {
-        // serialize the data
         return serialize(array(
             $this->id(),
             $this->email(),
@@ -142,18 +159,20 @@ class Copernica_MarketingSoftware_Model_Abstraction_Subscription implements Seri
 
     /**
      *  Unserialize the object
-     *  @param      string
-     *  @return     Copernica_MarketingSoftware_Model_Abstraction_Subscription
+     *  
+     *  @param	string	$string
+     *  @return	Copernica_MarketingSoftware_Model_Abstraction_Subscription
      */
     public function unserialize($string)
     {
         list(
-            $this->id,
-            $this->email,
-            $this->status,
-            $this->storeview,
-            $this->customerId
+            $this->_id,
+            $this->_email,
+            $this->_status,
+            $this->_storeview,
+            $this->_customerId
         ) = unserialize($string);
+        
         return $this;
     }
 }

@@ -51,6 +51,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Settings ext
 
     /**
      *  Returns the state URL
+     *  
      *  @return string
      */
     public function getStateUrl()
@@ -60,6 +61,7 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Settings ext
 
     /**
      *  Returns the queue URL
+     *  
      *  @return string
      */
     public function getQueuePostUrl()
@@ -69,10 +71,21 @@ class Copernica_MarketingSoftware_Block_Adminhtml_Marketingsoftware_Settings ext
 
     /**
      *  Returns the stores URL
+     *  
      *  @return string
      */
     public function getStoresPostUrl()
     {
         return Mage::helper('adminhtml')->getUrl('*/*/stores');
+    }
+
+    /**
+     *  Access token form url
+     *  
+     *  @return string
+     */
+    public function getAccessTokenUrl()
+    {
+        return Mage::helper('adminhtml')->getUrl('*/marketingsoftware_accessToken/index');
     }
 }

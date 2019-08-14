@@ -19,13 +19,20 @@
             Copernica structure
         </h3>
         <ul id="collection_list" class="tabs">
+            <li data-target="default">
+                <a class="tab-item-link">
+                    <span>
+                        Default structure
+                    </span>
+                </a>
+            </li>        
             <li data-target="main">
                 <a class="tab-item-link">
                     <span>
                         Database
                     </span>
                 </a>
-            </li>
+            </li>         
             <li data-target="cartproducts">
                 <a class="tab-item-link">
                     <span>
@@ -43,7 +50,7 @@
             <li data-target="orderproducts">
                 <a class="tab-item-link">
                     <span>
-                        Order products collection
+                        Order items collection
                     </span>
                 </a>
             </li>
@@ -61,13 +68,13 @@
                     </span>
                 </a>
             </li>
-            <li data-target="default">
+            <li data-target="wishlistproducts">
                 <a class="tab-item-link">
                     <span>
-                        Default structure
+                        Wishlist items collection
                     </span>
                 </a>
-            </li>
+            </li>            
         </ul>
     </div>
 
@@ -85,10 +92,10 @@
     // urls in controller and actual usage will be in js file.
     Copernica.ajaxUrls = {
         collection: {
-            fetch: '<?php echo $this->getAjaxCollectionFetchUrl(); ?>',
-            store: '<?php echo $this->getAjaxCollectionStoreUrl(); ?>',
-            default: '<?php echo $this->getAjaxCollectionDefaultUrl(); ?>',
-            validate: '<?php echo $this->getAjaxCollectionValidateUrl(); ?>'
+        	default: '<?php echo $this->getAjaxCollectionDefaultUrl(); ?>',
+            fetch: '<?php echo $this->getAjaxCollectionFetchUrl(); ?>',                        
+            validate: '<?php echo $this->getAjaxCollectionValidateUrl(); ?>',
+            store: '<?php echo $this->getAjaxCollectionStoreUrl(); ?>'
         }
     };
 
