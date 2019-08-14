@@ -32,7 +32,7 @@ $installer->startSetup();
 
 try {
     // get queue table name
-    $queueTableName = $installer->getTable('marketingsoftware/queue');
+    $queueTableName = $installer->getTable('marketingsoftware/queue_item');
     
     /*
      *  Varien DDL does not support enum as a column type. That is why we will

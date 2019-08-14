@@ -48,8 +48,8 @@ class Copernica_MarketingSoftware_Model_Copernica_Entity_Quote extends Copernica
      */
     public function getItems()
     {
-        if (!is_null($this->$_quoteItems)) {
-        	return $this->$_quoteItems;
+        if (!is_null($this->_quoteItems)) {
+        	return $this->_quoteItems;
         }
 
         $quoteItems = array();

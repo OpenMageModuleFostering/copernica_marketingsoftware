@@ -94,9 +94,9 @@ SELECT  'marketingsoftware/linked_order_item_fields', productfields
 FROM    {$installer->getTable('copernica_marketingsoftware')}
 WHERE   marketingsoftware_id = 1;
 
-DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/queue')}`;
+DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/queue_item')}`;
     
-CREATE TABLE `{$installer->getTable('marketingsoftware/queue')}` (
+CREATE TABLE `{$installer->getTable('marketingsoftware/queue_item')}` (
     `id` int(10) unsigned NOT NULL auto_increment,
     `object` text NOT NULL,
     `action` enum('add', 'remove', 'modify', 'full', 'start_sync') NOT NULL DEFAULT 'modify',

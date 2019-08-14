@@ -56,7 +56,7 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
                     try {
                         $validator->validateDatabaseField($post['name'], $copernica, $magento);    
                     } catch (Copernica_MarketingSoftware_Exception $exception) {
-                        array_push($problems, $magento.','.$exception->getMessage());
+                        array_push($problems, '"'.$copernica.'"'.','.$exception->getMessage());
                     }
                 }
             } else {
@@ -72,9 +72,9 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
                     list($magento, $copernica) = explode(',', $field);
 
                     try {
-                        $validator->validateCollectionField($databaseName, $post['name'], $post['type'], $copernica, $magento);
+                        $validator->validateCollectionField($databaseName, $post['name'], $post['type'], $magento, $copernica);
                     } catch (Copernica_MarketingSoftware_Exception $exception) {
-                        array_push($problems, $magento.','.$exception->getMessage());
+                        array_push($problems, '"'.$copernica.'"'.','.$exception->getMessage());
                     }
                 }
             }
@@ -160,9 +160,9 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
                 break;
 
             case 'viewedproducts':  
-                $linkedName = $config->getViewedProductsCollectionName(); 
+                $linkedName = $config->getViewedProductCollectionName(); 
                 $supportedFields = $data->supportedViewedProductFields();
-                $linkedFields = $config->getLinkedViewedProductsFields();
+                $linkedFields = $config->getLinkedViewedProductFields();
                 $label = 'Viewed products collection';
                 break;
 
@@ -435,6 +435,8 @@ class Copernica_MarketingSoftware_Adminhtml_Marketingsoftware_AjaxcollectionCont
             $builder->createCollectionField($databaseName, 'Viewed_Products', 'viewedproducts', $name, $name);   
             $linkedFields[$name] = $name;
         } 
+        
+        $config->setLinkedViewedProductFields($linkedFields);
         
         /*
          *  Wishlist items collection

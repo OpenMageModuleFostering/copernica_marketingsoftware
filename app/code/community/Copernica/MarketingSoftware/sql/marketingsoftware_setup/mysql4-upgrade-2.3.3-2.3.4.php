@@ -49,10 +49,10 @@ try {
         $syncEvent->delete();
 
         // create sync status object
-        $syncStatus = Mage::getModel('marketingsoftware/SyncStatus');
+        $syncStatus = Mage::getModel('marketingsoftware/sync_status');
 
         // create new sync event
-        Mage::getModel('marketingsoftware/queue')
+        Mage::getModel('marketingsoftware/queue_item')
             ->setObject($syncStatus)
             ->setAction('start_sync')
             ->save();

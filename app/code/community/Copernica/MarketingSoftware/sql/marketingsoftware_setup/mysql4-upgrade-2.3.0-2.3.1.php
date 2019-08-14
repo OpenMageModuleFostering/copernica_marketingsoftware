@@ -31,8 +31,8 @@ $installer->startSetup();
 try {
     // create profile cache table
     $installer->run("
-        DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/profileCache')}`;
-        CREATE TABLE `{$installer->getTable('marketingsoftware/profileCache')}` (
+        DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/profile_cache')}`;
+        CREATE TABLE `{$installer->getTable('marketingsoftware/profile_cache')}` (
             `id` int(10) unsigned auto_increment,
             `customer_id` varchar(255) NOT NULL,
             `profile_id` int(10) unsigned NOT NULL,

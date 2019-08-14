@@ -9,7 +9,7 @@ $installer->startSetup();
 // there may be exceptions
 try {
     // get table name for profile cache table
-    $tableName = $this->getTable('marketingsoftware/profileCache');
+    $tableName = $this->getTable('marketingsoftware/profile_cache');
 
     // drop old table (it should be safe to drop such table)
     $installer->run("DROP TABLE IF EXISTS {$tableName}");
@@ -58,7 +58,7 @@ try {
     $installer->getConnection()->createTable($table);
 
     // get queue table name
-    $queueTableName = $installer->getTable('marketingsoftware/queue');
+    $queueTableName = $installer->getTable('marketingsoftware/queue_item');
 
     /*
      *  Varien DDL does not support enum as a column type. That is why we will

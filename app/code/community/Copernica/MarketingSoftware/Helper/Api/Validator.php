@@ -214,7 +214,7 @@ class Copernica_MarketingSoftware_Helper_Api_Validator extends Copernica_Marketi
             if ($field['name'] != $copernicaFieldName) {
             	continue;
             }
-
+            
             $fieldDefinition = Mage::helper('marketingsoftware/data')->getCollectionFieldDefinition($collectionType, $magentoFieldName);     
 
             if ($fieldDefinition['type'] != $field['type']) {

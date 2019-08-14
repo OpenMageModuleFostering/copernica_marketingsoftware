@@ -214,7 +214,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
             ->addFilter('action', 'add')
             ->addFilter('name', $this->getName())
             ->addFilter('object', ($object = $this->getData('object')) ? $object : '')
-            ->addFilter('entity_id', $this->_getEntityId());
+            ->addFilter('entity_id', $this->getEntityId());
 
         foreach ($collection as $event) {
         	$event->delete();
@@ -224,7 +224,7 @@ class Copernica_MarketingSoftware_Model_Queue_Item extends Mage_Core_Model_Abstr
             ->addFilter('action', 'modify')
             ->addFilter('name', $this->getName())
             ->addFilter('object', ($object = $this->getData('object')) ? $object : '')
-            ->addFilter('entity_id', $this->_getEntityId());
+            ->addFilter('entity_id', $this->getEntityId());
 
         foreach ($collection as $event) {
         	$event->delete();

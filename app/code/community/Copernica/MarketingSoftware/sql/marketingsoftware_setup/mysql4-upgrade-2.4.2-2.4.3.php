@@ -33,7 +33,7 @@ try
     $installer->startSetup();
 
     // get table name for abandoned carts table
-    $tableName = $this->getTable('marketingsoftware/abandonedCart');
+    $tableName = $this->getTable('marketingsoftware/abandoned_cart');
 
     // drop old table (it should be safe to drop such table)
     $installer->run("DROP TABLE IF EXISTS {$tableName}");

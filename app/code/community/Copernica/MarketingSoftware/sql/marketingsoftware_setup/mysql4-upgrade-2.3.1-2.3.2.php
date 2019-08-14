@@ -31,8 +31,8 @@ $installer->startSetup();
 try {
     // create error queue table
     $installer->run("
-        DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/errorqueue')}`;
-        CREATE TABLE `{$installer->getTable('marketingsoftware/errorqueue')}` (
+        DROP TABLE IF EXISTS `{$installer->getTable('marketingsoftware/error_queue')}`;
+        CREATE TABLE `{$installer->getTable('marketingsoftware/error_queue')}` (
             `id` int(10) unsigned auto_increment,
             `old_id` int(10) unsigned,
             `object` longtext,

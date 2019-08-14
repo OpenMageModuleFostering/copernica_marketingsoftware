@@ -33,7 +33,7 @@ try
     $installer->startSetup();
 
     // get name of the EventQueue table
-    $queueTableName = $installer->getTable('marketingsoftware/queue');
+    $queueTableName = $installer->getTable('marketingsoftware/queue_item');
 
     /* 
      *  We want to get list of distinct customers that should be synchronized.
@@ -71,7 +71,7 @@ try
     foreach ($result as $row)
     {
         // create new events to sync all unique custoemr that we found on old queue
-        Mage::getModel('marketingsoftware/queue')
+        Mage::getModel('marketingsoftware/queue_item')
             ->setObject(null)
             ->setCustomer($row['customer'])
             ->setEntityId($row['customer'])

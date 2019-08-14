@@ -36,7 +36,7 @@ try
      */
 
     // get table name for profile cache table
-    $tableName = $this->getTable('marketingsoftware/profileCache');
+    $tableName = $this->getTable('marketingsoftware/profile_cache');
 
     // drop old table (it should be safe to drop such table)
     $installer->run("DROP TABLE IF EXISTS {$tableName}");

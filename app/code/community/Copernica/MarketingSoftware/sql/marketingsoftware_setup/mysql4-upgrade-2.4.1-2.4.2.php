@@ -33,7 +33,7 @@ try
     $installer->startSetup();
 
     // get table name for sync profile table
-    $tableName = $this->getTable('marketingsoftware/syncProfile');
+    $tableName = $this->getTable('marketingsoftware/sync_profile');
 
     // drop old table (it should be safe to drop such table)
     $installer->run("DROP TABLE IF EXISTS {$tableName}");

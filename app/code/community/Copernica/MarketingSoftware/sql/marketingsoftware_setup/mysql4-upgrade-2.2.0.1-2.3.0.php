@@ -29,7 +29,7 @@ $installer->startSetup();
 
 try {
     $installer->run("
-        ALTER TABLE {$this->getTable('marketingsoftware/queue')}
+        ALTER TABLE {$this->getTable('marketingsoftware/queue_item')}
         ADD COLUMN customer int NULL DEFAULT NULL;");
 } catch(Exception $e) {}
 
